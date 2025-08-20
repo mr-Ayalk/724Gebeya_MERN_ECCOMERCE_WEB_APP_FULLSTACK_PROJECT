@@ -1,0 +1,377 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  background: #f5f0f0;
+  color: #3e3e3e !important;
+  overflow-x: hidden;
+}
+
+p {
+  font-size: 14px;
+  line-height: 25px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+}
+.btn-org {
+  background: #ff5252 !important;
+  color: #fff !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+  padding: 7px 20px !important;
+}
+.btn-lg {
+  font-size: 18px !important;
+  padding: 10px 20px !important;
+}
+.btn-sm {
+  font-size: 12px !important;
+  padding: 5px 20px !important;
+}
+.btn-org.btn-border {
+  background: none !important;
+  color: #ff5252 !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+  padding: 7px 20px !important;
+  border: 1px solid #ff5252 !important;
+}
+
+.btn-org.btn-border:hover {
+  background: #171717 !important;
+  color: #fff !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+  padding: 7px 20px !important;
+  border: 1px solid #171717 !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+::-webkit-scrollbar-thumb {
+  background: #ff5252;
+}
+::-webkit-scrollbar-track {
+  background: #fff;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #ccc;
+}
+.container {
+  width: 95%;
+  margin: auto;
+}
+
+/* header .top-strip {
+} */
+
+.link:hover {
+  color: #ff5252 !important;
+}
+
+.MuiBadge-badge {
+  background-color: #ff5252 !important;
+}
+nav ul button {
+  text-transform: capitalize !important;
+}
+nav ul button .MuiTouchRipple-root::after {
+  background: rgba(0, 0, 0, 1) !important;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 5px !important;
+}
+.scroll::-webkit-scrollbar-thumb {
+  background: #ccc !important;
+}
+
+.sliderHome {
+  overflow: inherit !important;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 100%;
+  width: 45px;
+  height: 45px;
+  min-width: 45px;
+  box-shadow: 0 1px 3px #0000001f, 0 1px 2px #0000003d !important;
+}
+.swiper-button-prev:after,
+.swiper-button-next:after {
+  font-size: 22px !important;
+  color: #000 !important;
+}
+.smlBtn .swiper-button-prev,
+.smlBtn .swiper-button-next {
+  width: 30px !important;
+  height: 30px !important ;
+  min-width: 30px !important;
+  top: 55% !important;
+}
+.smlBtn .swiper-button-prev:after,
+.smlBtn .swiper-button-next:after {
+  font-size: 18px !important;
+  color: #000 !important;
+}
+.homeCatSlider {
+  overflow: inherit !important;
+}
+.homeCatSlider .swiper-button-prev,
+.homeCatSlider .swiper-button-next {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+}
+.homeCatSlider .swiper-button-prev:after,
+.homeCatSlider .swiper-button-next::after {
+  font-size: 16px !important;
+}
+.homeCatSlider .swiper-button-prev {
+  left: -10px !important;
+}
+.homeCatSlider .swiper-button-next {
+  right: -10px !important;
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background: #ff5252 !important;
+}
+.swiper-button-prev:hover::after,
+.swiper-button-next:hover::after {
+  background: #ff5252 !important;
+  color: #fff;
+}
+.homeCatSlider .item {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.homeCatSlider .item:hover img {
+  transform: scale(1.1);
+}
+.MuiTabs-indicator {
+  background-color: #ff5252 !important;
+}
+.MuiTab-textColorPrimary.Mui-selected {
+  color: #ff5252 !important;
+}
+.productsSlider .swiper-wrapper {
+  padding: 15px;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+
+footer form input::placeholder {
+  font-size: 14px;
+}
+.css-imrjgg-MuiButtonBase-root-MuiCheckbox-root.Mui-checked,
+.css-imrjgg-MuiButtonBase-root-MuiCheckbox-root.MuiCheckbox-indeterminate {
+  color: #ff5252 !important;
+}
+
+.MuiFormControlLabel-label {
+  font-size: 13px !important;
+  color: rgba(0, 0, 0, 0.8);
+}
+.MuiSvgIcon-root {
+  color: #ff5252 !important;
+}
+
+.MuiFormControlLabel-label {
+  font-size: 13px !important;
+  color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.swiper-pagination-bullet {
+  background: #000 !important;
+}
+.swiper-pagination-bullet-active {
+  background: #ff5252 !important;
+}
+
+.homeSliderV2 .swiper-slide-active .info {
+  right: 0px !important;
+  opacity: 1 !important;
+}
+
+.homeSliderV2 .swiper-slide-active .info h4 {
+  right: 0px !important;
+  opacity: 1 !important;
+}
+.homeSliderV2 .swiper-slide-active .info h3 {
+  right: 0px !important;
+  opacity: 1 !important;
+}
+.homeSliderV2 .swiper-slide-active .info h2 {
+  right: 0px !important;
+  opacity: 1 !important;
+}
+.homeSliderV2 .swiper-slide-active .info .btn_ {
+  right: 0px !important;
+  opacity: 1 !important;
+}
+.homeSliderV2 .info h4 {
+  transition-duration: 1.2s;
+}
+.homeSliderV2 .info h2 {
+  transition-duration: 1.5s;
+}
+
+.homeSliderV2 .info h3 {
+  transition-duration: 1.8s;
+}
+.homeSliderV2 .info .btn_ {
+  transition-duration: 2.1s;
+}
+.MuiCheckbox-root {
+  padding: 6px !important;
+}
+
+.ReactCollapse--collapse {
+  transition: height 400ms;
+}
+
+.btn-org:hover {
+  background: #171717 !important;
+}
+
+.itemViewActions button.active svg {
+  color: #ff5252;
+  opacity: 1;
+}
+
+.Mui-selected.MuiPaginationItem-page {
+  background: #ff5252 !important;
+  color: #fff !important;
+}
+.zoomProductSliderThumbs .swiper-wrapper {
+  padding-top: 38px !important;
+}
+.zoomProductSliderThumbs .swiper-button-next {
+  bottom: 0 !important;
+  right: inherit !important;
+  top: inherit !important;
+  width: 100% !important;
+  height: 30px !important;
+  border-radius: 0px !important;
+}
+.zoomProductSliderThumbs .swiper-button-next::after {
+  transform: rotate(90deg);
+}
+.zoomProductSliderThumbs .swiper-button-prev {
+  top: 20px !important;
+  right: inherit !important;
+
+  width: 100% !important;
+  height: 30px !important;
+  border-radius: 0px !important;
+  left: 0 !important;
+}
+.zoomProductSliderThumbs .swiper-button-prev::after {
+  transform: rotate(90deg);
+}
+.productContent .actions button {
+  min-width: 40px !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  height: 30px !important;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+/* .iiz {
+  border-radius: 40px !important;
+  height: 470px !important;
+} */
+.reviewScroll::-webkit-scrollbar {
+  width: 5px !important;
+}
+.reviewScroll::-webkit-scrollbar-thumb {
+  background: #ccc !important;
+}
+.productDetailsModal .MuiDialogContent-root {
+  padding: 0 !important;
+}
+.cartPanel .MuiPaper-root {
+  width: 400px;
+  overflow: hidden;
+}
+
+#size-menu .MuiButtonBase-root {
+  font-size: 12px !important;
+}
+
+.otpBox input {
+  border: 1px solid rgba(0, 0, 0, 0.3) !important;
+  outline: none !important;
+  border-radius: 4px;
+}
+
+.otpBox input:focus {
+  border: 1px solid rgba(0, 0, 0, 0.7) !important;
+}
+
+.otpPage .container {
+  height: 90vh;
+  display: flex;
+}
+#account-menu .MuiPaper-root {
+  width: 200px !important;
+}
+.myAccountTabs li a {
+  position: relative;
+  display: block;
+}
+.myAccountTabs li a::before {
+  content: "";
+  width: 3px;
+  height: 50%;
+  position: absolute;
+  top: 50px;
+  left: 0px;
+  background: #ff5252;
+  transition: all 0.3s ease-in-out;
+  opacity: 0;
+}
+.myAccountTabs li a.active::before {
+  height: 100%;
+  opacity: 1;
+  top: 0px;
+}
+.myAccountTabs li a.active button svg {
+  color: #ff5252 !important;
+  opacity: 1 !important;
+}
