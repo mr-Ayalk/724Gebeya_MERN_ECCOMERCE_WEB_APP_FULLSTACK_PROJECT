@@ -7,12 +7,15 @@ import {
   registerUserController,
   //   resetPassword,
   //   updateUserDetails,
-  //   uploadAvatar,
+  //uploadAvatar,
   verifyEmailController,
+  userAvatarController,
+  removeImageFromCloudinary,
   //   verifyForgotPasswordOtp,
   //   userDetails,
 } from "../controller/user.controller.js";
 import auth from "../middlewares/auth.js";
+import upload from "../middlewares/muller.js";
 // import upload from "../middleware/multer.js";
 
 const userRouter = Router();
@@ -22,7 +25,13 @@ userRouter.post("/verifyEmail", verifyEmailController);
 userRouter.post("/login", loginController);
 
 userRouter.get("/logout", auth, logoutController);
-// userRouter.put("/upload-avatar", auth, upload.single("avatar"), uploadAvatar);
+userRouter.put(
+  "/user-avatar",
+  auth,
+  upload.array("avatar"),
+  userAvatarController
+);
+userRouter.delete("/deleteImage", auth, removeImageFromCloudinary);
 // userRouter.put("/update-user", auth, updateUserDetails);
 // userRouter.put("/forgot-password", forgotPasswordController);
 // userRouter.post("/verify-forgot-password-otp", verifyForgotPasswordOtp);

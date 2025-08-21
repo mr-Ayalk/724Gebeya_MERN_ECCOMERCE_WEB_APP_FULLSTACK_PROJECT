@@ -6,8 +6,17 @@ import sendEmailFun from "../lib/sendEmail.js";
 import VerificationEmail from "../utils/verifyEmailTemplates.js";
 import generatedAccessToken from "../utils/generatedAccessToken.js";
 import generatedRefreshToken from "../utils/generatedRefreshToken.js";
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
+cloudinary.config({
+  cloud_name: process.env.cloudinary_Config_Cloud_Name,
+  api_key: process.env.cloudinary_Config_api_key,
+  api_secret: process.env.cloudinary_Config_api_secret,
+  secure: true,
+});
 
+// registration conttroller
 export async function registerUserController(request, response) {
   try {
     let user;
@@ -94,6 +103,7 @@ export async function registerUserController(request, response) {
   }
 }
 
+// verification of email controller
 export async function verifyEmailController(request, response) {
   try {
     const { email, otp } = request.body;
@@ -140,6 +150,7 @@ export async function verifyEmailController(request, response) {
   }
 }
 
+// login controller
 export async function loginController(request, response) {
   try {
     const { email, password } = request.body;
@@ -199,36 +210,164 @@ export async function loginController(request, response) {
       success: false,
     });
   }
-};
+}
 
+// loout controller
 
-
-
-
-export async function logoutController(request,response){
-try {
-  const userid=request.userId //middleware
-  const cookiesOption={
-    httpOnly:true,
-    secure:true,
-    sameSite:"None"
-  }
-response.clearCookie("accessToken",cookiesOption)
-response.clearCookie("refereshToken",cookiesOption)
-const removeRefereshToken=await UserModel.findByIdAndUpdate(userid,{
-  refresh_token:""
-})
- return response.json({
+export async function logoutController(request, response) {
+  try {
+    const userid = request.userId; //middleware
+    const cookiesOption = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
+    response.clearCookie("accessToken", cookiesOption);
+    response.clearCookie("refereshToken", cookiesOption);
+    const removeRefereshToken = await UserModel.findByIdAndUpdate(userid, {
+      refresh_token: "",
+    });
+    return response.json({
       message: "Logout Successfullly",
       error: false,
       success: true,
     });
-
-} catch (error) {
-   return response.json({
+  } catch (error) {
+    return response.json({
       message: error.message || error,
       error: true,
       success: false,
     });
+  }
 }
+
+// image upload
+
+var imagesArr = [];
+export async function userAvatarController(request, response) {
+  try {
+    imagesArr = [];
+
+    const userId = request.userId;
+    const image = request.files;
+
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) {
+      return response.status(500).json({
+        message: "User not found",
+        error: true,
+        success: false,
+      });
+    }
+    //first remove image from cloudinary
+
+    const imgUrl = user.avatar;
+
+    const urlArr = imgUrl.split("/");
+    const avatar_image = urlArr[urlArr.length - 1];
+    const imageName = avatar_image.split(".")[0];
+    if (imageName) {
+      const res = await cloudinary.uploader.destroy(
+        imageName,
+        (error, result) => {
+          //console.log(error,res)
+        }
+      );
+    }
+
+    // console.log(image);
+
+    for (let i = 0; i < image?.length; i++) {
+      const options = {
+        use_filename: true,
+        unique_filename: false,
+        overwrite: false,
+      };
+      const img = await cloudinary.uploader.upload(
+        image[i].path,
+        options,
+        function (error, result) {
+          // console.log(result);
+          imagesArr.push(result.secure_url);
+          fs.unlinkSync(`uploads/${request.files[i].filename}`);
+          console.log(request.files[i].filename);
+        }
+      );
+    }
+
+    user.avatar = imagesArr[0];
+    await user.save();
+
+    return response.status(200).json({
+      _id: userId,
+      avator: imagesArr[0],
+    });
+  } catch (error) {
+    return response.json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
 }
+
+// export async function removeImageFromCloudinary(request, response) {
+//   const imgUrl = request.query.img;
+
+//   const urlArr = imgUrl.split("/");
+//   const image = urlArr[urlArr.length - 1];
+//   const imageName = image.split(".")[0];
+//   if (imageName) {
+//     const res = await cloudinary.uploader.destroy(
+//       imageName,
+//       (error, result) => {
+//         //console.log(error,res)
+//       }
+//     );
+//     if (res) {
+//       response.status(200).send(res);
+//     }
+//   }
+// }
+
+export async function removeImageFromCloudinary(req, res) {
+  try {
+    const imgUrl = req.query.img;
+    if (!imgUrl) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Image URL required" });
+    }
+
+    // Extract the file name part
+    const fileName = imgUrl.split("/").pop(); // "1755768104262_image1_large_1.jpg"
+    const publicId = fileName.split(".")[0]; // "1755768104262_image1_large_1"
+
+    console.log("Deleting Cloudinary public_id:", publicId);
+
+    const result = await cloudinary.uploader.destroy(publicId);
+
+    if (result.result === "ok") {
+      return res
+        .status(200)
+        .json({ success: true, message: "Image deleted", result });
+    } else {
+      return res
+        .status(404)
+        .json({ success: false, message: "Image not found", result });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: true, message: error.message });
+  }
+}
+
+
+
+export async function updateUserDetails(request,response){
+  try {
+    const usedId=request.userId //auth middleware
+  } catch (error) {
+    
+  }
+}
+
