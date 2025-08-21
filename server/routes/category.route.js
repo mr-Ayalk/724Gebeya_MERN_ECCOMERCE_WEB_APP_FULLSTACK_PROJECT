@@ -3,6 +3,8 @@ import auth from "../middlewares/auth.js";
 import upload from "../middlewares/muller.js";
 import {
   createCategory,
+  getCategory,
+  getCategoryCount,
   uploadImages,
 } from "../controller/category.controller.js";
 
@@ -15,5 +17,6 @@ categoryRouter.post(
 );
 
 categoryRouter.post("/create", auth, createCategory);
-
+categoryRouter.get("/", auth, getCategory);
+categoryRouter.get("/get/count", auth, getCategoryCount);
 export default categoryRouter;
