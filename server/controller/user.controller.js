@@ -4,6 +4,9 @@ import jwt from "jsonwebtoken";
 
 import sendEmailFun from "../lib/sendEmail.js";
 import VerificationEmail from "../utils/verifyEmailTemplates.js";
+import generatedAccessToken from "../utils/generatedAccessToken.js";
+import generatedRefreshToken from "../utils/generatedRefreshToken.js";
+
 
 export async function registerUserController(request, response) {
   try {
@@ -135,4 +138,97 @@ export async function verifyEmailController(request, response) {
       success: false,
     });
   }
+}
+
+export async function loginController(request, response) {
+  try {
+    const { email, password } = request.body;
+
+    const user = await UserModel.findOne({ email: email });
+
+    if (!user) {
+      response.status(400).json({
+        message: "Invalid Credential",
+        error: true,
+        success: false,
+      });
+    }
+    if (user.status !== "Active") {
+      response.status(400).json({
+        message: "Contact to admin",
+        error: true,
+        success: false,
+      });
+    }
+    const checkPassword = await bcryptjs.compare(password, user.password);
+    if (!checkPassword) {
+      response.status(400).json({
+        message: "Invalid Credential",
+        error: true,
+        success: false,
+      });
+    }
+
+    const accesstoken = await generatedAccessToken(user._id);
+    const refreshToken = await generatedRefreshToken(user._id);
+
+    const updateUser = await UserModel.findByIdAndUpdate(user?._id, {
+      last_login_date: new Date(),
+    });
+    const cookiesOption = {
+      httpOnly: true,
+      secure: true,
+      semeSite: "None",
+    };
+    response.cookie("accessToken", accesstoken, cookiesOption);
+    response.cookie("refereshToken", refreshToken, cookiesOption);
+
+    return response.json({
+      message: "Login successfully",
+      error: false,
+      success: true,
+      data: {
+        accesstoken,
+        refreshToken,
+      },
+    });
+  } catch (error) {
+    return response.json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+
+
+
+
+
+export async function logoutController(request,response){
+try {
+  const userid=request.userId //middleware
+  const cookiesOption={
+    httpOnly:true,
+    secure:true,
+    sameSite:"None"
+  }
+response.clearCookie("accessToken",cookiesOption)
+response.clearCookie("refereshToken",cookiesOption)
+const removeRefereshToken=await UserModel.findByIdAndUpdate(userid,{
+  refresh_token:""
+})
+ return response.json({
+      message: "Logout Successfullly",
+      error: false,
+      success: true,
+    });
+
+} catch (error) {
+   return response.json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+}
 }
