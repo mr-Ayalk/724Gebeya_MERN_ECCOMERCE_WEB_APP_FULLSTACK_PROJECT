@@ -8,6 +8,7 @@ import generatedAccessToken from "../utils/generatedAccessToken.js";
 import generatedRefreshToken from "../utils/generatedRefreshToken.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import { error } from "console";
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
@@ -591,6 +592,81 @@ export async function resetpassword(request, response) {
     // });
     return response.json({
       message: "password updated successfully.",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+//refresh token controller
+
+export async function refreshToken(request, response) {
+  try {
+    const refreshToken =
+      request.cookies.refreshToken ||
+      request?.headers?.authorization?.split(" ")[1]; //[Bear token]
+    if (!refreshToken) {
+      return result.status(401).json({
+        message: "Invelid token",
+        error: true,
+        success: false,
+      });
+    }
+    const verifyToken = await jwt.verify(
+      refreshToken,
+      process.env.SECRET_KEY_REFRESH_TOKEN
+    );
+    if (!verifyToken) {
+      return response.status(401).json({
+        message: "token is expired",
+        error: true,
+        success: false,
+      });
+    }
+    const userId = verifyToken?.id;
+    const newAccessToken = await generatedAccessToken(userId);
+    const cookiesOption = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
+    response.cookie("accessToken", newAccessToken, cookiesOption);
+    return response.json({
+      message: "New Access token generated",
+      error: false,
+      success: true,
+      data: {
+        accessToken: newAccessToken,
+      },
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+// get login user details
+
+export async function userDetails(request, response) {
+  try {
+    const userId = request.userId;
+    console.log(userId);
+    const user = await UserModel.findById(userId).select(
+      "-password -refresh_token"
+    );
+
+    return response.json({
+      message: "User details",
+      data: user,
       error: false,
       success: true,
     });
