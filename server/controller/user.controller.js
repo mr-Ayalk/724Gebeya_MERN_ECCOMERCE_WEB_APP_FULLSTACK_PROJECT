@@ -8,6 +8,7 @@ import generatedAccessToken from "../utils/generatedAccessToken.js";
 import generatedRefreshToken from "../utils/generatedRefreshToken.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import { error } from "console";
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
@@ -158,22 +159,29 @@ export async function loginController(request, response) {
     const user = await UserModel.findOne({ email: email });
 
     if (!user) {
-      response.status(400).json({
+      return response.status(400).json({
         message: "Invalid Credential",
         error: true,
         success: false,
       });
     }
     if (user.status !== "Active") {
-      response.status(400).json({
+      return response.status(400).json({
         message: "Contact to admin",
+        error: true,
+        success: false,
+      });
+    }
+    if (user.verify_email !== true) {
+      return response.status(400).json({
+        message: "Your Email is not verify yet.Please verify your email first",
         error: true,
         success: false,
       });
     }
     const checkPassword = await bcryptjs.compare(password, user.password);
     if (!checkPassword) {
-      response.status(400).json({
+      return response.status(400).json({
         message: "Invalid Credential",
         error: true,
         success: false,
@@ -341,6 +349,7 @@ export async function removeImageFromCloudinary(req, res) {
 
     // Extract the file name part
     const fileName = imgUrl.split("/").pop(); // "1755768104262_image1_large_1.jpg"
+
     const publicId = fileName.split(".")[0]; // "1755768104262_image1_large_1"
 
     console.log("Deleting Cloudinary public_id:", publicId);
@@ -360,14 +369,196 @@ export async function removeImageFromCloudinary(req, res) {
     return res.status(500).json({ error: true, message: error.message });
   }
 }
-
-
-
-export async function updateUserDetails(request,response){
+//update user details
+export async function updateUserDetails(request, response) {
   try {
-    const usedId=request.userId //auth middleware
+    const userId = request.userId; //auth middleware
+    const { name, email, mobile, password } = request.body;
+    const userExist = await UserModel.findById(userId);
+
+    if (!userExist)
+      return response.status(400).send("The user cannot be updated!");
+    // Use existing name if not provided
+    const finalName = name || userExist.name;
+    const finalEmail = email || userExist.email;
+    let verifyCode = "";
+    if (finalEmail && email !== userExist.email) {
+      verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+    }
+    let hashPassword = "";
+    if (password) {
+      const salt = await bcryptjs.genSalt(10);
+      hashPassword = await bcryptjs.hash(password, salt);
+    } else {
+      hashPassword = userExist.password;
+    }
+
+    // const updateUser = await UserModel.findByIdAndUpdate(
+    //   userId,
+    //   {
+    //     name: finalName,
+    //     mobile: mobile,
+    //     email: email,
+    //     verify_email: email !== userExist.email ? false : true,
+    //     password: hashPassword,
+    //     otp: verifyCode !== "" ? verifyCode : null,
+    //     otpExpires: verifyCode !== "" ? Date.now() + 600000 : "",
+    //   },
+    //   { new: true }
+    // );
+    const updateUser = await UserModel.findByIdAndUpdate(
+      userId,
+      {
+        name: finalName,
+        mobile: mobile,
+        email: finalEmail,
+        verify_email: email && email !== userExist.email ? false : true,
+        password: hashPassword,
+        otp: verifyCode !== "" ? verifyCode : null,
+        otpExpires: verifyCode !== "" ? Date.now() + 600000 : "",
+      },
+      { new: true }
+    );
+    // if (email !== userExist.email) {
+    //   // Send verification email
+    //   await sendEmailFun({
+    //     sendTo: email,
+    //     subject: "Verify email from 724 Gebeya",
+    //     text: "",
+    //     html: VerificationEmail(finalName, verifyCode),
+    //   });
+    // }
+    if (verifyCode) {
+      await sendEmailFun({
+        sendTo: finalEmail,
+        subject: "Verify email from 724 Gebeya",
+        text: "",
+        html: VerificationEmail(finalName, verifyCode),
+      });
+    }
+    return response.json({
+      message: "User Updated successfully",
+      error: false,
+      success: true,
+      user: updateUser,
+    });
   } catch (error) {
-    
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
   }
 }
 
+//forgot password
+
+export async function forgotPasswordController(request, response) {
+  try {
+    const { email } = request.body;
+    const user = await UserModel.findOne({ email: email });
+
+    if (!user) {
+      return response.status(400).json({
+        message: "Email not available",
+        error: true,
+        success: false,
+      });
+    }
+
+    let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const updateUser = await UserModel.findByIdAndUpdate(
+      user?._id,
+      {
+        otp: verifyCode,
+        otpExpires: Date.now() + 600000,
+      },
+      { new: true }
+    );
+
+    await sendEmailFun({
+      sendTo: email,
+      subject: "Verify email from Eccommerce App",
+      text: "",
+      html: VerificationEmail(user?.name, verifyCode),
+    });
+
+    return response.json({
+      message: "check your email",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+export async function verifyForgotPasswordOtp(request, response) {
+  try {
+    const { email, otp } = request.body;
+    const user = await UserModel.findOne({ email: email });
+
+    if (!user) {
+      return response.status(400).json({
+        message: "Email not available",
+        error: true,
+        success: false,
+      });
+    }
+
+    if (!email || !otp) {
+      return response.status(400).json({
+        message: "Provide required field email,otp.",
+        error: true,
+        success: false,
+      });
+    }
+
+    if (otp !== user.otp) {
+      return response.status(400).json({
+        message: "Invalid OTP",
+        error: true,
+        success: false,
+      });
+    }
+
+    const currentTime = new Date().toISOString();
+
+    if (user.otpExpires < currentTime) {
+      return response.status(400).json({
+        message: "Otp is expired",
+        error: true,
+        success: false,
+      });
+    }
+
+    user.otp = "";
+    user.otpExpires = "";
+    await user.save();
+
+    return response.status(400).json({
+      message: "OTP Verified Successfully",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+// export async function updateUserDetails(request, response) { try { const userId ==request.userId;
+//    //auth middleware
+//    const { name, email, mobile, password } = request.body; const userExist = await UserModel.findById(userId); if (!userExist) return response.status(400).send("The user cannot be updated!");
+//    // Use existing name if not provided
+//    const finalName = name || userExist.name; let verifyCode = ""; if (email !== userExist.email) { verifyCode = Math.floor(100000 + Math.random() * 900000).toString(); } let hashPassword = ""; if (password) { const salt = await bcryptjs.genSalt(10); hashPassword = await bcryptjs.hash(password, salt); } else { hashPassword = userExist.password; } const updateUser = await UserModel.findByIdAndUpdate( userId, { name: finalName, mobile: mobile, email: email, verify_email: email !== userExist.email ? false : true, password: hashPassword, otp: verifyCode !== "" ? verifyCode : null, otpExpires: verifyCode !== "" ? Date.now() + 600000 : "", }, { new: true } ); if (email !== userExist.email) {
+//      // Send verification email
+//      await sendEmailFun({ sendTo: email, subject: "Verify email from 724 Gebeya", text: "", html: VerificationEmail(finalName, verifyCode), }); } return response.json({ message: "User Updated successfully", error: false, success: true, user: updateUser, }); } catch (error) { return response.status(500).json({ message: error.message || error, error: true, success: false, }); } }
