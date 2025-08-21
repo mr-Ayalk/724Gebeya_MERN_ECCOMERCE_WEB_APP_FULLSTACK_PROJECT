@@ -8,7 +8,6 @@ import generatedAccessToken from "../utils/generatedAccessToken.js";
 import generatedRefreshToken from "../utils/generatedRefreshToken.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-import { error } from "console";
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
@@ -543,6 +542,55 @@ export async function verifyForgotPasswordOtp(request, response) {
 
     return response.status(400).json({
       message: "OTP Verified Successfully",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+//reset password
+
+export async function resetpassword(request, response) {
+  try {
+    const { email, newPassword, confirmPassword } = request.body;
+    if (!email || !newPassword || !confirmPassword) {
+      return response.status(400).json({
+        message: "provide required fields email,newPassword,confirmPassword",
+      });
+    }
+
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return response.status(400).json({
+        message: "Email is not available",
+        error: true,
+        success: false,
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return response.status(400).json({
+        message: "newPassword and confirmPassword must be same",
+        error: true,
+        success: false,
+      });
+    }
+    const salt = await bcryptjs.genSalt(10);
+    const hashPassword = await bcryptjs.hash(confirmPassword, salt);
+    user.password = hashPassword;
+    await user.save();
+    // const update = await UserModel.findOneAndUpdate(user._id, {
+    //   password: hashPassword,
+    // });
+    return response.json({
+      message: "password updated successfully.",
       error: false,
       success: true,
     });
