@@ -81,3 +81,56 @@ export async function createCategory(request, response) {
     });
   }
 }
+
+//get all category
+
+export async function getCategory(request, response) {
+  try {
+    const categories = await Categorymodel.find();
+    const categoryMap = {};
+    categories.forEach((cat) => {
+      categoryMap[cat._id] = { ...cat._doc, children: [] };
+    });
+    const rootCategories = [];
+    categories.forEach((cat) => {
+      if (cat.parentId) {
+        categoryMap[cat.parentId].children.push(categoryMap[cat._id]);
+      } else {
+        rootCategories.push(categoryMap[cat._id]);
+      }
+    });
+    return response.status(200).json({
+      error: false,
+      success: true,
+      daata: rootCategories,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+//get category count
+export async function getCategoryCount(request, response) {
+  try {
+    const categoryCount = await Categorymodel.countDocuments({
+      parentId: undefined,
+    });
+    if (!categoryCount) {
+      response.status(500).json({ success: false, error: true });
+    } else {
+      response.send({
+        categoryCount: categoryCount,
+      });
+    }
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
