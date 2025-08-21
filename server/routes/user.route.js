@@ -4,21 +4,18 @@ import {
   logoutController,
   //   refreshToken,
   registerUserController,
-  //   resetPassword,
-  //   updateUserDetails,
-  //uploadAvatar,
   verifyEmailController,
   userAvatarController,
   removeImageFromCloudinary,
   updateUserDetails,
   forgotPasswordController,
   verifyForgotPasswordOtp,
+  resetpassword,
 
   //   userDetails,
 } from "../controller/user.controller.js";
 import auth from "../middlewares/auth.js";
 import upload from "../middlewares/muller.js";
-// import upload from "../middleware/multer.js";
 
 const userRouter = Router();
 
@@ -37,7 +34,7 @@ userRouter.delete("/deleteImage", auth, removeImageFromCloudinary);
 userRouter.put("/:id", auth, updateUserDetails);
 userRouter.post("/forgot-password", forgotPasswordController);
 userRouter.post("/verify-forgot-password-otp", verifyForgotPasswordOtp);
-// userRouter.put("/reset-password", resetPassword);
+userRouter.post("/reset-password", resetpassword);
 // userRouter.post("/refresh-token", refreshToken);
 // userRouter.get("/user-details", auth, userDetails);
 
