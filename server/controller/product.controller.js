@@ -490,3 +490,157 @@ export async function getAllProductsByPrice(request, response) {
     page: 0,
   });
 }
+
+//get all products by rating
+
+export async function getAllProductsByRating(request, response) {
+  try {
+    // let { page, limit, search } = request.body;
+    const page = parseInt(request.query.page) || 1;
+    const perPage = parseInt(request.query.perPage) || 5;
+    const totalPosts = await ProductModel.countDocuments();
+    const totalPages = Math.ceil(totalPosts / perPage);
+
+    if (page > totalPages) {
+      return response.status(404).json({
+        message: "Page not found",
+        success: false,
+        error: true,
+      });
+    }
+    let products = [];
+    if (request.query.catId !== undefined) {
+      products = await ProductModel.find({
+        rating: request.query.rating,
+        catId: request.query.catId,
+        //subCatId: request.query.subCatId,
+        //   thirdsubCatId: request.query.thirdsubCatId,
+      })
+        .populate("category")
+        .skip((page - 1) * perPage)
+        .limit(perPage)
+        .exec();
+    }
+    if (request.query.subCat !== undefined) {
+      products = await ProductModel.find({
+        rating: request.query.rating,
+        //catId: request.query.catId,
+        subCatId: request.query.subCatId,
+        //   thirdsubCatId: request.query.thirdsubCatId,
+      })
+        .populate("category")
+        .skip((page - 1) * perPage)
+        .limit(perPage)
+        .exec();
+    }
+
+    if (request.query.thirdsubCat !== undefined) {
+      products = await ProductModel.find({
+        rating: request.query.rating,
+        //catId: request.query.catId,
+        //   subCatId: request.query.subCatId,
+        thirdsubCatId: request.query.thirdsubCatId,
+      })
+        .populate("category")
+        .skip((page - 1) * perPage)
+        .limit(perPage)
+        .exec();
+    }
+
+    if (!products) {
+      response.status(500).json({
+        error: true,
+        success: false,
+        message: "No Product Available",
+      });
+    }
+    return response.status(200).json({
+      error: false,
+      success: true,
+      products: products,
+      totalPages: totalPages,
+      page: page,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+//get all product count
+
+export async function getProductCount(request, response) {
+  try {
+    const productsCount = await ProductModel.countDocuments();
+    if (!productsCount) {
+      response.status(500).json({
+        error: true,
+        success: false,
+      });
+    }
+    return response.status(200).json({
+      error: false,
+      success: true,
+      productsCount: productsCount,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+
+
+// get all feature products
+
+export async function getAllProductsByThirdLevelCatName(request, response) {
+  try {
+    // let { page, limit, search } = request.body;
+    const page = parseInt(request.query.page) || 1;
+    const perPage = parseInt(request.query.perPage) || 5;
+    const totalPosts = await ProductModel.countDocuments();
+    const totalPages = Math.ceil(totalPosts / perPage);
+
+    if (page > totalPages) {
+      return response.status(404).json({
+        message: "Page not found",
+        success: false,
+        error: true,
+      });
+    }
+
+    const products = await ProductModel.find({
+      thirdsubCat: request.query.thirdsubCat,
+    })
+      .populate("category")
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .exec();
+
+    if (!products) {
+      response.status(500).json({
+        error: true,
+        success: false,
+        message: "No Product Available",
+      });
+    }
+    return response.status(200).json({
+      error: false,
+      success: true,
+      products: products,
+      totalPages: totalPages,
+      page: page,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}

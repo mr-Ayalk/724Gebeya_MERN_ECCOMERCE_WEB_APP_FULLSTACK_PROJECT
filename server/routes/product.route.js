@@ -7,10 +7,12 @@ import {
   getAllProductsByCatId,
   getAllProductsByCatName,
   getAllProductsByPrice,
+  getAllProductsByRating,
   getAllProductsBysubCatId,
   getAllProductsBysubCatName,
   getAllProductsByThirdLevelCatId,
   getAllProductsByThirdLevelCatName,
+  getProductCount,
   uploadImages,
 } from "../controller/product.controller.js";
 
@@ -32,4 +34,6 @@ productRoute.get(
   getAllProductsByThirdLevelCatName
 );
 productRoute.get("/getAllProductByPrice", getAllProductsByPrice);
+productRoute.get("/getAllProductByRating", getAllProductsByRating);
+productRoute.get("/getAllProductCount", getProductCount);
 export default productRoute;
