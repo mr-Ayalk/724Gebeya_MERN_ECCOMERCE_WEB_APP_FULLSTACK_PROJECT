@@ -7,6 +7,7 @@ import helmet from "helmet";
 import connectDB from "./lib/connectDb.js";
 import userRouter from "./routes/user.route.js";
 import categoryRouter from "./routes/category.route.js";
+import productRoute from "./routes/product.route.js";
 dotenv.config();
 const PORT = process.env.PORT || 8000; // <-- FIXED
 
@@ -30,6 +31,9 @@ app.get("/", (req, res) => {
 
 app.use(`/api/user`, userRouter);
 app.use(`/api/category`, categoryRouter);
+
+app.use("/api/product", productRoute);
+
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log("Server is running on port", PORT);

@@ -1,6 +1,5 @@
 import Categorymodel from "../models/catagory.js";
 import { v2 as cloudinary } from "cloudinary";
-import { error } from "console";
 
 import fs from "fs";
 
