@@ -3,6 +3,7 @@ import auth from "../middlewares/auth.js";
 import upload from "../middlewares/muller.js";
 import {
   createProduct,
+  getAllFeaturedProducts,
   getAllProducts,
   getAllProductsByCatId,
   getAllProductsByCatName,
@@ -36,4 +37,5 @@ productRoute.get(
 productRoute.get("/getAllProductByPrice", getAllProductsByPrice);
 productRoute.get("/getAllProductByRating", getAllProductsByRating);
 productRoute.get("/getAllProductCount", getProductCount);
+productRoute.get("/getAllFeaturedProducts",getAllFeaturedProducts)
 export default productRoute;

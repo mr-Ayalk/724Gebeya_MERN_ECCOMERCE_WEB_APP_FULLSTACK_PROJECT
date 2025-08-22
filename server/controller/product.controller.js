@@ -594,33 +594,13 @@ export async function getProductCount(request, response) {
   }
 }
 
-
-
 // get all feature products
 
-export async function getAllProductsByThirdLevelCatName(request, response) {
+export async function getAllFeaturedProducts(request, response) {
   try {
-    // let { page, limit, search } = request.body;
-    const page = parseInt(request.query.page) || 1;
-    const perPage = parseInt(request.query.perPage) || 5;
-    const totalPosts = await ProductModel.countDocuments();
-    const totalPages = Math.ceil(totalPosts / perPage);
-
-    if (page > totalPages) {
-      return response.status(404).json({
-        message: "Page not found",
-        success: false,
-        error: true,
-      });
-    }
-
     const products = await ProductModel.find({
-      thirdsubCat: request.query.thirdsubCat,
-    })
-      .populate("category")
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
+      isFeatured: true,
+    }).populate("category");
 
     if (!products) {
       response.status(500).json({
@@ -633,8 +613,6 @@ export async function getAllProductsByThirdLevelCatName(request, response) {
       error: false,
       success: true,
       products: products,
-      totalPages: totalPages,
-      page: page,
     });
   } catch (error) {
     return response.status(500).json({
