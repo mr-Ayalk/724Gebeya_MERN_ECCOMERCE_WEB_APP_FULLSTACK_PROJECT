@@ -5,6 +5,7 @@ import {
   createProduct,
   getAllProducts,
   getAllProductsByCatId,
+  getAllProductsByCatName,
   uploadImages,
 } from "../controller/product.controller.js";
 
@@ -13,4 +14,5 @@ productRoute.post("/uploadImages", auth, upload.array("images"), uploadImages);
 productRoute.post("/create", auth, createProduct);
 productRoute.get("/getAllProducts", getAllProducts);
 productRoute.get("/getAllProductsByCatId/:id", getAllProductsByCatId);
+productRoute.get("/getAllProductsByCatName", getAllProductsByCatName);
 export default productRoute;

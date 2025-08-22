@@ -147,7 +147,7 @@ export async function getAllProducts(request, response) {
   }
 }
 
-//get all products by product Id
+//get all products byCategory Id
 
 export async function getAllProductsByCatId(request, response) {
   try {
@@ -167,6 +167,55 @@ export async function getAllProductsByCatId(request, response) {
 
     const products = await ProductModel.find({
       catId: request.params.id,
+    })
+      .populate("category")
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .exec();
+
+    if (!products) {
+      response.status(500).json({
+        error: true,
+        success: false,
+        message: "No Product Available",
+      });
+    }
+    return response.status(200).json({
+      error: false,
+      success: true,
+      products: products,
+      totalPages: totalPages,
+      page: page,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+//get all products byCategory name
+
+export async function getAllProductsByCatName(request, response) {
+  try {
+    // let { page, limit, search } = request.body;
+    const page = parseInt(request.query.page) || 1;
+    const perPage = parseInt(request.query.perPage) || 5;
+    const totalPosts = await ProductModel.countDocuments();
+    const totalPages = Math.ceil(totalPosts / perPage);
+
+    if (page > totalPages) {
+      return response.status(404).json({
+        message: "Page not found",
+        success: false,
+        error: true,
+      });
+    }
+
+    const products = await ProductModel.find({
+      catName: request.query.catName,
     })
       .populate("category")
       .skip((page - 1) * perPage)
