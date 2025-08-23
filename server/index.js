@@ -8,6 +8,7 @@ import connectDB from "./lib/connectDb.js";
 import userRouter from "./routes/user.route.js";
 import categoryRouter from "./routes/category.route.js";
 import productRoute from "./routes/product.route.js";
+import cartRoute from "./routes/cart.route.js";
 dotenv.config();
 const PORT = process.env.PORT || 8000; // <-- FIXED
 
@@ -33,7 +34,7 @@ app.use(`/api/user`, userRouter);
 app.use(`/api/category`, categoryRouter);
 
 app.use("/api/product", productRoute);
-
+app.use("/api/cart", cartRoute);
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log("Server is running on port", PORT);
