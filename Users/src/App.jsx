@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header/Header";
@@ -38,6 +38,15 @@ function App() {
   const toggleCartPanel = (newOpen) => () => {
     setOpenCartPanel(newOpen);
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("accesstoken");
+    if (token !== undefined && token !== null && token !== "") {
+      setIsLogin(true);
+    } else {
+      setIsLogin(false);
+    }
+  });
 
   const handleCloseProductDetailsModel = () => {
     setOpenProductDetailsModel(false);

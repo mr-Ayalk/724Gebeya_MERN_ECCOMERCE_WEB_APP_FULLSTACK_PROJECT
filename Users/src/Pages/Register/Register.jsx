@@ -97,7 +97,7 @@ function Register() {
       setIsLoading(false);
     }
 
-    console.log(res);
+    // console.log(res);
   };
 
   return (
