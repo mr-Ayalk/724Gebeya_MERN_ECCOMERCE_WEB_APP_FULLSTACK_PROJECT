@@ -33,7 +33,8 @@ function App() {
   const [maxWidth, setMaxWidth] = useState("md");
   const [fullWidth, setFullWidth] = useState(true);
   const [openCartPanel, setOpenCartPanel] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_URL;
   const toggleCartPanel = (newOpen) => () => {
     setOpenCartPanel(newOpen);
   };
