@@ -13,19 +13,43 @@ function Verify() {
 
   const history = useNavigate();
   const context = useContext(MyContext);
+  const actionType = localStorage.getItem("actionType");
   const verifyOTP = (e) => {
     e.preventDefault();
-    postData("/api/user/verifyEmail", {
-      email: localStorage.getItem("userEmail"),
-      otp: otp,
-    }).then((res) => {
-      // console.log(res);
-      context.openAlertBox("success", res?.message);
-      localStorage.removeItem("userEmail");
-      if (res?.error === false) {
-        history("/login");
-      }
-    });
+
+    // alert(actionType)
+
+    if (actionType !== "forgot-password") {
+      postData("/api/user/verifyEmail", {
+        email: localStorage.getItem("userEmail"),
+        otp: otp,
+      }).then((res) => {
+        // console.log(res);
+
+        if (res?.error === false) {
+          context.openAlertBox("success", res?.message);
+          
+          history("/login");
+        } else {
+          context.openAlertBox("error", res?.message);
+        }
+      });
+    } else {
+      postData("/api/user/verify-forgot-password-otp", {
+        email: localStorage.getItem("userEmail"),
+        otp: otp,
+      }).then((res) => {
+        // console.log(res);
+
+        if (res?.error === false) {
+          context.openAlertBox("success", res?.message);
+         
+          history("/forgot-password");
+        } else {
+          context.openAlertBox("error", res?.message);
+        }
+      });
+    }
   };
   return (
     <div>
@@ -45,7 +69,7 @@ function Verify() {
             <p className="text-center mt-0 mb-4">
               OTP send to{" "}
               <span className="text-primary font-bold">
-                {localStorage.getItem("useEmail")}
+                {localStorage.getItem("userEmail")}
               </span>
             </p>
             <form action="" onSubmit={verifyOTP}>

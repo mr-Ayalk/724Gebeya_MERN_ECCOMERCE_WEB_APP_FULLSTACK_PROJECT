@@ -119,7 +119,7 @@ function Header() {
                   </Link>{" "}
                   | &nbsp;
                   <Link
-                    to="/login"
+                    to="/register"
                     className="link transition text-15px font-[500] "
                   >
                     Register
@@ -136,10 +136,10 @@ function Header() {
                     </div>
                     <div className="info flex flex-col">
                       <h4 className="leading-3 text-[14px] text-[rgba(0,0,0,0.7)]  mb-0 capitalize text-left justify-start font-[500]">
-                        Ayalk Teketel
+                        {context?.userData?.name}
                       </h4>
                       <span className="text-[13px]  font-[400] lowercase text-left justify-center text-[rgba(0,0,0,0.7)]">
-                        ayalk@gmail.com
+                        {context?.userData?.email}
                       </span>
                     </div>
                   </Button>

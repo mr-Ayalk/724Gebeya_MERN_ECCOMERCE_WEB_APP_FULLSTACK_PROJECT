@@ -26,6 +26,7 @@ import Checkout from "./Pages/Checkout/Checkout";
 import MyAccount from "./Pages/MyAccount/MyAccount";
 import MyList from "./Pages/MyList/MyList";
 import Orders from "./Pages/Orders/Orders";
+import { fetchDataFromApi } from "./utils/api";
 // import Drawer from "@mui/materia/Drawer";
 const MyContext = createContext();
 function App() {
@@ -34,6 +35,7 @@ function App() {
   const [fullWidth, setFullWidth] = useState(true);
   const [openCartPanel, setOpenCartPanel] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
+  const [userData, setUserData] = useState(null);
   const apiUrl = import.meta.env.VITE_API_URL;
   const toggleCartPanel = (newOpen) => () => {
     setOpenCartPanel(newOpen);
@@ -43,10 +45,17 @@ function App() {
     const token = localStorage.getItem("accesstoken");
     if (token !== undefined && token !== null && token !== "") {
       setIsLogin(true);
+
+      //  fetchDataFromApi(`/api/user/user-details?token=${token}`)
+
+      fetchDataFromApi("/api/user/user-details").then((res) => {
+        console.log(res);
+        setUserData(res.data);
+      });
     } else {
       setIsLogin(false);
     }
-  });
+  }, [isLogin]);
 
   const handleCloseProductDetailsModel = () => {
     setOpenProductDetailsModel(false);
@@ -67,6 +76,8 @@ function App() {
     openAlertBox,
     isLogin,
     setIsLogin,
+    setUserData,
+    userData,
   };
   return (
     <>

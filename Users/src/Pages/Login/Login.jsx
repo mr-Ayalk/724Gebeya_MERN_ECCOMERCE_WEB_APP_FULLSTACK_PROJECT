@@ -26,8 +26,28 @@ function Login() {
     });
   };
   const forgotPassword = () => {
-    context.openAlertBox("success", "OTP Send");
-    history("/verify");
+    if (formFields.email === "") {
+      context.openAlertBox("error", "Please enter email id");
+      return false;
+    } else {
+      context.openAlertBox("success", `OTP Send to ${formFields.email}`);
+      localStorage.setItem("userEmail", formFields.email);
+      localStorage.setItem("actionType", "forgot-password");
+
+      postData("/api/user/forgot-password", {
+        email: formFields.email,
+      }).then((res) => {
+        // console.log(res);
+
+        if (res?.error === false) {
+          context.openAlertBox("success", res?.message);
+
+          history("/verify");
+        } else {
+          context.openAlertBox("error", res?.message);
+        }
+      });
+    }
   };
   const validateValue = Object.values(formFields).every((el) => el);
   const handleSubmit = async (e) => {
@@ -35,10 +55,6 @@ function Login() {
 
     setIsLoading(true);
 
-    if (formFields.name === "") {
-      context.openAlertBox("error", "Please enter full name");
-      return;
-    }
     if (formFields.email === "") {
       context.openAlertBox("error", "Please enter email");
       return;
