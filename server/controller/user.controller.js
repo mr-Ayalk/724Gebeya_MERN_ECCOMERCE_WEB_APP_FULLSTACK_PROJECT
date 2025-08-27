@@ -479,7 +479,7 @@ export async function forgotPasswordController(request, response) {
 
     await sendEmailFun({
       sendTo: email,
-      subject: "Verify email from Eccommerce App",
+      subject: "Verify OTP from Eccommerce App",
       text: "",
       html: VerificationEmail(user?.name, verifyCode),
     });
@@ -541,7 +541,7 @@ export async function verifyForgotPasswordOtp(request, response) {
     user.otpExpires = "";
     await user.save();
 
-    return response.status(400).json({
+    return response.status(200).json({
       message: "OTP Verified Successfully",
       error: false,
       success: true,

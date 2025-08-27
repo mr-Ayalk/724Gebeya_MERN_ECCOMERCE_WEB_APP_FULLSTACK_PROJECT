@@ -30,7 +30,6 @@ const apiUrl = import.meta.env.VITE_API_URL;
 //   }
 // };
 
-
 export const postData = async (url, formData) => {
   try {
     const response = await axios.post(apiUrl + url, formData, {
@@ -40,10 +39,12 @@ export const postData = async (url, formData) => {
     });
     return response.data;
   } catch (error) {
-    const message = error.response?.data?.message || "Something went wrong";
-    throw new Error(message);
+    return {
+      error: true,
+      message: error.response?.data?.message || "Something went wrong",
+    };
   }
-};
+}; 
 
 export const fetchDataFromApi = async (url) => {
   try {
