@@ -372,7 +372,8 @@ export async function removeImageFromCloudinary(req, res) {
 //update user details
 export async function updateUserDetails(request, response) {
   try {
-    const userId = request.userId; //auth middleware
+    // const userId = request.userId; //auth middleware
+    const userId = request.params.id;
     const { name, email, mobile, password } = request.body;
     const userExist = await UserModel.findById(userId);
 
@@ -393,19 +394,6 @@ export async function updateUserDetails(request, response) {
       hashPassword = userExist.password;
     }
 
-    // const updateUser = await UserModel.findByIdAndUpdate(
-    //   userId,
-    //   {
-    //     name: finalName,
-    //     mobile: mobile,
-    //     email: email,
-    //     verify_email: email !== userExist.email ? false : true,
-    //     password: hashPassword,
-    //     otp: verifyCode !== "" ? verifyCode : null,
-    //     otpExpires: verifyCode !== "" ? Date.now() + 600000 : "",
-    //   },
-    //   { new: true }
-    // );
     const updateUser = await UserModel.findByIdAndUpdate(
       userId,
       {
@@ -419,15 +407,7 @@ export async function updateUserDetails(request, response) {
       },
       { new: true }
     );
-    // if (email !== userExist.email) {
-    //   // Send verification email
-    //   await sendEmailFun({
-    //     sendTo: email,
-    //     subject: "Verify email from 724 Gebeya",
-    //     text: "",
-    //     html: VerificationEmail(finalName, verifyCode),
-    //   });
-    // }
+
     if (verifyCode) {
       await sendEmailFun({
         sendTo: finalEmail,
@@ -440,7 +420,13 @@ export async function updateUserDetails(request, response) {
       message: "User Updated successfully",
       error: false,
       success: true,
-      user: updateUser,
+      user: {
+        name: updateUser?.name,
+        _id: updateUser?._id,
+        email: updateUser?.email,
+        mobile: updateUser?.mobile,
+        avatar: updateUser?.avatar,
+      },
     });
   } catch (error) {
     return response.status(500).json({
