@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo-light-transparent.png";
 import Search from "../Search/Search";
 import Button from "@mui/material/Button";
@@ -38,7 +38,7 @@ function Header() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+const history=useNavigate()
   // const logout = () => {
   //   setAnchorEl(null);
   //   fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accesstoken')}`, { withCredentials: true }).then(
@@ -54,9 +54,13 @@ function Header() {
       `/api/user/logout?token=${localStorage.getItem("accesstoken")}`,
       { withCredentials: true }
     ).then((res) => {
-      localStorage.removeItem("accesstoken");
-      localStorage.removeItem("refreshToken");
-      context.setIsLogin(false);
+      if (res?.error === false) {
+        localStorage.removeItem("accesstoken");
+        localStorage.removeItem("refreshToken");
+        context.setIsLogin(false);
+        history("/");
+      }
+
       console.log(res);
     });
   };
