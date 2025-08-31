@@ -66,19 +66,6 @@ function Register() {
       return;
     }
 
-    // try {
-    //   const res = await postData("/api/user/register", formFields);
-    //   setIsLoading(false);
-    //   setFormFields({
-    //     name: "",
-    //     email: "",
-    //     password: "",
-    //   });
-    //   context.openAlertBox("success", "User Registered Successfully");
-    //   console.log(res);
-    // } catch (error) {
-    //   context.openAlertBox("error", error.message);
-    // }
     setIsLoading(true); // Show loading before starting request
 
     const res = await postData("/api/user/register", formFields);
@@ -91,7 +78,7 @@ function Register() {
         email: "",
         password: "",
       });
-      history("/verify");
+      history("/verify-account");
     } else {
       context.openAlertBox("error", res?.message);
       setIsLoading(false);

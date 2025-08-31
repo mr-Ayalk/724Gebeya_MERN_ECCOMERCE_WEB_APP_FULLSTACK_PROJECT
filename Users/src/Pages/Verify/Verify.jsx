@@ -10,10 +10,10 @@ function Verify() {
   const handleOtpChange = (value) => {
     setOtp(value);
   };
-
+const actionType = localStorage.getItem("actionType");
   const history = useNavigate();
   const context = useContext(MyContext);
-  const actionType = localStorage.getItem("actionType");
+  //
   const verifyOTP = (e) => {
     e.preventDefault();
 
