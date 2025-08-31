@@ -545,7 +545,7 @@ export async function verifyForgotPasswordOtp(request, response) {
 
 export async function resetpassword(request, response) {
   try {
-    const { email, newPassword, confirmPassword } = request.body;
+    const { email, oldPassword, newPassword, confirmPassword } = request.body;
     if (!email || !newPassword || !confirmPassword) {
       return response.status(400).json({
         message: "provide required fields email,newPassword,confirmPassword",
@@ -562,6 +562,14 @@ export async function resetpassword(request, response) {
       });
     }
 
+    const checkPassword = await bcryptjs.compare(oldPassword, user.password);
+    if (!checkPassword) {
+      return response.status(400).json({
+        message: "your old password is wrong",
+        error: true,
+        success: false,
+      });
+    }
     if (newPassword !== confirmPassword) {
       return response.status(400).json({
         message: "newPassword and confirmPassword must be same",
