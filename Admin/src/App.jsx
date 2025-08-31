@@ -10,13 +10,11 @@ import Products from "./Components/Products/Products";
 import AddProduct from "./Components/Products/AddProduct";
 import Dialog from "@mui/material/Dialog";
 
-
-
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-
+import toast, { Toaster } from "react-hot-toast";
 import Slide from "@mui/material/Slide";
 import { IoMdClose } from "react-icons/io";
 import HomeSliderBanners from "./Pages/HomeSliderBanners";
@@ -38,11 +36,20 @@ const MyContext = createContext();
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLogin, setIslogin] = useState(false);
+
   const [isOpenFullScreenPanel, setIsOpenFullScreenPanel] = useState({
     open: false,
     model: "",
   });
 
+  const openAlertBox = (status, msg) => {
+    if (status === "success") {
+      toast.success(msg);
+    }
+    if (status === "error") {
+      toast.error(msg);
+    }
+  };
   const router = createBrowserRouter([
     {
       path: "/",
@@ -89,7 +96,8 @@ function App() {
       path: "/verify-account",
       exact: true,
       element: <VerifyAccount />,
-    }, {
+    },
+    {
       path: "/change-password",
       exact: true,
       element: <ChangePassword />,
@@ -261,6 +269,7 @@ function App() {
     setIsSidebarOpen,
     isLogin,
     setIslogin,
+    openAlertBox,
     isOpenFullScreenPanel,
     setIsOpenFullScreenPanel,
   };
@@ -269,7 +278,7 @@ function App() {
     <>
       <MyContext.Provider value={values}>
         <RouterProvider router={router} />
-
+        <Toaster />
         <Dialog
           fullScreen
           open={isOpenFullScreenPanel.open}

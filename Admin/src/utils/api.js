@@ -20,14 +20,13 @@ export const postData = async (url, formData) => {
 
 export const fetchDataFromApi = async (url) => {
   try {
-   
     // const { data } = await axios.get(apiUrl + url, {
     //   headers: {
     //     Authorization: `Bearer ${localStorage.getItem("accesstoken")}`, //include your API key in the Autorization header
     //     'Content-Type':'application/json',//Adjuc=st the content type as needed
     const { data } = await axios.get(apiUrl + url, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`, //include your API key in the Autorization header
+        Authorization: `Bearer ${localStorage.getItem("accesstoken")}`, //include your API key in the Autorization header
         "Content-Type": "application/json", //Adjuc=st the content type as needed
       },
     });
@@ -35,5 +34,60 @@ export const fetchDataFromApi = async (url) => {
   } catch (error) {
     console.log(error);
     throw error;
+  }
+};
+
+export const uploadImage = async (url, updateData) => {
+  const params = {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accesstoken")}`, //include your API key in the Autorization header
+      "Content-Type": "application/json", //Adjuc=st the content type as needed
+    },
+  };
+  var response;
+  await axios.put(apiUrl + url, updateData, params).then((res) => {
+    // console.log(res);
+    response = res;
+  });
+  return response;
+};
+
+// export const editData = async (url, updatedData) => {
+//   try {
+//     const params = {
+//       headers: {
+//         Authorization: `Bearer ${localStorage.getItem("accesstoken")}`,
+//         "Content-Type": "multipart/form-data",
+//       },
+//     };
+
+//     const response = await axios.put(apiUrl + url, updatedData, params);
+
+//     return response.data; // return only data (commonly used)
+//   } catch (error) {
+//     console.error("Error uploading image:", error);
+
+//     return {
+//       success: false,
+//       message: error.response?.data?.message || "Image upload failed",
+//     };
+//   }
+// };
+export const editData = async (url, updatedData) => {
+  try {
+    const params = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accesstoken")}`,
+        "Content-Type": "application/json",
+      },
+    };
+
+    const response = await axios.put(apiUrl + url, updatedData, params);
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || "Update failed",
+    };
   }
 };

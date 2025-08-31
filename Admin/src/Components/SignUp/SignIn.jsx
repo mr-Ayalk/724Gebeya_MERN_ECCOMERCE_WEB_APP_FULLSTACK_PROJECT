@@ -7,10 +7,35 @@ import { FaEyeSlash, FaRegEye, FaRegUser } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { BsFacebook } from "react-icons/bs";
 import { Checkbox } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { CircularProgress } from "@mui/material";
+import { useContext } from "react";
+import { MyContext } from "../../App";
+import { postData } from "../../utils/api";
+
 const SignUp = () => {
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [loadingFacebook, setLoadingFacebook] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const context = useContext(MyContext);
+  const history = useNavigate();
 
+  const [formFields, setFormFields] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const validateValue = Object.values(formFields).every((el) => el);
+
+  const onChangeInput = (e) => {
+    const { name, value } = e.target;
+    setFormFields(() => {
+      return {
+        ...formFields,
+        [name]: value,
+      };
+    });
+  };
   const [isPasswordShow, setIsPasswordShow] = useState(false);
   function handleClickFacebook() {
     setLoadingFacebook(true);
@@ -18,6 +43,46 @@ const SignUp = () => {
   function handleClickGoogle() {
     setLoadingGoogle(true);
   }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setIsLoading(true);
+
+    if (formFields.name === "") {
+      context.openAlertBox("error", "Please enter full name");
+      return;
+    }
+    if (formFields.email === "") {
+      context.openAlertBox("error", "Please enter email");
+      return;
+    }
+    if (formFields.password === "") {
+      context.openAlertBox("error", "Please enter password");
+      return;
+    }
+
+    setIsLoading(true); // Show loading before starting request
+
+    const res = await postData("/api/user/register", formFields);
+    if (res?.error !== true) {
+      context.openAlertBox("success", res?.message);
+      localStorage.setItem("userEmail", formFields.email);
+      setIsLoading(false);
+      setFormFields({
+        name: "",
+        email: "",
+        password: "",
+      });
+      history("/verify-account");
+    } else {
+      context.openAlertBox("error", res?.message);
+      setIsLoading(false);
+    }
+
+    // console.log(res);
+  };
+
   return (
     <section className="!bg-white ">
       <header className="w-full fixed top-0 left-0 px-4 py-3 flex items-center justify-between z-50">
@@ -45,7 +110,6 @@ const SignUp = () => {
           </NavLink>
         </div>
       </header>
-  
 
       <div className="loginBox card w-[45%] h-auto pb-20  mx-auto mt-20 relative z-50 border-2 border-gray-200 rounded-3xl shadow-md">
         <div className="text-center mx-auto">
@@ -97,11 +161,16 @@ const SignUp = () => {
           <span className="flex items-center w-[100px] h-[1px] bg-[rgba(0,0,0,0.2)]"></span>
         </div>
         <br />
-        <form action="" className="w-full px-8 mt-3">
+        <form className="w-full px-8 mt-3" onSubmit={handleSubmit}>
           <div className="form-group mb-4 w-full">
             <h4 className="text-[14px] font-[500] mb-1">Full Name</h4>
             <input
               type="text"
+              id="name"
+              name="name"
+              onChange={onChangeInput}
+              value={formFields.name}
+              disabled={isLoading}
               className="w-full h-[50px] border-2 border-[rgba(0,0,0,0.1)] rounded-md focus:border-[rgba(0,0,0,0.7)] focus:outline-none px-3"
             />
           </div>
@@ -109,6 +178,11 @@ const SignUp = () => {
             <h4 className="text-[14px] font-[500] mb-1">Email</h4>
             <input
               type="email"
+              id="email"
+              name="email"
+              onChange={onChangeInput}
+              value={formFields.email}
+              disabled={isLoading}
               className="w-full h-[50px] border-2 border-[rgba(0,0,0,0.1)] rounded-md focus:border-[rgba(0,0,0,0.7)] focus:outline-none px-3"
             />
           </div>
@@ -116,14 +190,20 @@ const SignUp = () => {
             <h4 className="text-[14px] font-[500] mb-1">Password</h4>
             <div className="relative w-full">
               <input
-                type={isPasswordShow === false ? "password" : "text"}
+                type={isPasswordShow ? "text" : "password"}
+                id="password"
+                name="password"
+                onChange={onChangeInput}
+                value={formFields.password}
+                disabled={isLoading}
                 className="w-full h-[50px] border-2 border-[rgba(0,0,0,0.1)] rounded-md focus:border-[rgba(0,0,0,0.7)] focus:outline-none px-3"
               />
               <Button
+                type="button" // ✅ prevents accidental submit
                 className="!absolute top-[7px] right-[10px] z-50 !rounded-full !w-[35px] !h-[35px] !min-w-[35px] !text-gray-600"
                 onClick={() => setIsPasswordShow(!isPasswordShow)}
               >
-                {isPasswordShow === true ? (
+                {isPasswordShow ? (
                   <FaRegEye className="text-[18px]" />
                 ) : (
                   <FaEyeSlash className="text-[18px]" />
@@ -144,7 +224,19 @@ const SignUp = () => {
               Already have an Account
             </Link>
           </div>
-          <Button className="btn-blue btn-lg w-full ">Sign Up</Button>
+          <div className="flex items-center w-full mt-3 mb-3">
+            <Button
+              type="submit"
+              disabled={!validateValue || isLoading}
+              className="btn-blue btn-lg w-full flex gap-3 hover:!btn-org/75"
+            >
+              {isLoading ? (
+                <CircularProgress color="inherit" size={24} />
+              ) : (
+                "Sign Up"
+              )}
+            </Button>
+          </div>
         </form>
       </div>
     </section>
