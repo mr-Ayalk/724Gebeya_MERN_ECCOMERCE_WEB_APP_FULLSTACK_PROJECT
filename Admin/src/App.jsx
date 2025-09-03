@@ -28,6 +28,10 @@ import Orders from "./Pages/Orders/Orders";
 import ForgotPassword from "./Components/ForgotPassword/ForgotPassword";
 import VerifyAccount from "./Components/VerifyAccount/VerifyAccount";
 import ChangePassword from "./Components/ChangePassword";
+import { useEffect } from "react";
+import { fetchDataFromApi } from "./utils/api";
+import Profile from "./Pages/Profile/Profile";
+import AddAddress from "./Pages/Address/AddAddress";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -36,6 +40,27 @@ const MyContext = createContext();
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLogin, setIslogin] = useState(false);
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    const token = localStorage.getItem("accesstoken");
+    if (token !== undefined && token !== null && token !== "") {
+      setIslogin(true);
+      fetchDataFromApi("/api/user/user-details").then((res) => {
+        setUserData(res.data);
+
+        if (res?.response?.data?.error === true) {
+          if (res?.response?.data?.message === "You have not login") {
+            localStorage.removeItem("accesstoken"); // ✅ fixed token key
+            localStorage.removeItem("refreshToken");
+
+            openAlertBox("error", "Your session is closed please login again");
+            setIslogin(false);
+            window.location.href = "/login";
+          }
+        }
+      });
+    }
+  }, [isLogin]);
 
   const [isOpenFullScreenPanel, setIsOpenFullScreenPanel] = useState({
     open: false,
@@ -262,6 +287,33 @@ function App() {
         // </MyContext.Provider>
       ),
     },
+    {
+      path: "/profile",
+      exact: true,
+      element: (
+        // <MyContext.Provider value={{ isSidebarOpen, setIsSidebarOpen }}>
+        <section className="main">
+          <Header />
+          <div className="contentMain flex">
+            <div
+              className={`overflow-hidden sidebarWrapper transition-all duration-500 ease-in-out 
+    ${isSidebarOpen ? "w-[18%] " : "w-[0%] px-0 opacity-0"}`}
+            >
+              <Sidebar />
+            </div>
+
+            <div
+              className={`contentRight !bg-gray-50 py-4 px-5 transition-all duration-500 ease-in-out ${
+                isSidebarOpen ? "w-[82%] " : "w-[100%] "
+              }`}
+            >
+              <Profile />
+            </div>
+          </div>
+        </section>
+        // </MyContext.Provider>
+      ),
+    },
   ]);
 
   const values = {
@@ -272,6 +324,8 @@ function App() {
     openAlertBox,
     isOpenFullScreenPanel,
     setIsOpenFullScreenPanel,
+    userData,
+    setUserData,
   };
 
   return (
@@ -322,6 +376,9 @@ function App() {
           )}
           {isOpenFullScreenPanel?.model === "Add New Sub Category" && (
             <AddSubCategory />
+          )}
+           {isOpenFullScreenPanel?.model === "Add New Address" && (
+            <AddAddress />
           )}
         </Dialog>
       </MyContext.Provider>

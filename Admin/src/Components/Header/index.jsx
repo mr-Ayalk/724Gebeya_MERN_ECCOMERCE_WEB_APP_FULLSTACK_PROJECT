@@ -11,7 +11,9 @@ import { IoMdLogOut } from "react-icons/io";
 import { MyContext } from "../../App";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import { fetchDataFromApi } from "../../utils/api";
 
+import { useNavigate } from "react-router-dom";
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
     right: -3,
@@ -21,6 +23,8 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 const Header = () => {
+  const context = useContext(MyContext);
+  const history = useNavigate();
   const [anchorMyAcc, setAnchorMyAcc] = useState(null);
   const openMyAcc = Boolean(anchorMyAcc);
   const handleClickMyAcc = (event) => {
@@ -29,8 +33,22 @@ const Header = () => {
   const handleCloseMyAcc = () => {
     setAnchorMyAcc(null);
   };
+  const logout = () => {
+    setAnchorMyAcc(null);
+    fetchDataFromApi(
+      `/api/user/logout?token=${localStorage.getItem("accesstoken")}`,
+      { withCredentials: true }
+    ).then((res) => {
+      if (res?.error === false) {
+        localStorage.removeItem("accesstoken");
+        localStorage.removeItem("refreshToken");
+        context.setIsLogin(false);
+        history("/login"); // 👈 properly navigate to login
+      }
 
-  const context = useContext(MyContext);
+      console.log(res);
+    });
+  };
 
   return (
     <header
@@ -119,27 +137,27 @@ const Header = () => {
 
                   <div className="info">
                     <h3 className="text-[15px] font-[500] leading-5">
-                      Ayalkbet Teketel
+                      {context?.userData?.name}
                     </h3>
                     <p className="text-[13px] font-[400] opacity-70">
-                      ayalk@gmail.com
+                      {context?.userData?.email}
                     </p>
                   </div>
                 </div>
               </MenuItem>
               <Divider />
+              <Link to={"/profile"}>
+                {" "}
+                <MenuItem
+                  onClick={handleCloseMyAcc}
+                  className="flex items-center gap-3"
+                >
+                  <FaRegUser className="text-[16px]" />
+                  <span className="text-[14px]">Profile</span>
+                </MenuItem>
+              </Link>
 
-              <MenuItem
-                onClick={handleCloseMyAcc}
-                className="flex items-center gap-3"
-              >
-                <FaRegUser className="text-[16px]" />
-                <span className="text-[14px]">Profile</span>
-              </MenuItem>
-              <MenuItem
-                onClick={handleCloseMyAcc}
-                className="flex items-center gap-3"
-              >
+              <MenuItem onClick={logout} className="flex items-center gap-3">
                 <IoMdLogOut className="text-[16px]" />
                 <span className="text-[14px]">Sign Out</span>
               </MenuItem>

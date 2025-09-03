@@ -142,9 +142,7 @@ function Login() {
             >
               Forgot Password
             </a>
-            {/* <div className="flex items-center w-full mt-3 mb-3">
-              <Button className="btn-org  btn-lg w-full">Login</Button>
-            </div> */}
+
             <div className="flex items-center w-full mt-3 mb-3">
               <Button
                 type="submit"

@@ -41,7 +41,6 @@ export const uploadImage = async (url, updateData) => {
   const params = {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("accesstoken")}`, //include your API key in the Autorization header
-      "Content-Type": "application/json", //Adjuc=st the content type as needed
     },
   };
   var response;

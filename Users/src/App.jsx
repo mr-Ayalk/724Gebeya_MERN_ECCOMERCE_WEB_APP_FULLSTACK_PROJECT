@@ -41,28 +41,48 @@ function App() {
     setOpenCartPanel(newOpen);
   };
 
+  // useEffect(() => {
+  //   const token = localStorage.getItem("accesstoken");
+  //   if (token) {
+  //     setIsLogin(true);
+
+  //     fetchDataFromApi("/api/user/user-details").then((res) => {
+  //       setUserData(res?.data);
+  //       console.log(res?.response?.data?.error);
+
+  //       if (res?.response?.data?.error === true) {
+  //         if (res?.response?.data?.message === "You have not login") {
+  //           localStorage.removeItem("accesstoken"); // ✅ fixed token key
+  //           localStorage.removeItem("refreshToken");
+
+  //           openAlertBox("error", "Your session is closed");
+  //           setIsLogin(false);
+  //         }
+  //       }
+  //     });
+  //   }
+  // }, [isLogin]); // ✅ dependency array correctly placed here
+
   useEffect(() => {
     const token = localStorage.getItem("accesstoken");
-    if (token) {
+    if (token !== undefined && token !== null && token !== "") {
       setIsLogin(true);
-
       fetchDataFromApi("/api/user/user-details").then((res) => {
-        setUserData(res?.data);
-        console.log(res?.response?.data?.error);
+        setUserData(res.data);
 
         if (res?.response?.data?.error === true) {
           if (res?.response?.data?.message === "You have not login") {
             localStorage.removeItem("accesstoken"); // ✅ fixed token key
             localStorage.removeItem("refreshToken");
 
-            openAlertBox("error", "Your session is closed");
+            openAlertBox("error", "Your session is closed please login again");
             setIsLogin(false);
+            window.location.href = "/login";
           }
         }
       });
     }
-  }, [isLogin]); // ✅ dependency array correctly placed here
-
+  }, [isLogin]);
   const handleCloseProductDetailsModel = () => {
     setOpenProductDetailsModel(false);
   };

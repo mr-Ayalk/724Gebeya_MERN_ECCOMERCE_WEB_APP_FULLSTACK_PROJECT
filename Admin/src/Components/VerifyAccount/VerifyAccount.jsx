@@ -9,7 +9,7 @@ import OtpBox from "../OtpBox/OtpBox";
 import { useContext } from "react";
 import { MyContext } from "../../App";
 import { postData } from "../../utils/api";
-
+import { CircularProgress } from "@mui/material";
 const VerifyAccount = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState("");
@@ -52,7 +52,7 @@ const VerifyAccount = () => {
           if (res?.error === false) {
             context.openAlertBox("success", res?.message);
             setIsLoading(false);
-            history("/forgot-password");
+            history("/change-password");
           } else {
             context.openAlertBox("error", res?.message);
             setIsLoading(false);

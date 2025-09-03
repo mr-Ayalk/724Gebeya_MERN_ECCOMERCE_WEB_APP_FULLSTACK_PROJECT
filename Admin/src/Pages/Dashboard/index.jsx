@@ -245,7 +245,7 @@ const Dashboard = () => {
                 })
               }
             >
-              {" "}
+              {/* {" "} */}
               <FaPlus />
               Add Product
             </Button>

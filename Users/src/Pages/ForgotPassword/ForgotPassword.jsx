@@ -42,7 +42,7 @@ function ForgotPassword() {
       setIsLoading(false);
       return false;
     }
-    if (formFields.confirmPassword !== formFields.confirmPassword) {
+    if (formFields.newPassword !== formFields.confirmPassword) {
       context.openAlertBox("error", "Password and confirm password not match");
 
       return false;
