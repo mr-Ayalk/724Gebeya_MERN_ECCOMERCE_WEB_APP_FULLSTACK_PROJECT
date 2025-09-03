@@ -1,24 +1,20 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
-import Logo from "../Logo";
-import { Button } from "@mui/material";
-import { CgLogIn } from "react-icons/cg";
-import { FaEyeSlash, FaRegEye, FaRegUser } from "react-icons/fa";
-
 import { useContext } from "react";
 import TextField from "@mui/material/TextField";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
-
+import Button from "@mui/material/Button";
+import { Link, NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
+import { FcGoogle } from "react-icons/fc";
 import { MyContext } from "../../App";
 import { CircularProgress } from "@mui/material";
 import { postData } from "../../utils/api";
-
-const ChangePassword = () => {
+import Logo from "../Logo";
+import { CgLogIn } from "react-icons/cg";
+import { FaRegUser } from "react-icons/fa";
+function ForgotPassword() {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isShowPassword2, setIsShowPassword2] = useState(false);
-
   const [formFields, setFormFields] = useState({
     email: localStorage.getItem("userEmail"),
     newPassword: "",
@@ -36,33 +32,32 @@ const ChangePassword = () => {
       };
     });
   };
+
   const validateValue = Object.values(formFields).every((el) => el);
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setIsLoading(true);
 
     if (formFields.newPassword === "") {
-      context.openAlertBox("error", "Please enter new password");
+      context.openAlertBox("error", "Please new password");
+
       setIsLoading(false);
+      return false;
+    }
+    if (formFields.confirmPassword !== formFields.confirmPassword) {
+      context.openAlertBox("error", "Password and confirm password not match");
+
       return false;
     }
 
     if (formFields.confirmPassword === "") {
-      context.openAlertBox("error", "Please enter confirm password");
+      context.openAlertBox("error", "Please enter  confirm password");
       setIsLoading(false);
       return false;
     }
-
-    if (formFields.newPassword !== formFields.confirmPassword) {
-      context.openAlertBox(
-        "error",
-        "Password and confirm password do not match"
-      );
-      setIsLoading(false);
-      return false;
-    }
-
     postData(`/api/user/reset-password`, formFields).then((res) => {
+      // console.log(res);
       if (res?.error === false) {
         context.openAlertBox("success", res?.message);
 
@@ -73,11 +68,10 @@ const ChangePassword = () => {
         history("/login");
       } else {
         context.openAlertBox("error", res?.message);
-        setIsLoading(false);
       }
     });
+    // console.log(res);
   };
-
   return (
     <section className="!bg-white ">
       <header className="w-full fixed top-0 left-0 px-4 py-3 flex items-center justify-between z-50">
@@ -106,7 +100,7 @@ const ChangePassword = () => {
         </div>
       </header>
 
-      <div className="loginBox card w-[45%] h-auto pb-20  mx-auto mt-20 relative z-50 border-2 border-gray-200 rounded-3xl shadow-md p-10">
+      <div className="loginBox card w-[45%] h-auto pb-20  mx-auto mt-20 relative z-50 border-2 border-gray-200 rounded-3xl shadow-md">
         <div className="text-center mx-auto">
           <Logo
             className="text-emerald-950"
@@ -117,11 +111,9 @@ const ChangePassword = () => {
           Welcome Back !<br />
           <span className="text-blue-600 text-[30px]">
             {" "}
-            You can change your password from here
+            Sign in with your credentials
           </span>
         </h1>
-
-        <br />
 
         <form action="" className="w-full mt-5" onSubmit={handleSubmit}>
           <div className="form-group w-full mb-5 relative">
@@ -194,6 +186,6 @@ const ChangePassword = () => {
       </div>
     </section>
   );
-};
+}
 
-export default ChangePassword;
+export default ForgotPassword;

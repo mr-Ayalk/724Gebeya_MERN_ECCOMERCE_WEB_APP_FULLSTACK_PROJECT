@@ -31,7 +31,7 @@ function AccountSidebar() {
   let img_arr = [];
   let uniqueArray = [];
   let selectedImages = [];
-
+  //
   const onChangeFile = async (e, apiEndPoint) => {
     try {
       setPreviews([]);

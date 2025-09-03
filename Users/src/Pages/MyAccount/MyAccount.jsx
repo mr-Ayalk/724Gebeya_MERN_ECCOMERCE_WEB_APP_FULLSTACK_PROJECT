@@ -75,15 +75,15 @@ function MyAccount() {
     if (res?.error !== true) {
       context.openAlertBox("success", res?.message);
 
-      setFormsFields({
-        name: "",
-        email: "",
-        mobile: "",
-      });
+      // setFormsFields({
+      //   name: "",
+      //   email: "",
+      //   mobile: "",
+      // });
 
       context.setIsLogin(true);
       setIsLoading(false);
-      history("/");
+      // history("/");
     } else {
       context.openAlertBox("error", res?.message);
       setIsLoading(false);
@@ -119,7 +119,7 @@ function MyAccount() {
       setIsLoadingPassword(false);
       return false;
     }
-    const res = await postData(`/api/user/reset-password`, changePassword, {
+    const res = await postData(`/api/user/change-password`, changePassword, {
       withCredentials: true,
     });
     // console.log(res);
@@ -180,7 +180,7 @@ function MyAccount() {
             </div>
 
             <hr />
-            <form action="mt-8" onSubmit={handleSubmit}>
+            <form className="mt-8" onSubmit={handleSubmit}>
               <div className="flex items-center gap-5 ">
                 <div className="w-[50%]">
                   <TextField

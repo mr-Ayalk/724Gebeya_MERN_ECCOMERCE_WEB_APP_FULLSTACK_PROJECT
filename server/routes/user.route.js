@@ -12,7 +12,7 @@ import {
   resetpassword,
   refreshToken,
   userDetails,
-
+  changepassword,
 } from "../controller/user.controller.js";
 import auth from "../middlewares/auth.js";
 import upload from "../middlewares/muller.js";
@@ -35,6 +35,7 @@ userRouter.put("/:id", auth, updateUserDetails);
 userRouter.post("/forgot-password", forgotPasswordController);
 userRouter.post("/verify-forgot-password-otp", verifyForgotPasswordOtp);
 userRouter.post("/reset-password", resetpassword);
+userRouter.post("/change-password", changepassword);
 userRouter.post("/refresh-token", refreshToken);
 userRouter.get("/user-details", auth, userDetails);
 

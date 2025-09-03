@@ -7,7 +7,18 @@ import { FaEyeSlash, FaRegEye, FaRegUser } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { BsFacebook } from "react-icons/bs";
 import { Checkbox } from "@mui/material";
+
+import { useNavigate } from "react-router-dom";
+
+import { CircularProgress } from "@mui/material";
+import { useContext } from "react";
+import { MyContext } from "../../App";
+import { postData } from "../../utils/api";
+
 const Login = () => {
+  const history = useNavigate();
+  const context = useContext(MyContext);
+  const [isLoading, setIsLoading] = useState(false);
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [loadingFacebook, setLoadingFacebook] = useState(false);
 
@@ -18,6 +29,82 @@ const Login = () => {
   function handleClickGoogle() {
     setLoadingGoogle(true);
   }
+  const [formFields, setFormFields] = useState({
+    email: "",
+    password: "",
+  });
+  const onChangeInput = (e) => {
+    const { name, value } = e.target;
+    setFormFields(() => {
+      return {
+        ...formFields,
+        [name]: value,
+      };
+    });
+  };
+  const forgotPassword = () => {
+    if (formFields.email === "") {
+      context.openAlertBox("error", "Please enter email id");
+      return false;
+    } else {
+      context.openAlertBox("success", `OTP Send to ${formFields.email}`);
+      localStorage.setItem("userEmail", formFields.email);
+      localStorage.setItem("actionType", "forgot-password");
+
+      postData("/api/user/forgot-password", {
+        email: formFields.email,
+      }).then((res) => {
+        // console.log(res);
+
+        if (res?.error === false) {
+          context.openAlertBox("success", res?.message);
+
+          history("/verify-account");
+        } else {
+          context.openAlertBox("error", res?.message);
+        }
+      });
+    }
+  };
+  const validateValue = Object.values(formFields).every((el) => el);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setIsLoading(true);
+
+    if (formFields.email === "") {
+      context.openAlertBox("error", "Please enter email");
+      return;
+    }
+    if (formFields.password === "") {
+      context.openAlertBox("error", "Please enter password");
+      return;
+    }
+
+    const res = await postData("/api/user/login", formFields, {
+      withCredentials: true,
+    });
+    if (res?.error !== true) {
+      context.openAlertBox("success", res?.message);
+
+      setFormFields({
+        email: "",
+        password: "",
+      });
+      localStorage.setItem("accesstoken", res?.data?.accesstoken);
+      localStorage.setItem("refreshToken", res?.data?.refreshToken);
+
+      context.setIslogin(true);
+      setIsLoading(false);
+      history("/");
+    } else {
+      context.openAlertBox("error", res?.message);
+      setIsLoading(false);
+    }
+
+    // console.log(res);
+  };
   return (
     <section className="!bg-white ">
       <header className="w-full fixed top-0 left-0 px-4 py-3 flex items-center justify-between z-50">
@@ -45,7 +132,6 @@ const Login = () => {
           </NavLink>
         </div>
       </header>
-    
 
       <div className="loginBox card w-[45%] h-auto pb-20  mx-auto mt-20 relative z-50 border-2 border-gray-200 rounded-3xl shadow-md">
         <div className="text-center mx-auto">
@@ -60,7 +146,7 @@ const Login = () => {
             {" "}
             Sign in with your credentials
           </span>
-        </h1>{" "}
+        </h1>
         <div className="flex items-center justify-center w-full mt-5 gap-4">
           <Button
             size="small"
@@ -96,11 +182,18 @@ const Login = () => {
           <span className="flex items-center w-[100px] h-[1px] bg-[rgba(0,0,0,0.2)]"></span>
         </div>
         <br />
-        <form action="" className="w-full px-8 mt-3">
+        <form action="" className="w-full px-8 mt-3" onSubmit={handleSubmit}>
           <div className="form-group mb-4 w-full">
             <h4 className="text-[14px] font-[500] mb-1">Email</h4>
             <input
               type="email"
+              id="email"
+              name="email"
+              label="Email"
+              variant="outlined"
+              onChange={onChangeInput}
+              value={formFields.email}
+              disabled={isLoading === true ? true : false}
               className="w-full h-[50px] border-2 border-[rgba(0,0,0,0.1)] rounded-md focus:border-[rgba(0,0,0,0.7)] focus:outline-none px-3"
             />
           </div>
@@ -109,6 +202,13 @@ const Login = () => {
             <div className="relative w-full">
               <input
                 type={isPasswordShow === false ? "password" : "text"}
+                id="password"
+                name="password"
+                label="Password"
+                variant="outlined"
+                onChange={onChangeInput}
+                value={formFields.password}
+                disabled={isLoading === true ? true : false}
                 className="w-full h-[50px] border-2 border-[rgba(0,0,0,0.1)] rounded-md focus:border-[rgba(0,0,0,0.7)] focus:outline-none px-3"
               />
               <Button
@@ -129,14 +229,28 @@ const Login = () => {
               control={<Checkbox defaultChecked />}
               label="Remember Me"
             />
-            <Link
-              to={"/forgot-password"}
-              className="text-blue-600 font-[700] text-[15px] hover:underline hover:text-gray-700"
+
+            <a
+           
+              className="link cursor-pointer text-[14px] font-[600]"
+              onClick={forgotPassword}
             >
               Forgot Password
-            </Link>
+            </a>
           </div>
-          <Button className="btn-blue btn-lg w-full ">Sign In</Button>
+          <div className="flex items-center w-full mt-3 mb-3">
+            <Button
+              type="submit"
+              disabled={!validateValue}
+              className="btn-blue  btn-lg w-full flex gap-3 hover:!btn-org/75"
+            >
+              {isLoading === true ? (
+                <CircularProgress color="inherit" />
+              ) : (
+                "Login"
+              )}
+            </Button>
+          </div>
         </form>
       </div>
     </section>
