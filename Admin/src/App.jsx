@@ -41,6 +41,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLogin, setIslogin] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [address, setAddress] = useState([]);
   useEffect(() => {
     const token = localStorage.getItem("accesstoken");
     if (token !== undefined && token !== null && token !== "") {
@@ -326,6 +327,8 @@ function App() {
     setIsOpenFullScreenPanel,
     userData,
     setUserData,
+    address,
+    setAddress,
   };
 
   return (
@@ -377,9 +380,7 @@ function App() {
           {isOpenFullScreenPanel?.model === "Add New Sub Category" && (
             <AddSubCategory />
           )}
-           {isOpenFullScreenPanel?.model === "Add New Address" && (
-            <AddAddress />
-          )}
+          {isOpenFullScreenPanel?.model === "Add New Address" && <AddAddress />}
         </Dialog>
       </MyContext.Provider>
     </>
