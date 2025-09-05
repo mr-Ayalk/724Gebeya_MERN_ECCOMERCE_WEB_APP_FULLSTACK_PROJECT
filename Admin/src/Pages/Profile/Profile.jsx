@@ -1,52 +1,94 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { uploadImage } from "../../utils/api";
+import {
+  fetchDataFromApi,
+  uploadImage,
+  editData,
+  postData,
+} from "../../utils/api";
 
-import { FaRegUser } from "react-icons/fa";
 import Button from "@mui/material/Button";
-import { IoBagCheckOutline } from "react-icons/io5";
-import { IoIosLogOut, IoMdHeartEmpty } from "react-icons/io";
-import { NavLink } from "react-router";
-import { useContext, useEffect, useState } from "react";
-
-import { CircularProgress } from "@mui/material";
-import { MyContext } from "../../App";
-
-import TextField from "@mui/material/TextField";
-
-import { useNavigate } from "react-router-dom";
-import { editData, postData } from "../../utils/api";
-
+import { CircularProgress, TextField, Checkbox, Radio } from "@mui/material";
 import { Collapse } from "react-collapse";
-
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
+
+import { useNavigate, NavLink } from "react-router-dom";
+import { MyContext } from "../../App";
+
+// const label = { inputProps: { "aria-label": "Checkbox demo" } };
+
 const Profile = () => {
   const context = useContext(MyContext);
   const history = useNavigate();
+
   const [phone, setPhone] = useState("");
+  const [previews, setPreviews] = useState([]);
+  const [userId, setUserId] = useState("");
+  const [address, setAddress] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPassword, setIsLoadingPassword] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [isChangePasswordFormShow, setIsChangePasswordFormShow] =
+    useState(false);
+
+  const [formFields, setFormsFields] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+  });
+
+  const [changePassword, setChangePassword] = useState({
+    email: "",
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  // ✅ Load user data
   useEffect(() => {
-    const userAvatar = [];
-    if (
-      context?.userData?.avatar !== "" &&
-      context?.userData?.avatar !== undefined
-    ) {
-      userAvatar.push(context?.userData?.avatar);
-      setPreviews(userAvatar);
+    if (context?.userData?._id) {
+      setUserId(context?.userData._id);
+      setFormsFields({
+        name: context?.userData.name || "",
+        email: context?.userData.email || "",
+        mobile: context?.userData.mobile || "",
+      });
+      setPhone(String(context?.userData?.mobile || ""));
+      setChangePassword((prev) => ({
+        ...prev,
+        email: context?.userData.email || "",
+      }));
+
+      if (context?.userData?.avatar) {
+        setPreviews([context.userData.avatar]);
+      }
+
+      // fetchDataFromApi(`/api/address/get?${context?.userData?._id}`).then(
+      //   (res) => {
+      //     console.log(res);
+      //   }
+      // );
+
+      fetchDataFromApi(`/api/address/get/${context?.userData?._id}`).then(
+        (res) => {
+          // console.log(res);
+          setAddress(res.data);
+        }
+      );
     }
   }, [context?.userData]);
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoading1, setIsLoading1] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [previews, setPreviews] = useState([]);
-  const [userData, setUserData] = useState([]);
-  const formdata = new FormData();
+  // ✅ Redirect if not logged in
+  useEffect(() => {
+    const token = localStorage.getItem("accesstoken");
+    if (!token || context?.isLogin === false) {
+      // history("/login");
+    }
+  }, [context?.isLogin, history]);
 
-  let img_arr = [];
-  let uniqueArray = [];
-  let selectedImages = [];
-  //
+  // ✅ File Upload
   const onChangeFile = async (e, apiEndPoint) => {
     try {
       setPreviews([]);
@@ -57,187 +99,114 @@ const Profile = () => {
         const file = files[i];
 
         if (
-          file.type === "image/jpeg" ||
-          file.type === "image/jpg" ||
-          file.type === "image/png" ||
-          file.type === "image/webp"
+          ["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(
+            file.type
+          )
         ) {
-          const formdata = new FormData(); // create new for each file
+          const formdata = new FormData();
           formdata.append("avatar", file);
 
           const res = await uploadImage(apiEndPoint, formdata);
 
           if (res?.data?.avator) {
-            setPreviews([res.data.avator]); // set avatar URL from backend
+            setPreviews([res.data.avator]);
           }
         } else {
           context.openAlertBox({
             open: true,
             error: true,
-            msg: "Please select a valid JPG or PNG image file.",
+            msg: "Please select a valid JPG, PNG, or WEBP image file.",
           });
           setUploading(false);
           return;
         }
       }
-
-      setUploading(false); // ✅ stop loading after success
+      setUploading(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setUploading(false);
     }
   };
 
-  const [isLoadingPassword, setIsLoadingPassword] = useState(false);
-  const [userId, setUserId] = useState("");
-  const [isChangePasswordFormShow, setIsChangePasswordFormShow] =
-    useState(false);
-  useEffect(() => {
-    if (context?.userData?._id !== "" && context?.userData?._id !== undefined) {
-      setUserId(context?.userData?._id);
-      setFormsFields({
-        name: context?.userData?.name,
-        email: context?.userData?.email,
-        mobile: context?.userData?.mobile,
-      });
-
-      const ph = `"${context?.userData?.mobile}"`;
-      //console.log(ph)
-      setPhone(ph);
-      setChangePassword({
-        email: context?.userData?.email,
-      });
-    }
-  }, [context?.userData]);
-
-  const [formFields, setFormsFields] = useState({
-    name: "",
-    email: "",
-    mobile: "",
-  });
-  const [changePassword, setChangePassword] = useState({
-    email: "",
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
-  useEffect(() => {
-    const token = localStorage.getItem("accesstoken"); // match handleSubmit
-    if (!token) {
-      history("/login");
-    }
-  }, [context?.isLogin, history]);
-
   const validateValue = Object.values(formFields).every((el) => el);
-
   const validateValuePassword = Object.values(changePassword).every((el) => el);
+
+  const [selectedValue, setSelectedValue] = useState(""); // start empty
+
+  const handleChangeradio = (event) => {
+    setSelectedValue(event.target.value); // updates selected value
+  };
+
+  // ✅ Profile Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setIsLoading(true);
 
-    if (formFields.name === "") {
-      context.openAlertBox("error", "Please enter your Full name");
+    if (!formFields.name || !formFields.email || !formFields.mobile) {
+      context.openAlertBox("error", "Please fill all required fields");
+      setIsLoading(false);
       return;
     }
-    if (formFields.email === "") {
-      context.openAlertBox("error", "Please enter your email id");
-      return;
-    }
-    if (formFields.mobile === "") {
-      context.openAlertBox("error", "Please enter your mobile phone number");
-      return;
-    }
+
     const res = await editData(`/api/user/${userId}`, formFields, {
       withCredentials: true,
     });
-    // console.log(res);
-    if (res?.error !== true) {
-      context.openAlertBox("success", res?.message);
 
-      // context.setIsLogin(true);
-      setIsLoading(false);
-      // history("/");
+    if (!res?.error) {
+      context.openAlertBox("success", res?.message);
     } else {
       context.openAlertBox("error", res?.message);
-      setIsLoading(false);
     }
-
-    // console.log(res);
+    setIsLoading(false);
   };
 
+  // ✅ Change Password Submit
   const handleSubmitPassword = async (e) => {
     e.preventDefault();
-
     setIsLoadingPassword(true);
 
-    if (changePassword.oldPassword === "") {
-      context.openAlertBox("error", "Please enter your Old Password");
-      return;
-    }
-    if (changePassword.newPassword === "") {
-      context.openAlertBox("error", "Please enter new Password");
+    if (
+      !changePassword.oldPassword ||
+      !changePassword.newPassword ||
+      !changePassword.confirmPassword
+    ) {
+      context.openAlertBox("error", "Please fill all password fields");
       setIsLoadingPassword(false);
       return;
     }
-    if (changePassword.confirmPassword === "") {
-      context.openAlertBox("error", "Please enter confirm Password");
+
+    if (changePassword.newPassword !== changePassword.confirmPassword) {
+      context.openAlertBox("error", "Passwords do not match");
       setIsLoadingPassword(false);
       return;
     }
-    if (changePassword.confirmPassword !== changePassword.newPassword) {
-      context.openAlertBox(
-        "error",
-        "New password and confirm password do not match"
-      );
-      setIsLoadingPassword(false);
-      return false;
-    }
+
     const res = await postData(`/api/user/change-password`, changePassword, {
       withCredentials: true,
     });
-    // console.log(res);
-    if (res?.error !== true) {
+
+    if (!res?.error) {
       context.openAlertBox("success", res?.message);
-
-      setFormsFields({
-        name: "",
-        email: "",
-        mobile: "",
-      });
-
-      // context.setIsLogin(true);
-      setIsLoadingPassword(false);
+      setFormsFields({ name: "", email: "", mobile: "" });
       history("/");
     } else {
       context.openAlertBox("error", res?.message);
-      setIsLoadingPassword(false);
     }
-
-    // console.log(res);
+    setIsLoadingPassword(false);
   };
 
+  // ✅ Input Change Handler
   const onChangeInput = (e) => {
     const { name, value } = e.target;
-    setFormsFields(() => {
-      return {
-        ...formFields,
-        [name]: value,
-      };
-    });
-    setChangePassword((prev) => {
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
+    setFormsFields((prev) => ({ ...prev, [name]: value }));
+    setChangePassword((prev) => ({ ...prev, [name]: value }));
   };
+
   return (
     <>
       <div className="card w-[65%] my-4 pt-5 shadow-md sm:rounded-lg bg-white px-5 pb-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-[18px] font-[600]">Users Profile</h2>
+          <h2 className="text-[18px] font-[600]">User Profile</h2>
           <Button
             className="!ml-auto"
             onClick={() =>
@@ -248,32 +217,30 @@ const Profile = () => {
           </Button>
         </div>
         <br />
+
+        {/* Avatar */}
         <div className="w-[110px] h-[110px] rounded-full overflow-hidden mb-4 relative group flex items-center justify-center bg-gray-200 ">
-          {uploading === true ? (
+          {uploading ? (
             <CircularProgress color="inherit" />
+          ) : previews.length > 0 ? (
+            previews.map((img, index) => (
+              <img
+                src={img}
+                key={index}
+                alt="avatar"
+                className="w-full h-full object-cover"
+              />
+            ))
           ) : (
-            <>
-              {previews.length > 0 ? (
-                previews.map((img, index) => (
-                  <img
-                    src={img}
-                    key={index}
-                    alt="avatar"
-                    className="w-full h-full object-cover"
-                  />
-                ))
-              ) : (
-                <img
-                  src="/user.png"
-                  alt="user image avatar place holder"
-                  className="w-full h-full object-cover"
-                />
-              )}
-            </>
+            <img
+              src="/user.png"
+              alt="user avatar placeholder"
+              className="w-full h-full object-cover"
+            />
           )}
 
           <div className="overlay w-[100%] h-[100%] absolute top-0 left-0 z-50 bg-[rgba(0,0,0,0.7)] flex items-center justify-center cursor-pointer opacity-0 transition-all group-hover:opacity-100">
-            <FaCloudUploadAlt className="text-[#fff] text-[25px]  cursor-pointer" />
+            <FaCloudUploadAlt className="text-[#fff] text-[25px] cursor-pointer" />
             <input
               type="file"
               className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
@@ -283,48 +250,48 @@ const Profile = () => {
           </div>
         </div>
 
+        {/* Profile Form */}
         <form className="form mt-8" onSubmit={handleSubmit}>
           <div className="flex items-center gap-5 ">
             <div className="w-[50%]">
               <input
                 type="text"
-                className="w-full h-[40px] border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-sm p-3 text-sm"
+                className="w-full h-[40px] border border-gray-300 focus:outline-none focus:border-gray-500 rounded-sm p-3 text-sm"
                 name="name"
                 onChange={onChangeInput}
                 value={formFields.name}
-                disabled={isLoading === true ? true : false}
+                disabled={isLoading}
               />
             </div>
             <div className="w-[50%]">
               <input
                 type="email"
-                className="w-full h-[40px] border border-[rgba(0,0,0,0.2)] focus:outline-none focus:border-[rgba(0,0,0,0.4)] rounded-sm p-3 text-sm"
+                className="w-full h-[40px] border border-gray-300 focus:outline-none focus:border-gray-500 rounded-sm p-3 text-sm"
                 name="email"
                 onChange={onChangeInput}
                 value={formFields.email}
-                disabled={true}
+                disabled
               />
             </div>
           </div>
+
           <div className="flex items-center mt-4 gap-5 ">
             <div className="w-[50%]">
               <PhoneInput
-                defaultCountry="et" // Ethiopia (prefix +251)
+                defaultCountry="et"
                 value={phone}
                 onChange={(phone) => {
                   setPhone(phone);
-                  setFormsFields({
-                    mobile: phone,
-                  });
+                  setFormsFields((prev) => ({ ...prev, mobile: phone }));
                 }}
-                disabled={isLoading === true ? true : false}
+                disabled={isLoading}
               />
             </div>
           </div>
 
           <br />
           <div
-            className="flex items-center justify-center p-5 border border-dashed border-[rgba(0,0,0,0.2)] bg-[#f1f1ff] hover:bg-[#e7f3f9] cursor-pointer"
+            className="flex items-center justify-center p-5 border border-dashed border-gray-300 bg-[#f1f1ff] hover:bg-[#e7f3f9] cursor-pointer"
             onClick={() =>
               context.setIsOpenFullScreenPanel({
                 open: true,
@@ -332,17 +299,38 @@ const Profile = () => {
               })
             }
           >
-            <span className="text-[]14px] font-[500]">Add Address</span>
+            <span className="text-[14px] font-[500]">Add Address</span>
           </div>
 
           <br />
+          <div className="flex gap-2 flex-col mt-4">
+            {address?.length > 0 &&
+              address.map((addr, index) => (
+                <label
+                  key={index}
+                  className="border border-dashed border-gray-300 addressBox w-full flex items-center justify-start bg-[#f1f1f1] p-3 rounded-md cursor-pointer mb-2"
+                >
+                  <Radio
+                    name="selectedAddress" // all radios share the same name
+                    value={addr._id || index} // unique value per address
+                    checked={selectedValue === (addr._id || index)}
+                    onChange={handleChangeradio}
+                  />
+                  <span>
+                    {addr.address_line1}, {addr.city}, {addr.state},{" "}
+                    {addr.country},{addr.pincode}
+                  </span>
+                </label>
+              ))}
+          </div>
+
           <div className="flex items-center w-full mt-3 mb-3">
             <Button
               type="submit"
               disabled={!validateValue}
-              className="btn-blue  btn-lg w-full flex gap-3 hover:!btn-org/75"
+              className="btn-blue btn-lg w-full flex gap-3 hover:!btn-org/75"
             >
-              {isLoading === true ? (
+              {isLoading ? (
                 <CircularProgress color="inherit" />
               ) : (
                 "Update Profile"
@@ -352,13 +340,13 @@ const Profile = () => {
         </form>
       </div>
 
+      {/* Change Password Form */}
       <Collapse isOpened={isChangePasswordFormShow}>
         <div className="card w-[65%] bg-white p-5 shadow-md rounded-md mb-5">
-          {" "}
           <div className="flex items-center pb-3 font-black">
             <h2 className="pb-0">Change Password</h2>
           </div>
-          <form action="mt-8" onSubmit={handleSubmitPassword}>
+          <form onSubmit={handleSubmitPassword}>
             <div className="flex items-center gap-5 ">
               <div className="w-[50%]">
                 <TextField
@@ -366,11 +354,11 @@ const Profile = () => {
                   variant="outlined"
                   size="small"
                   className="w-full"
-                  type="text"
+                  type="password"
                   name="oldPassword"
                   onChange={onChangeInput}
                   value={changePassword.oldPassword}
-                  disabled={isLoading === true ? true : false}
+                  disabled={isLoadingPassword}
                 />
               </div>
               <div className="w-[50%]">
@@ -379,10 +367,11 @@ const Profile = () => {
                   variant="outlined"
                   size="small"
                   className="w-full"
-                  type="text"
+                  type="password"
                   name="newPassword"
                   onChange={onChangeInput}
                   value={changePassword.newPassword}
+                  disabled={isLoadingPassword}
                 />
               </div>
             </div>
@@ -392,10 +381,11 @@ const Profile = () => {
                 variant="outlined"
                 size="small"
                 className="w-full"
-                type="confirmPassword"
+                type="password"
                 name="confirmPassword"
                 onChange={onChangeInput}
                 value={changePassword.confirmPassword}
+                disabled={isLoadingPassword}
               />
             </div>
             <br />
@@ -403,9 +393,9 @@ const Profile = () => {
               <Button
                 type="submit"
                 disabled={!validateValuePassword}
-                className="btn-blue  btn-lg w-full flex gap-3 hover:!btn-org/75"
+                className="btn-blue btn-lg w-full flex gap-3 hover:!btn-org/75"
               >
-                {isLoadingPassword === true ? (
+                {isLoadingPassword ? (
                   <CircularProgress color="inherit" />
                 ) : (
                   "Change Password"

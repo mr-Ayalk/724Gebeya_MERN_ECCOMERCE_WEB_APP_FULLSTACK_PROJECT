@@ -7,7 +7,8 @@ import { useContext, useEffect, useState } from "react";
 import { MyContext } from "../../App";
 import { CircularProgress } from "@mui/material";
 import { uploadImage } from "../../utils/api";
-
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import HomeIcon from "@mui/icons-material/Home";
 function AccountSidebar() {
   const context = useContext(MyContext);
 
@@ -82,19 +83,6 @@ function AccountSidebar() {
               <CircularProgress color="inherit" />
             ) : (
               <>
-                {/* {previews?.length !== 0 &&
-                  previews?.map((img, index) => {
-                    return (
-                      <img
-                        src={img}
-                        key={index}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    );
-
-                  })} */}
-
                 {previews.length > 0 ? (
                   previews.map((img, index) => (
                     <img
@@ -133,7 +121,15 @@ function AccountSidebar() {
             <NavLink to="/my-account" activeclassname="isActive">
               <Button className="w-full !text-left !py-2 !px-5 !justify-start !capitalize !text-[rgba(0,0,0,0.8)] !rounded-none flex items-center gap-2 ">
                 <FaRegUser className="text-[18px]" />
-                User Profile
+                My Profile
+              </Button>
+            </NavLink>
+          </li>
+          <li className="w-full">
+            <NavLink to="/my-address" activeclassname="isActive">
+              <Button className="w-full !text-left !py-2 !px-5 !justify-start !capitalize !text-[rgba(0,0,0,0.8)] !rounded-none flex items-center gap-2 ">
+                <HomeIcon className="text-[18px]" />
+                My Address
               </Button>
             </NavLink>
           </li>
