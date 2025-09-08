@@ -1,102 +1,6 @@
-// import { request } from "express";
-// import AddressModel from "../models/address.js";
-// import UserModel from "../models/User.js";
-
-// export const addAddressController = async (request, response) => {
-//   try {
-//     const {
-//       address_line1,
-//       city,
-//       state,
-//       pincode,
-//       country,
-//       mobile,
-//       status,
-//       userId,
-//     } = request.body;
-//     // const userId = request.userId;
-//     // if (!address_line1 || city || state || pincode || country || mobile || userId) {
-//     //   return response.status(500).json({
-//     //     message: "Please provide all the fields",
-//     //     error: true,
-//     //     success: false,
-//     //   });
-//     // }
-
-//     const address = new AddressModel({
-//       address_line1,
-//       city,
-//       state,
-//       pincode,
-//       country,
-//       mobile,
-//       status,
-//       userId,
-//     });
-//     const savedAddress = await address.save();
-//     const updateCartUser = await UserModel.updateOne(
-//       { _id: userId },
-//       {
-//         $push: {
-//           address_details: savedAddress?._id,
-//         },
-//       }
-//     );
-
-//     return response.status(200).json({
-//       data: savedAddress,
-//       message: "Address added successfully",
-//       error: false,
-//       success: true,
-//     });
-//   } catch (error) {
-//     return response.status(500).json({
-//       message: error.message || error,
-//       error: true,
-//       success: false,
-//     });
-//   }
-// };
-
-// export const getAddressController = async (request, response) => {
-//   try {
-//     const address = await AddressModel.find({ userId: request?.query?.userId });
-//     if (!address) {
-//       return response.json({
-//         message: "Address not found",
-//         error: true,
-//         success: false,
-//       });
-//     } else {
-//       const updatedUser = await UserModel.updateOne(
-//         {
-//           _id: request?.query?.userId,
-//         },
-//         {
-//           $push: {
-//             // address_details: address?._id,
-//             address: address?._id,
-//           },
-//         }
-//       );
-//     }
-//     return response.status(200).json({
-//       error: false,
-//       success: true,
-//       data: address,
-//     });
-//   } catch (error) {
-//     return response.status(500).json({
-//       message: error.message || error,
-//       error: true,
-//       success: false,
-//     });
-//   }
-// };
-// ❌ remove: import { request } from "express";
 import AddressModel from "../models/address.js";
 import UserModel from "../models/User.js";
-
+import mongoose from "mongoose";
 // POST /api/address/add
 export const addAddressController = async (request, response) => {
   try {
@@ -168,6 +72,52 @@ export const getAddressController = async (request, response) => {
     });
   } catch (error) {
     return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+
+export const deleteAddressController = async (req, res) => {
+  try {
+    const userId = req.userId; // from auth middleware
+    const _id = req.params.id;
+
+    if (!_id) {
+      return res.status(401).json({
+        message: "Unauthorized.Provide _id",
+        error: true,
+        success: false,
+      });
+    }
+
+    const deletedItem = await AddressModel.deleteOne({
+      _id: _id,
+      userId: userId,
+    });
+
+    if (!deletedItem) {
+      return res.status(404).json({
+        message: "Address not found in database",
+        error: true,
+        success: false,
+      });
+    }
+
+    // // Remove from user's shopping_cart array
+    // await AddressModel.findByIdAndUpdate(userId, {
+    //   $pull: { shopping_cart: new mongoose.Types.ObjectId(_id) },
+    // });
+
+    return res.status(200).json({
+      message: "Address removed successfully",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Delete Address error:", error.message);
+    return res.status(500).json({
       message: error.message || error,
       error: true,
       success: false,

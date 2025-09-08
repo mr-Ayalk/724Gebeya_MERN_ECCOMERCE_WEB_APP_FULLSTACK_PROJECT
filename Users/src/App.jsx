@@ -27,6 +27,7 @@ import MyAccount from "./Pages/MyAccount/MyAccount";
 import MyList from "./Pages/MyList/MyList";
 import Orders from "./Pages/Orders/Orders";
 import { fetchDataFromApi } from "./utils/api";
+import Address from "./Pages/MyAccount/address";
 // import Drawer from "@mui/materia/Drawer";
 const MyContext = createContext();
 function App() {
@@ -40,28 +41,6 @@ function App() {
   const toggleCartPanel = (newOpen) => () => {
     setOpenCartPanel(newOpen);
   };
-
-  // useEffect(() => {
-  //   const token = localStorage.getItem("accesstoken");
-  //   if (token) {
-  //     setIsLogin(true);
-
-  //     fetchDataFromApi("/api/user/user-details").then((res) => {
-  //       setUserData(res?.data);
-  //       console.log(res?.response?.data?.error);
-
-  //       if (res?.response?.data?.error === true) {
-  //         if (res?.response?.data?.message === "You have not login") {
-  //           localStorage.removeItem("accesstoken"); // ✅ fixed token key
-  //           localStorage.removeItem("refreshToken");
-
-  //           openAlertBox("error", "Your session is closed");
-  //           setIsLogin(false);
-  //         }
-  //       }
-  //     });
-  //   }
-  // }, [isLogin]); // ✅ dependency array correctly placed here
 
   useEffect(() => {
     const token = localStorage.getItem("accesstoken");
@@ -123,6 +102,7 @@ function App() {
             <Route path={"/my-account"} element={<MyAccount />} />
             <Route path={"/my-list"} element={<MyList />} />
             <Route path={"/my-orders"} element={<Orders />} />
+            <Route path={"/my-address"} element={<Address />} />
           </Routes>
           <Footer />
         </MyContext.Provider>

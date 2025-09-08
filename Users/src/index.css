@@ -380,3 +380,17 @@ button .MuiCircularProgress-root {
   width: 30px !important;
   height: 30px !important;
 }
+.homeiconaddress {
+  color: black !important;
+}
+.react-international-phone-input {
+  width: 90% !important;
+}
+
+.react-international-phone-country-selector-button {
+  width: 50px !important;
+}
+.MuiDialog-paper {
+  width: 800px !important;
+  max-width: 800px !important;
+}
