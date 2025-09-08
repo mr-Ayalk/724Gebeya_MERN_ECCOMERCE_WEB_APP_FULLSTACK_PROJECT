@@ -4,30 +4,66 @@ import AccountSidebar from "../../components/AccountSidebar/AccountSidebar";
 import { useContext, useEffect, useState } from "react";
 import { MyContext } from "../../App";
 import { useNavigate } from "react-router-dom";
-import { editData, postData } from "../../utils/api";
+import { editData, fetchDataFromApi, postData } from "../../utils/api";
 import { CircularProgress } from "@mui/material";
 import { Collapse } from "react-collapse";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
 function MyAccount() {
+  const [phone, setPhone] = useState("");
+  const [previews, setPreviews] = useState([]);
+  const [address, setAddress] = useState([]);
   const context = useContext(MyContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPassword, setIsLoadingPassword] = useState(false);
   const [userId, setUserId] = useState("");
   const [isChangePasswordFormShow, setIsChangePasswordFormShow] =
     useState(false);
+  // useEffect(() => {
+  //   if (context?.userData?._id !== "" && context?.userData?._id !== undefined) {
+  //     setUserId(context?.userData?._id);
+  //     setFormsFields({
+  //       name: context?.userData?.name,
+  //       email: context?.userData?.email,
+  //       mobile: context?.userData?.mobile,
+  //     });
+  //     setChangePassword({
+  //       email: context?.userData?.email,
+  //     });
+  //   }
+  // }, [context?.userData]);
   useEffect(() => {
-    if (context?.userData?._id !== "" && context?.userData?._id !== undefined) {
-      setUserId(context?.userData?._id);
+    if (context?.userData?._id) {
+      setUserId(context?.userData._id);
       setFormsFields({
-        name: context?.userData?.name,
-        email: context?.userData?.email,
-        mobile: context?.userData?.mobile,
+        name: context?.userData.name || "",
+        email: context?.userData.email || "",
+        mobile: context?.userData.mobile || "",
       });
-      setChangePassword({
-        email: context?.userData?.email,
-      });
+      setPhone(String(context?.userData?.mobile || ""));
+      setChangePassword((prev) => ({
+        ...prev,
+        email: context?.userData.email || "",
+      }));
+
+      if (context?.userData?.avatar) {
+        setPreviews([context.userData.avatar]);
+      }
+
+      // fetchDataFromApi(`/api/address/get?${context?.userData?._id}`).then(
+      //   (res) => {
+      //     console.log(res);
+      //   }
+      // );
+
+      fetchDataFromApi(`/api/address/get/${context?.userData?._id}`).then(
+        (res) => {
+          // console.log(res);
+          setAddress(res.data);
+        }
+      );
     }
   }, [context?.userData]);
-
   const [formFields, setFormsFields] = useState({
     name: "",
     email: "",
@@ -213,17 +249,14 @@ function MyAccount() {
               </div>
               <div className="flex items-center mt-4 gap-5 ">
                 <div className="w-[50%]">
-                  <TextField
-                    label="Phone Number"
-                    type="number"
-                    id="mobile"
-                    name="mobile"
-                    onChange={onChangeInput}
-                    value={formFields.mobile}
-                    variant="outlined"
-                    size="small"
-                    className="w-full"
-                    disabled={isLoading === true ? true : false}
+                  <PhoneInput
+                    defaultCountry="et"
+                    value={phone}
+                    onChange={(phone) => {
+                      setPhone(phone);
+                      setFormsFields((prev) => ({ ...prev, mobile: phone }));
+                    }}
+                    disabled={isLoading}
                   />
                 </div>
               </div>

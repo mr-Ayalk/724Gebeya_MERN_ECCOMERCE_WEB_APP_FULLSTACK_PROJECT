@@ -128,7 +128,11 @@ function AccountSidebar() {
           <li className="w-full">
             <NavLink to="/my-address" activeclassname="isActive">
               <Button className="w-full !text-left !py-2 !px-5 !justify-start !capitalize !text-[rgba(0,0,0,0.8)] !rounded-none flex items-center gap-2 ">
-                <HomeIcon className="text-[18px]" />
+                <HomeIcon
+                  className="homeiconaddress  text-[18px] "
+                  color="white"
+                  fill="white"
+                />
                 My Address
               </Button>
             </NavLink>

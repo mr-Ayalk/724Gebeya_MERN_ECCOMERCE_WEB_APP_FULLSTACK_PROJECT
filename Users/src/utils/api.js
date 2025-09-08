@@ -90,3 +90,21 @@ export const editData = async (url, updatedData) => {
     };
   }
 };
+
+export const deleteData = async (url) => {
+  try {
+    const params = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accesstoken")}`,
+        "Content-Type": "application/json",
+      },
+    };
+    const { res } = await axios.delete(`${apiUrl + url}`, params);
+    return res;
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || "Update failed",
+    };
+  }
+};

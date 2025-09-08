@@ -16,8 +16,6 @@ import "react-international-phone/style.css";
 import { useNavigate, NavLink } from "react-router-dom";
 import { MyContext } from "../../App";
 
-// const label = { inputProps: { "aria-label": "Checkbox demo" } };
-
 const Profile = () => {
   const context = useContext(MyContext);
   const history = useNavigate();
