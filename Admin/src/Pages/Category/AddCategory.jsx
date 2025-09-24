@@ -2,11 +2,14 @@ import UploadBox from "../../Components/UploadBox/UploadBox";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoMdClose } from "react-icons/io";
-import { Button } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { useState } from "react";
-import { deleteImages } from "../../utils/api";
+import { useContext, useState } from "react";
+import { deleteImages, postData } from "../../utils/api";
+import { MyContext } from "../../App";
 const AddCategory = () => {
+  const context = useContext(MyContext);
+  const [isLoading, setIsLoading] = useState(false);
   const [previews, setPreviews] = useState([]);
   const [formFields, setFormFields] = useState({
     name: "",
@@ -49,10 +52,31 @@ const AddCategory = () => {
       }
     });
   };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    if (formFields.name.trim() === "") {
+      context.openAlertBox("error", "Category name is required");
+      setIsLoading(false);
+      return false;
+    }
+    if (previews.length === 0) {
+      context.openAlertBox("error", "Category image is required");
+      setIsLoading(false);
+      return false;
+    }
+    postData("/api/category/create", formFields).then((res) => {
+      if (res?.error) {
+        context.openAlertBox("error", res?.message || "Failed to add category");
+        console.log(res.message);
+        setIsLoading(false);
+      }
+    });
+  };
 
   return (
     <section className="p-5 px-20 bg-gray-50  overflow-hidden">
-      <form action="" className="form p-8 py-3 ">
+      <form action="" className="form p-8 py-3 " onSubmit={handleSubmit}>
         <div className="scroll max-h-[75vh] overflow-y-scroll pr-4 pt-3">
           <div className="col  w-1/4">
             <h3 className="text-[14px] font-[500] mb-1 !text-black">
@@ -62,6 +86,8 @@ const AddCategory = () => {
             <input
               type="text"
               className="w-full h-[40px] border border-[rgba(0,0,0,0.3)] focus:outline-none focus:border-blue-600 rounded-sm p-3 text-sm bg-white "
+              name="name"
+              value={formFields.name}
               onChange={onChangeInput}
             />
           </div>
@@ -111,9 +137,13 @@ const AddCategory = () => {
 
         <br />
         <div className="w-[250px]">
-          <Button type="button" className="btn-blue btn-lg w-full flex gap-2">
+          <Button type="submit" className="btn-blue btn-lg w-full flex gap-2">
             <FaCloudUploadAlt className="text-[25px] text-white" />
-            Publish and View
+            {isLoading === true ? (
+              <CircularProgress color="inherit" />
+            ) : (
+              " Publish and View"
+            )}
           </Button>
         </div>
       </form>
