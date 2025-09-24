@@ -720,10 +720,3 @@ export async function userDetails(request, response) {
   }
 }
 
-// export async function updateUserDetails(request, response) { try { const userId ==request.userId;
-//    //auth middleware
-//    const { name, email, mobile, password } = request.body; const userExist = await UserModel.findById(userId); if (!userExist) return response.status(400).send("The user cannot be updated!");
-//    // Use existing name if not provided
-//    const finalName = name || userExist.name; let verifyCode = ""; if (email !== userExist.email) { verifyCode = Math.floor(100000 + Math.random() * 900000).toString(); } let hashPassword = ""; if (password) { const salt = await bcryptjs.genSalt(10); hashPassword = await bcryptjs.hash(password, salt); } else { hashPassword = userExist.password; } const updateUser = await UserModel.findByIdAndUpdate( userId, { name: finalName, mobile: mobile, email: email, verify_email: email !== userExist.email ? false : true, password: hashPassword, otp: verifyCode !== "" ? verifyCode : null, otpExpires: verifyCode !== "" ? Date.now() + 600000 : "", }, { new: true } ); if (email !== userExist.email) {
-//      // Send verification email
-//      await sendEmailFun({ sendTo: email, subject: "Verify email from 724 Gebeya", text: "", html: VerificationEmail(finalName, verifyCode), }); } return response.json({ message: "User Updated successfully", error: false, success: true, user: updateUser, }); } catch (error) { return response.status(500).json({ message: error.message || error, error: true, success: false, }); } }

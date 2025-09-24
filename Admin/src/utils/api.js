@@ -37,41 +37,34 @@ export const fetchDataFromApi = async (url) => {
   }
 };
 
-export const uploadImage = async (url, updateData) => {
-  const params = {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accesstoken")}`, //include your API key in the Autorization header
-    },
-  };
-  var response;
-  await axios.put(apiUrl + url, updateData, params).then((res) => {
-    // console.log(res);
-    response = res;
-  });
-  return response;
+// export const uploadImage = async (url, updateData) => {
+//   const params = {
+//     headers: {
+//       Authorization: `Bearer ${localStorage.getItem("accesstoken")}`, //include your API key in the Autorization header
+//     },
+//   };
+//   var response;
+//   await axios.put(apiUrl + url, updateData, params).then((res) => {
+//     // console.log(res);
+//     response = res;
+//   });
+//   return response;
+// };
+export const uploadImage = async (url, formData) => {
+  try {
+    const response = await axios.post(apiUrl + url, formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accesstoken")}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Upload failed:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
-// export const editData = async (url, updatedData) => {
-//   try {
-//     const params = {
-//       headers: {
-//         Authorization: `Bearer ${localStorage.getItem("accesstoken")}`,
-//         "Content-Type": "multipart/form-data",
-//       },
-//     };
-
-//     const response = await axios.put(apiUrl + url, updatedData, params);
-
-//     return response.data; // return only data (commonly used)
-//   } catch (error) {
-//     console.error("Error uploading image:", error);
-
-//     return {
-//       success: false,
-//       message: error.response?.data?.message || "Image upload failed",
-//     };
-//   }
-// };
 export const editData = async (url, updatedData) => {
   try {
     const params = {
@@ -87,6 +80,40 @@ export const editData = async (url, updatedData) => {
     return {
       success: false,
       message: error.response?.data?.message || "Update failed",
+    };
+  }
+};
+
+// export const deleteImages = async (url, image) => {
+//   try {
+//     const params = {
+//       headers: {
+//         Authorization: `Bearer ${localStorage.getItem("accesstoken")}`,
+//         "Content-Type": "application/json",
+//       },
+//     };
+
+//     const response = await axios.delete(apiUrl + url, image, params);
+//     return response.data;
+//   } catch (error) {
+//     return {
+//       success: false,
+//       message: error.response?.data?.message || "Delete failed",
+//     };
+//   }
+// };
+export const deleteImages = async (url) => {
+  try {
+    const response = await axios.delete(apiUrl + url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accesstoken")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || "Delete failed",
     };
   }
 };
