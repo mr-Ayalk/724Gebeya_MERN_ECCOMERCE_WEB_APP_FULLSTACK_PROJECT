@@ -4,7 +4,52 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoMdClose } from "react-icons/io";
 import { Button } from "@mui/material";
 import { FaCloudUploadAlt } from "react-icons/fa";
+import { useState } from "react";
+import { deleteImages } from "../../utils/api";
 const AddCategory = () => {
+  const [previews, setPreviews] = useState([]);
+  const [formFields, setFormFields] = useState({
+    name: "",
+    images: [],
+    // parentCatName: "",
+    // parentId: "",
+  });
+  const setPreviewsFunction = (images) => {
+    setPreviews(images);
+    setFormFields((prev) => ({
+      ...prev,
+      images,
+    }));
+  };
+
+  const onChangeInput = (e) => {
+    const { name, value } = e.target;
+    setFormFields(() => {
+      return {
+        ...formFields,
+        [name]: e.target.value,
+      };
+    });
+  };
+  // const removeImg = (image, index) => {
+  //   deleteImages(`/api/category/deleteImage?img=${image}`).then((res) => {
+  //     console.log(res);
+  //   });
+  // };
+
+  const removeImg = (imageObj, index) => {
+    deleteImages(
+      `/api/category/deleteImage?public_id=${imageObj.public_id}`
+    ).then((res) => {
+      console.log(res);
+
+      // Remove from UI state after successful delete
+      if (res.success) {
+        setPreviews((prev) => prev.filter((_, i) => i !== index));
+      }
+    });
+  };
+
   return (
     <section className="p-5 px-20 bg-gray-50  overflow-hidden">
       <form action="" className="form p-8 py-3 ">
@@ -17,6 +62,7 @@ const AddCategory = () => {
             <input
               type="text"
               className="w-full h-[40px] border border-[rgba(0,0,0,0.3)] focus:outline-none focus:border-blue-600 rounded-sm p-3 text-sm bg-white "
+              onChange={onChangeInput}
             />
           </div>
           <br />
@@ -24,27 +70,40 @@ const AddCategory = () => {
             Category Image
           </h3>
           <div className="grid grid-cols-6 gap-4">
-            <div className="uploadBoxWrapper relative">
-              <span className="absolute w-[20px] h-[20px] rounded-full overflow-hidden bg-red-700 -top-[5px] -right-[5px] flex items-center justify-center z-50 cursor-pointer">
-                <IoMdClose className="text-white text-[17px]" />
-              </span>
+            {previews?.length !== 0 &&
+              previews?.map((img, index) => {
+                return (
+                  <div key={index} className="uploadBoxWrapper relative">
+                    <span
+                      className="absolute w-[20px] h-[20px] rounded-full overflow-hidden bg-red-700 -top-[5px] -right-[5px] flex items-center justify-center z-50 cursor-pointer"
+                      onClick={() => removeImg(img, index)}
+                    >
+                      <IoMdClose className="text-white text-[17px]" />
+                    </span>
+                    <div className="uploadBox p-0  rounded-md overflow-hidden border border-dashed border-[rgba(0,0,0,0.3)] h-[150px] w-[170px] bg-gray-100 cursor-pointer hover:bg-gray-200 flex items-center justify-center flex-col relative">
+                      <LazyLoadImage
+                        className="w-full h-full object-cover"
+                        alt={"category image"}
+                        effect="blur"
+                        src={img.url} // ✅ use url field from object
+                      />
+                    </div>
+                  </div>
+                );
+              })}
 
-              <div className="uploadBox p-0  rounded-md overflow-hidden border border-dashed border-[rgba(0,0,0,0.3)] h-[150px] w-[170px] bg-gray-100 cursor-pointer hover:bg-gray-200 flex items-center justify-center flex-col relative">
-                <LazyLoadImage
-                  className="w-full h-full object-cover"
-                  alt={"image.alt"}
-                  effect="blur"
-                  wrapperProps={{
-                    // If you need to, you can tweak the effect transition using the wrapper style.
-                    style: { transitionDelay: "1s" },
-                  }}
-                  src={
-                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fHww"
-                  }
-                />
-              </div>
-            </div>
-            <UploadBox multiple={true} />
+            {/* <UploadBox
+              multiple={true}
+              name="images"
+              url="/api/category/uploadImages"
+              setPreviewsFunction={setPreviewsFunction}
+            /> */}
+            <UploadBox
+              multiple={true}
+              name="images"
+              url="/api/category/uploadImages"
+              setPreviewsFunction={setPreviewsFunction}
+            />
           </div>
 
           <br />

@@ -12,7 +12,7 @@ import {
   updatedCategory,
   uploadImages,
 } from "../controller/category.controller.js";
-
+//
 const categoryRouter = Router();
 categoryRouter.post(
   "/uploadImages",

@@ -99,12 +99,12 @@ export const deleteData = async (url) => {
         "Content-Type": "application/json",
       },
     };
-    const { res } = await axios.delete(`${apiUrl + url}`, params);
-    return res;
+    const response = await axios.delete(`${apiUrl + url}`, params);
+    return response.data; // return actual API response
   } catch (error) {
     return {
       success: false,
-      message: error.response?.data?.message || "Update failed",
+      message: error.response?.data?.message || "Delete failed",
     };
   }
 };

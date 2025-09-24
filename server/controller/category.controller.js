@@ -13,28 +13,64 @@ cloudinary.config({
 // image uploader
 
 var imagesArr = [];
+// export async function uploadImages(request, response) {
+//   try {
+//     imagesArr = [];
+
+//     const image = request.files;
+
+//     const options = {
+//       use_filename: true,
+//       unique_filename: false,
+//       overwrite: false,
+//     };
+//     for (let i = 0; i < image?.length; i++) {
+//       const img = await cloudinary.uploader.upload(
+//         image[i].path,
+//         options,
+//         function (error, result) {
+//           // console.log(result);
+//           imagesArr.push(result.secure_url);
+//           fs.unlinkSync(`uploads/${request.files[i].filename}`);
+//           console.log(request.files[i].filename);
+//         }
+//       );
+//     }
+
+//     return response.status(200).json({
+//       images: imagesArr,
+//     });
+//   } catch (error) {
+//     return response.json({
+//       message: error.message || error,
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+//create cateory
 export async function uploadImages(request, response) {
   try {
     imagesArr = [];
 
     const image = request.files;
-
     const options = {
       use_filename: true,
       unique_filename: false,
       overwrite: false,
     };
+
     for (let i = 0; i < image?.length; i++) {
-      const img = await cloudinary.uploader.upload(
-        image[i].path,
-        options,
-        function (error, result) {
-          // console.log(result);
-          imagesArr.push(result.secure_url);
-          fs.unlinkSync(`uploads/${request.files[i].filename}`);
-          console.log(request.files[i].filename);
-        }
-      );
+      const result = await cloudinary.uploader.upload(image[i].path, options);
+
+      // Save both url and public_id
+      imagesArr.push({
+        url: result.secure_url,
+        public_id: result.public_id,
+      });
+
+      // cleanup local file
+      fs.unlinkSync(`uploads/${request.files[i].filename}`);
     }
 
     return response.status(200).json({
@@ -48,7 +84,6 @@ export async function uploadImages(request, response) {
     });
   }
 }
-//create cateory
 
 export async function createCategory(request, response) {
   try {
@@ -135,31 +170,7 @@ export async function getCategoryCount(request, response) {
     });
   }
 }
-//get sub category count
-// export async function getsubCategoryCount(request, response) {
-//   try {
-//     const categories = await Categorymodel.find();
-//     if (!categories) {
-//       response.status(500).json({ success: false, error: true });
-//     } else {
-//       const subCatList = [];
-//       for (let cat of categories) {
-//         if (cat.parentId !== undefined) {
-//           subCatList.push(cat);
-//         }
-//       }
-//       response.send({
-//         subCategoryCount: subCatList.length,
-//       });
-//     }
-//   } catch (error) {
-//     return response.status(500).json({
-//       message: error.message || error,
-//       error: true,
-//       success: false,
-//     });
-//   }
-// }
+
 export async function getsubCategoryCount(request, response) {
   try {
     const subCategoryCount = await Categorymodel.countDocuments({
@@ -202,19 +213,46 @@ export async function getCategory(request, response) {
   }
 }
 
+// export async function removeImageFromCloudinary(req, res) {
+//   try {
+//     const imgUrl = req.query.img;
+//     if (!imgUrl) {
+//       return res
+//         .status(400)
+//         .json({ error: true, message: "Image URL required" });
+//     }
+
+//     // Extract the file name part
+//     const fileName = imgUrl.split("/").pop(); // "1755768104262_image1_large_1.jpg"
+
+//     const publicId = fileName.split(".")[0]; // "1755768104262_image1_large_1"
+
+//     console.log("Deleting Cloudinary public_id:", publicId);
+
+//     const result = await cloudinary.uploader.destroy(publicId);
+
+//     if (result.result === "ok") {
+//       return res
+//         .status(200)
+//         .json({ success: true, message: "Image deleted", result });
+//     } else {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Image not found", result });
+//     }
+//   } catch (error) {
+//     return res.status(500).json({ error: true, message: error.message });
+//   }
+// }
 export async function removeImageFromCloudinary(req, res) {
   try {
-    const imgUrl = req.query.img;
-    if (!imgUrl) {
+    const publicId = req.query.public_id;
+
+    if (!publicId) {
       return res
         .status(400)
-        .json({ error: true, message: "Image URL required" });
+        .json({ error: true, message: "public_id required" });
     }
-
-    // Extract the file name part
-    const fileName = imgUrl.split("/").pop(); // "1755768104262_image1_large_1.jpg"
-
-    const publicId = fileName.split(".")[0]; // "1755768104262_image1_large_1"
 
     console.log("Deleting Cloudinary public_id:", publicId);
 
@@ -233,65 +271,7 @@ export async function removeImageFromCloudinary(req, res) {
     return res.status(500).json({ error: true, message: error.message });
   }
 }
-// export async function deleteCatagory(request, response) {
-//   try {
-//     const category = await Categorymodel.findById(request.params.id);
-//     const images = category.images;
-//     for (let img of images) {
-//       const imgUrl = img;
-//       const urlArr = imgUrl.split("/");
-//       const image = urlArr[urlArr.length - 1];
-//       const imageName = image.split(".")[0];
-//       if (imageName) {
-//         cloudinary.uploader.destroy(imageName, (error, result) => {
-//           // console.log(error,result)
-//         });
-//         //    console.log(imageName);
-//       }
-//       const subCategory = await Categorymodel.find({
-//         parentId: request.params.id,
-//       });
 
-//       for (let i = 0; i < subCategory.length; i++) {
-//         console.log(subCategory[i]._id);
-//         const thirdsubCategory = await Categorymodel.find({
-//           parentId: subCategory[i]._id,
-//         });
-//         for (let i = 0; i < thirdsubCategory.length; i++) {
-//           const deletedThirdSubCat = await Categorymodel.findByIdAndDelete(
-//             thirdsubCategory[i]._id
-//           );
-//         }
-//         const deletedSubCat = await Categorymodel.findByIdAndDelete(
-//           subCategory[i]._id
-//         );
-//       }
-
-//       const deletedCat = await Categorymodel.findByIdAndDelete(
-//         request.params.id
-//       );
-//       if (!deletedCat) {
-//         response.status(404).json({
-//           message: "Category not found !",
-//           success: false,
-//           error: true,
-//         });
-//       }
-
-//       response.status(200).json({
-//         success: true,
-//         error: false,
-//         message: "Category Deleted",
-//       });
-//     }
-//   } catch (error) {
-//     return response.status(500).json({
-//       error: true,
-//       message: error.message,
-//       success: false,
-//     });
-//   }
-// }
 export async function deleteCatagory(request, response) {
   try {
     const category = await Categorymodel.findById(request.params.id);
@@ -345,32 +325,6 @@ export async function deleteCatagory(request, response) {
   }
 }
 
-// export async function updatedCategory(request, response) {
-//   const category = await Categorymodel.findByIdAndUpdate(
-//     request.params.id,
-//     {
-//       name: request.body.name,
-//       images: imagesArr.length > 0 ? imagesArr[0] : request.body.images,
-
-//       parentId: request.body.parentId,
-//       parentCatName: request.body.parentCatName,
-//     },
-//     { new: true }
-//   );
-//   if (!category) {
-//     return response.status(404).json({
-//       success: false,
-//       error: true,
-//       message: "Category cannot be updated",
-//     });
-//   }
-//   imagesArr = [];
-//   return response.status(200).json({
-//     success: true,
-//     error: false,
-//     category: category,
-//   });
-// }
 export async function updatedCategory(req, res) {
   try {
     let imageUrl = req.body.images; // fallback to existing

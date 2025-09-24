@@ -105,11 +105,6 @@ export const deleteAddressController = async (req, res) => {
       });
     }
 
-    // // Remove from user's shopping_cart array
-    // await AddressModel.findByIdAndUpdate(userId, {
-    //   $pull: { shopping_cart: new mongoose.Types.ObjectId(_id) },
-    // });
-
     return res.status(200).json({
       message: "Address removed successfully",
       error: false,

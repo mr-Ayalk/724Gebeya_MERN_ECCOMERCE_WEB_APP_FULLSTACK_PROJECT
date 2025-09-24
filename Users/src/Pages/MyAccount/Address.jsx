@@ -24,6 +24,14 @@ const Address = () => {
   const removeAddress = (id) => {
     deleteData(`/api/address/${id}`).then((res) => {
       console.log(res);
+      fetchDataFromApi(`/api/address/get/${context.userData._id}`)
+        .then((res) => {
+          setAddress(res.data || []);
+        })
+        .catch((err) => {
+          console.error("Error fetching address:", err);
+        });
+      context.openAlertBox("success", "Address Removed Successfully");
     });
   };
   const handleClickOpenAddressDialog = () => {
@@ -287,7 +295,7 @@ const Address = () => {
                       </span>
                     </div>
                     <span
-                      onClick={() => removeAddress(address?._id)}
+                      onClick={() => removeAddress(addr?._id)}
                       className="hidden group-hover:flex items-center justify-center w-[30px] h-[30px] rounded-full bg-gray-500 text-white ml-auto"
                     >
                       <FaRegTrashAlt />
