@@ -3,6 +3,7 @@ import auth from "../middlewares/auth.js";
 import upload from "../middlewares/muller.js";
 import {
   createProduct,
+  deleteMultipleProduct,
   deleteProduct,
   getAllFeaturedProducts,
   getAllProducts,
@@ -27,7 +28,7 @@ productRoute.post("/create", auth, createProduct);
 productRoute.get("/getAllProducts", getAllProducts);
 productRoute.get("/getAllProductsByCatId/:id", getAllProductsByCatId);
 productRoute.get("/getAllProductsByCatName", getAllProductsByCatName);
-
+//
 productRoute.get("/getAllProductsBysubCatId/:id", getAllProductsBysubCatId);
 productRoute.get("/getAllProductsBysubCatName", getAllProductsBysubCatName);
 productRoute.get(
@@ -46,7 +47,7 @@ productRoute.delete("/:id", deleteProduct);
 productRoute.get("/:id", getProduct);
 
 productRoute.delete("/deleteImage", auth, removeImageFromCloudinary);
-
+productRoute.delete("/deleteMultiple", deleteMultipleProduct);
 productRoute.put("/updateProduct/:id", auth, updatedProduct);
 
 export default productRoute;

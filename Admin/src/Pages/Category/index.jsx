@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaPlus, FaRegEye, FaTrash } from "react-icons/fa";
 import Checkbox from "@mui/material/Checkbox";
 import { Link } from "react-router-dom";
@@ -15,9 +15,11 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { BiExport } from "react-icons/bi";
-
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 import { MyContext } from "../../App";
 import SearchBox from "../../Components/SearchBox/SearchBox";
+import { deleteData, fetchDataFromApi } from "../../utils/api";
 
 const columns = [
   { id: "image", label: "CATEGORY IMAGE", minWidth: 250 },
@@ -36,7 +38,13 @@ const Category = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
+  // const [catData, setCatData] = useState([]);
+  useEffect(() => {
+    fetchDataFromApi("/api/category").then((res) => {
+      //console.log(res?.data);
+      context.setCatData(res?.data);
+    });
+  }, [context?.isOpenFullScreenPanel]);
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -44,6 +52,15 @@ const Category = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  };
+  const deleteCat = (id) => {
+    deleteData(`/api/category/${id}`).then((res) => {
+      context.openAlertBox("success",res?.message || "Category deleted successfully");
+      fetchDataFromApi("/api/category").then((res) => {
+        console.log(res?.data);
+        context.setCatData(res?.data);
+      });
+    });
   };
   return (
     <>
@@ -71,7 +88,6 @@ const Category = () => {
           </Button>
         </div>
       </div>
-   
 
       <div className="card my-4 pt-5 shadow-md sm:rounded-lg bg-white">
         <div className="flex items-center w-full px-5 justify-between ">
@@ -114,51 +130,72 @@ const Category = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <Checkbox {...label} size="small" />
-                </TableCell>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <div className="flex items-center gap-4 w-[100px]">
-                    <div className="img w-full h-24  rounded-md overflow-hidden group">
-                      <Link to={"/product/4545"}>
-                        <img
-                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fHww"
-                          className="w-full group-hover:scale-105 transition-all  h-full object-cover "
-                          alt=""
-                        />
-                      </Link>
-                    </div>
-                  </div>
-                </TableCell>
+              {context.catData?.length !== 0 &&
+                context.catData?.map((item, index) => {
+                  return (
+                    <TableRow>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        <Checkbox {...label} size="small" />
+                      </TableCell>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        <div className="flex items-center gap-4 w-[100px]">
+                          <div className="img w-full h-24  rounded-md overflow-hidden group">
+                            <Link to="/product/4545" data-discover="true">
+                              <LazyLoadImage
+                                alt="image"
+                                effect="blur"
+                                className="w-full group-hover:scale-105 transition-all h-full object-cover"
+                                src={item.images[0]?.url} // ✅ fixed
+                              />
+                            </Link>
+                          </div>
+                        </div>
+                      </TableCell>
 
-                <TableCell width={250}>Fashion</TableCell>
+                      <TableCell width={250}>{item?.name}</TableCell>
 
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <div className="flex items-center gap-4">
-                    <Tooltip1 title="Edit Product" placement="top-start">
-                      <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                        <AiOutlineEdit className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                      </Button>
-                    </Tooltip1>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        <div className="flex items-center gap-4">
+                          <Tooltip1 title="Edit Product" placement="top-start">
+                            <Button
+                              className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]"
+                              onClick={() =>
+                                context.setIsOpenFullScreenPanel({
+                                  open: true,
+                                  model: "Edit Category",
+                                  id: item?._id,
+                                })
+                              }
+                            >
+                              <AiOutlineEdit className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+                            </Button>
+                          </Tooltip1>
 
-                    <Tooltip1
-                      title="View Product Details"
-                      placement="top-start"
-                    >
-                      <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                        <FaRegEye className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                      </Button>
-                    </Tooltip1>
+                          {/* <Tooltip1
+                            title="View Product Details"
+                            placement="top-start"
+                          >
+                            <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
+                              <FaRegEye className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+                            </Button>
+                          </Tooltip1> */}
 
-                    <Tooltip1 title="Remove Product" placement="top-start">
-                      <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                        <FaTrash className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                      </Button>
-                    </Tooltip1>
-                  </div>
-                </TableCell>
-              </TableRow>
+                          <Tooltip1
+                            title="Remove Product"
+                            placement="top-start"
+                          >
+                            <Button
+                              className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]"
+                              onClick={() => deleteCat(item?._id)}
+                            >
+                              <FaTrash className="text-[rgba(0,0,0,0.7)] tex t-[20px]" />
+                            </Button>
+                          </Tooltip1>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </TableContainer>
@@ -172,8 +209,6 @@ const Category = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </div>
-
-     
     </>
   );
 };

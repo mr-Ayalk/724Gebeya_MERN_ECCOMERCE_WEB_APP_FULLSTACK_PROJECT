@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaPlus, FaRegEye, FaTrash } from "react-icons/fa";
 import Checkbox from "@mui/material/Checkbox";
 import { Link } from "react-router-dom";
@@ -18,7 +18,9 @@ import TableRow from "@mui/material/TableRow";
 import { BiExport } from "react-icons/bi";
 import SearchBox from "../SearchBox/SearchBox";
 import { MyContext } from "../../App";
-
+import { deleteData, fetchDataFromApi } from "../../utils/api";
+//
+import { LazyLoadImage } from "react-lazy-load-image-component";
 const columns = [
   // {
   //   id: "id",
@@ -54,14 +56,16 @@ const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const Products = () => {
   const context = useContext(MyContext);
   const [category, setCategory] = useState("");
-
+  const [productCat, setProductCat] = useState("");
+  const [productSubCat, setProductSubCat] = useState("");
+  const [productThirdLevelCat, setProductThirdLevelCat] = useState("");
   const handleChange = (event) => {
     setCategory(event.target.value);
   };
-
+  const [sortedIds, setsortedIds] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
+  const [productData, setProductData] = useState([]);
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -70,6 +74,122 @@ const Products = () => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+  const [formFields, setFormFields] = useState({
+    name: "",
+    description: "",
+    images: [],
+    brand: "",
+    price: "",
+    oldPrice: "",
+    category: "",
+    catName: "",
+    catId: "",
+    subCatId: "",
+    subCat: "",
+    thirdsubCat: "",
+    thirdsubCatId: "",
+    countInStock: "",
+    rating: "",
+    isFeatured: false,
+    discount: "",
+    productRam: [],
+    size: [],
+    productWeight: [],
+  });
+  useEffect(() => {
+    getProducts();
+  }, [context?.setIsOpenFullScreenPanel]);
+  const getProducts = async () => {
+    fetchDataFromApi("/api/product/getAllProducts").then((res) => {
+      let productArr = [];
+      console.log(res);
+      if (res?.error === false) {
+        for (let i = 0; i < res?.products?.length; i++) {
+          productArr[i] = res?.products[i];
+          productArr[i].checked = false;
+        }
+        setProductData(res?.products);
+      }
+    });
+  };
+  useEffect(() => {
+    fetchDataFromApi("/api/product/getAllProducts").then((res) => {
+      console.log(res);
+      if (res?.error === false) {
+        setProductData(res?.products);
+      }
+    });
+  }, []);
+  const deleteProduct = (id) => {
+    deleteData(`/api/product/${id}`).then((res) => {
+      // console.log(res);
+      if (res?.error === false) {
+        getProducts();
+        // console.log(res);
+        context.openAlertBox(
+          "error",
+          res?.message || "Please enter product name"
+        );
+      } else {
+        context.openAlertBox("success", "Product deleted successfully");
+      }
+    });
+  };
+  const deleteMultipleProduct = () => {
+    if (sortedIds.length === 0) {
+      context.openAlertBox("error", "Please select items to delete");
+      return;
+    }
+    console.log(sortedIds);
+    try {
+      deleteMultipleProduct(`/api/product/deleteMultiple`, {
+        data: { ids: sortedIds },
+      }).then((res) => {
+        console.log(res);
+        getProducts();
+        context.openAlertBox("success", "Product deleted");
+      });
+    } catch (error) {
+      context.openAlertBox("error", "Error deleting items.");
+    }
+  };
+  const handleChangeProductCat = (event) => {
+    setProductCat(event.target.value);
+    // formFields.catId = event.target.value;
+    fetchDataFromApi(
+      `/api/product/getAllProductsByCatId/${event.target.value}`
+    ).then((res) => {
+      // console.log(res);
+      if (res?.error === false) {
+        setProductData(res?.products);
+      }
+    });
+  };
+  const handleChangeProductSubCat = (event) => {
+    setProductSubCat(event.target.value);
+    // formFields.subCatId = event.target.value;
+    fetchDataFromApi(
+      `/api/product/getAllProductsBysubCatId/${event.target.value}`
+    ).then((res) => {
+      console.log(res);
+      if (res?.error === false) {
+        setProductData(res?.products);
+      }
+    });
+  };
+  const handleChangeProductThirdLevelCat = (event) => {
+    setProductThirdLevelCat(event.target.value);
+    // formFields.thirdLevelCat = event.target.value;
+    fetchDataFromApi(
+      `/api/product/getAllProductsthridLevelCatId/${event.target.value}`
+    ).then((res) => {
+      // console.log(res);
+      if (res?.error === false) {
+        setProductData(res?.products);
+      }
+    });
+  };
+
   return (
     <>
       <div className="flex items-center justify-between px-2 py-0 mt-3">
@@ -96,15 +216,38 @@ const Products = () => {
           </Button>
         </div>
       </div>
-   
 
       <div className="card my-4 pt-5 shadow-md sm:rounded-lg bg-white">
-        <div className="flex items-center w-full px-5 justify-between ">
-          <div className="col w-[20%] py-3">
+        <div className="flex items-center w-full px-5 justify-between  gap-4">
+          <div className="col w-[15%] py-3">
             <h4 className="font-[600] text-[13px] mb-2">Category By</h4>
-            <Select
+            {context?.catData?.length !== 0 && (
+              <Select
+                style={{ zoom: "80%" }}
+                labelId="demo-simple-select-label"
+                id="productCatDrop"
+                className="w-full bg-white"
+                size="small"
+                value={productCat}
+                label="Age"
+                onChange={handleChangeProductCat}
+              >
+                {context?.catData?.map((cat, index) => {
+                  return (
+                    <MenuItem value={cat?._id} key={index}>
+                      {cat?.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            )}
+          </div>
+          <div className="col w-[15%] py-3">
+            <h4 className="font-[600] text-[13px] mb-2">Sub Category By</h4>
+            {/* <Select
               size="small"
               className="w-full"
+              style={{ zoom: "80%" }}
               labelId="demo-simple-select-helper-label"
               id="demo-simple-select-helper"
               value={category}
@@ -117,9 +260,79 @@ const Products = () => {
               <MenuItem value={10}>Men</MenuItem>
               <MenuItem value={20}>Women</MenuItem>
               <MenuItem value={30}>Kids</MenuItem>
-            </Select>
+            </Select> */}
+            {context?.catData?.length !== 0 && (
+              <Select
+                labelId="demo-simple-select-label"
+                id="productCatDrop"
+                className="w-full bg-white"
+                size="small"
+                value={productSubCat}
+                label="Age"
+                onChange={handleChangeProductSubCat}
+              >
+                {context?.catData?.map(
+                  (cat, index) =>
+                    cat?.children?.length !== 0 &&
+                    cat?.children?.map((subCat, index_) => (
+                      <MenuItem key={subCat?._id} value={subCat?._id}>
+                        {subCat?.name}
+                      </MenuItem>
+                    ))
+                )}
+              </Select>
+            )}
           </div>
-
+          <div className="col w-[15%] py-3">
+            <h4 className="font-[600] text-[13px] mb-2">
+              Third Level Category By
+            </h4>
+            {/* <Select
+              size="small"
+              className="w-full"
+              style={{ zoom: "80%" }}
+              labelId="demo-simple-select-helper-label"
+              id="demo-simple-select-helper"
+              value={category}
+              label="Category"
+              onChange={handleChange}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              <MenuItem value={10}>Men</MenuItem>
+              <MenuItem value={20}>Women</MenuItem>
+              <MenuItem value={30}>Kids</MenuItem>
+            </Select> */}
+            {context?.catData?.length !== 0 && (
+              <Select
+                labelId="demo-simple-select-label"
+                id="productCatDrop"
+                className="w-full bg-white"
+                size="small"
+                value={productThirdLevelCat}
+                label="Age"
+                onChange={handleChangeProductThirdLevelCat}
+              >
+                {context?.catData?.map(
+                  (cat) =>
+                    cat?.children?.length !== 0 &&
+                    cat?.children?.map(
+                      (subCat) =>
+                        subCat?.children?.length !== 0 &&
+                        subCat?.children?.map((thirdLevelCat, index) => (
+                          <MenuItem
+                            value={thirdLevelCat?._id}
+                            key={thirdLevelCat?._id || index}
+                          >
+                            {thirdLevelCat?.name}
+                          </MenuItem>
+                        ))
+                    )
+                )}
+              </Select>
+            )}
+          </div>
           <div className="col w-[20%] ml-auto">
             <SearchBox />
           </div>
@@ -143,97 +356,119 @@ const Products = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <Checkbox {...label} size="small" />
-                </TableCell>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <div className="flex items-center gap-4 w-[300px]">
-                    <div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                      <Link to={"/product/4545"}>
-                        <img
-                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fHww"
-                          className="w-full group-hover:scale-105 transition-all"
-                          alt=""
-                        />
-                      </Link>
-                    </div>
+              {productData?.length !== 0 &&
+                productData?.map((product, index) => {
+                  return (
+                    <TableRow key={index}>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        <Checkbox {...label} size="small" />
+                      </TableCell>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        <div className="flex items-center gap-4 w-[300px]">
+                          <div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
+                            <Link to={`/product/${product?._id}`}>
+                              <LazyLoadImage
+                                className="w-full group-hover:scale-105 transition-all"
+                                alt={"category image"}
+                                effect="blur"
+                                src={product.images[0]} // ✅ use url field from object
+                              />
+                            </Link>
+                          </div>
 
-                    <div className="info w-[75%]">
-                      <h3 className="font-[600] text-[12px] leading-4 hover:text-[#3872fa]">
-                        <Link to={"/product/4545"}>
-                          {" "}
-                          Lorem, ipsum dolor sit amet consectetur adipisicing
-                          elit. Quia culpa
-                        </Link>
-                      </h3>
-                      <span className="text-[12px]">Books</span>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  Electronics
-                </TableCell>
+                          <div className="info w-[75%]">
+                            <h3 className="font-[600] text-[12px] leading-4 hover:text-[#3872fa]">
+                              <Link to={`/product/${product?._id}`}>
+                                {product?.name}
+                              </Link>
+                            </h3>
+                            <span className="text-[12px]">
+                              {product?.brand}
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        {product?.catName}
+                      </TableCell>
 
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  Women
-                </TableCell>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <div className="flex gap-1 flex-col">
-                    <span className="oldPrice line-through leading-3 text-gray-500 text-[14px] font-[500]">
-                      $44.99
-                    </span>
-                    <span className="price text-[#3872fa] text-[14px] font-[600]">
-                      $33.33
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <p className="text-[14px] w-[100px]">
-                    <span className="font-[600]">234</span>sale
-                    <Progress value={40} type={"success"} />
-                  </p>
-                </TableCell>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <div className="flex items-center gap-4">
-                    <Tooltip1 title="Edit Product" placement="top-start">
-                      <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                        <AiOutlineEdit className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                      </Button>
-                    </Tooltip1>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        {product?.subCat}
+                      </TableCell>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        <div className="flex gap-1 flex-col">
+                          <span className="oldPrice line-through leading-3 text-gray-500 text-[14px] font-[500]">
+                            &#x20b9; {product?.price}
+                          </span>
+                          <span className="price text-[#3872fa] text-[14px] font-[600]">
+                            &#x20b9; {product?.oldPrice}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        <p className="text-[14px] w-[100px]">
+                          <span className="font-[600]">{product?.sale} </span>
+                          sale
+                          {/* <Progress value={40} type={"success"} /> */}
+                        </p>
+                      </TableCell>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        <div className="flex items-center gap-4">
+                          <Tooltip1 title="Edit Product" placement="top-start">
+                            <Button
+                              className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]"
+                              onClick={() =>
+                                context.setIsOpenFullScreenPanel({
+                                  open: true,
+                                  model: "Edit Product",
+                                  id: product?._id,
+                                })
+                              }
+                            >
+                              <AiOutlineEdit className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+                            </Button>
+                          </Tooltip1>
 
-                    <Tooltip1
-                      title="View Product Details"
-                      placement="top-start"
-                    >
-                      <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                        <FaRegEye className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                      </Button>
-                    </Tooltip1>
+                          <Tooltip1
+                            title="View Product Details"
+                            placement="top-start"
+                          >
+                            <Link to={`/product/${product?._id}`}>
+                              <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
+                                <FaRegEye className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+                              </Button>
+                            </Link>
+                          </Tooltip1>
 
-                    <Tooltip1 title="Remove Product" placement="top-start">
-                      <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                        <FaTrash className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                      </Button>
-                    </Tooltip1>
-                  </div>
-                </TableCell>
-              </TableRow>
+                          <Tooltip1
+                            title="Remove Product"
+                            placement="top-start"
+                          >
+                            <Button
+                              className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]"
+                              onClick={() => deleteProduct(product?._id)}
+                            >
+                              <FaTrash className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+                            </Button>
+                          </Tooltip1>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={10}
+          count={productData?.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </div>
-
- 
     </>
   );
 };
