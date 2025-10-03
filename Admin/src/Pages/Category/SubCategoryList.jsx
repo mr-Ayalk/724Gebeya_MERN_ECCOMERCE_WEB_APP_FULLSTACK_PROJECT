@@ -1,64 +1,26 @@
-import { Button, Chip } from "@mui/material";
-import { useContext, useState } from "react";
-import { FaPlus, FaRegEye, FaTrash } from "react-icons/fa";
-import Checkbox from "@mui/material/Checkbox";
-import { Link } from "react-router-dom";
-import Progress from "../../Components/ProgressBar";
-import { AiOutlineEdit } from "react-icons/ai";
-import Tooltip1 from "@mui/material/Tooltip";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
-import TableRow from "@mui/material/TableRow";
-import { BiExport } from "react-icons/bi";
-
+import { Button } from "@mui/material";
+import React, { useContext, useState } from "react";
 import { MyContext } from "../../App";
-import SearchBox from "../../Components/SearchBox/SearchBox";
+import { FaAngleDown, FaPlus } from "react-icons/fa";
+import EditSubCatBox from "./EditSubCatBox";
 
-const columns = [
-  { id: "image", label: "CATEGORY IMAGE", minWidth: 240 },
-  { id: "catName", label: "CATEGORY NAME", minWidth: 240 },
-  { id: "subcatName", label: "SUB CATEGORY NAME", minWidth: 400 },
-  { id: "action", label: "ACTION", minWidth: 100 },
-];
-
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const SubCategoryList = () => {
+  const [isOpen, setIsOpen] = useState(0);
+
   const context = useContext(MyContext);
-  const [category, setCategory] = useState("");
-
-  const handleChange = (event) => {
-    setCategory(event.target.value);
+  const expand = (index) => {
+    if (isOpen === index) {
+      setIsOpen(!isOpen);
+    } else {
+      setIsOpen(index);
+    }
   };
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
   return (
     <>
       <div className="flex items-center justify-between px-2 py-0 mt-3">
-        <h2 className="text-[18px] font-[600]">
-          Sub Category List
-          <span className="font-[400] text-[14px]">(Material Ui Table)</span>
-        </h2>
-        <div className="col w-[40%] ml-auto flex items-center justify-end gap-3">
-          <Button className="btn !bg-green-600 !text-white btn-sm">
-            <BiExport />
-            Export
-          </Button>
+        <h2 className="text-[18px] font-[600]">Sub Category List</h2>
+        <div className="col w-[30%] ml-auto flex items-center justify-end gap-3">
           <Button
             className="btn-blue !text-white btn-sm"
             onClick={() =>
@@ -73,109 +35,275 @@ const SubCategoryList = () => {
           </Button>
         </div>
       </div>
-   
 
-      <div className="card my-4 pt-5 shadow-md sm:rounded-lg bg-white">
-        <div className="flex items-center w-full px-5 justify-between ">
-          <div className="col w-[20%] py-3">
-            <h4 className="font-[600] text-[13px] mb-2">Category By</h4>
-            <Select
-              size="small"
-              className="w-full"
-              labelId="demo-simple-select-helper-label"
-              id="demo-simple-select-helper"
-              value={category}
-              label="Category"
-              onChange={handleChange}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value={10}>Men</MenuItem>
-              <MenuItem value={20}>Women</MenuItem>
-              <MenuItem value={30}>Kids</MenuItem>
-            </Select>
-          </div>
+      <div className="card my-4 pt-5 pb-5 px-5 shadow-md sm:rounded-lg bg-white">
+        {context?.catData?.length !== 0 && (
+          <ul className="w-full">
+            {context?.catData?.map((firstLavelCat, index) => {
+              return (
+                <li className="w-full mb-1" key={index}>
+                  <div className="flex items-center w-full p-2 bg-[#f1f1f1] rounded-sm px-4">
+                    <span className="font-[500] flex items-center gap-4 text-[14px]">
+                      {" "}
+                      {firstLavelCat?.name}
+                    </span>
+                    <Button
+                      className="min-w-[35px] !w-[35px] !h-[35px] !rounded-full !text-black !ml-auto"
+                      onClick={() => expand(index)}
+                    >
+                      <FaAngleDown />
+                    </Button>
+                  </div>
+                  {isOpen === index && (
+                    <>
+                      {firstLavelCat?.children?.length !== 0 && (
+                        <ul className="w-full">
+                          {firstLavelCat?.children?.map((subCat, index_) => {
+                            return (
+                              <li className="w-full py-1" key={index_}>
+                                <EditSubCatBox
+                                  name={subCat?.name}
+                                  id={subCat?._id}
+                                  catData={context?.catData}
+                                  index={index_}
+                                  selectedCat={subCat?.parentId}
+                                  selectedCatName={subCat?.parentCatName}
+                                />
 
-          <div className="col w-[20%] ml-auto">
-            <SearchBox />
-          </div>
-        </div>
-        <TableContainer sx={{ maxHeight: 440 }}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow width={60}>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <Checkbox {...label} size="small" />
-                </TableCell>
-                {columns.map((column) => (
-                  <TableCell key={column.id} align={column.align}>
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <Checkbox {...label} size="small" />
-                </TableCell>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <div className="flex items-center gap-4 w-[100px]">
-                    <div className="img w-full h-20  rounded-md overflow-hidden group">
-                      <Link to={"/product/4545"}>
-                        <img
-                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fHww"
-                          className="w-full group-hover:scale-105 transition-all  h-full object-cover "
-                          alt=""
-                        />
-                      </Link>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Chip label="Fashion" />
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Chip label="Men" color={"primary"} />
-                    <Chip label="Women" color={"primary"}/>
-                    <Chip label="Kids" color={"primary"}/>
-                  </div>
-                </TableCell>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <div className="flex items-center gap-4">
-                    <Tooltip1 title="Edit Product" placement="top-start">
-                      <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                        <AiOutlineEdit className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                      </Button>
-                    </Tooltip1>
-
-                    <Tooltip1 title="Remove Product" placement="top-start">
-                      <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                        <FaTrash className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                      </Button>
-                    </Tooltip1>
-                  </div>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={10}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+                                {subCat?.children?.length !== 0 && (
+                                  <ul className="pl-4">
+                                    {subCat?.children?.map(
+                                      (thirdLevel, index__) => {
+                                        return (
+                                          <li
+                                            key={index__}
+                                            className="w-full hover:bg-[#f1f1f1]"
+                                          >
+                                            <EditSubCatBox
+                                              name={thirdLevel.name}
+                                              catData={firstLavelCat?.children}
+                                              index={index__}
+                                              selectedCat={
+                                                thirdLevel?.parentCatName
+                                              }
+                                              id={thirdLevel?._id}
+                                            />
+                                          </li>
+                                        );
+                                      }
+                                    )}
+                                  </ul>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
-
-     
     </>
   );
 };
 
 export default SubCategoryList;
+
+// import { Button, Chip } from "@mui/material";
+// import { useContext, useEffect, useState } from "react";
+// import { FaPlus, FaRegEye, FaTrash } from "react-icons/fa";
+// import Checkbox from "@mui/material/Checkbox";
+// import { Link } from "react-router-dom";
+// import Progress from "../../Components/ProgressBar";
+// import { AiOutlineEdit } from "react-icons/ai";
+// import Tooltip1 from "@mui/material/Tooltip";
+// import Select from "@mui/material/Select";
+// import MenuItem from "@mui/material/MenuItem";
+// import Table from "@mui/material/Table";
+// import TableBody from "@mui/material/TableBody";
+// import TableCell from "@mui/material/TableCell";
+// import TableContainer from "@mui/material/TableContainer";
+// import TableHead from "@mui/material/TableHead";
+// import TablePagination from "@mui/material/TablePagination";
+// import TableRow from "@mui/material/TableRow";
+// import { BiExport } from "react-icons/bi";
+
+// import { MyContext } from "../../App";
+// import SearchBox from "../../Components/SearchBox/SearchBox";
+// import { fetchDataFromApi } from "../../utils/api";
+
+// const columns = [
+//   { id: "image", label: "CATEGORY IMAGE", minWidth: 240 },
+//   { id: "catName", label: "CATEGORY NAME", minWidth: 240 },
+//   { id: "subcatName", label: "SUB CATEGORY NAME", minWidth: 400 },
+//   { id: "action", label: "ACTION", minWidth: 100 },
+// ];
+
+// const label = { inputProps: { "aria-label": "Checkbox demo" } };
+
+// const SubCategoryList = () => {
+//   const context = useContext(MyContext);
+//   const [category, setCategory] = useState("");
+//   const [page, setPage] = useState(0);
+//   const [rowsPerPage, setRowsPerPage] = useState(10);
+//   useEffect(() => {
+//     fetchDataFromApi("/api/category").then((res) => {
+//       //console.log(res?.data);
+//       context.setCatData(res?.data);
+//     });
+//   }, [context?.isOpenFullScreenPanel]);
+
+//   const handleChange = (event) => {
+//     setCategory(event.target.value);
+//   };
+
+//   const handleChangePage = (event, newPage) => {
+//     setPage(newPage);
+//   };
+
+//   const handleChangeRowsPerPage = (event) => {
+//     setRowsPerPage(+event.target.value);
+//     setPage(0);
+//   };
+//   return (
+//     <>
+//       <div className="flex items-center justify-between px-2 py-0 mt-3">
+//         <h2 className="text-[18px] font-[600]">
+//           Sub Category List
+//           <span className="font-[400] text-[14px]">(Material Ui Table)</span>
+//         </h2>
+//         <div className="col w-[40%] ml-auto flex items-center justify-end gap-3">
+//           <Button className="btn !bg-green-600 !text-white btn-sm">
+//             <BiExport />
+//             Export
+//           </Button>
+//           <Button
+//             className="btn-blue !text-white btn-sm"
+//             onClick={() =>
+//               context.setIsOpenFullScreenPanel({
+//                 open: true,
+//                 model: "Add New Sub Category",
+//               })
+//             }
+//           >
+//             <FaPlus className="items-center" />
+//             Add New Sub Category
+//           </Button>
+//         </div>
+//       </div>
+
+//       <div className="card my-4 pt-5 shadow-md sm:rounded-lg bg-white">
+//         <div className="flex items-center w-full px-5 justify-between ">
+//           <div className="col w-[20%] py-3">
+//             <h4 className="font-[600] text-[13px] mb-2">Category By</h4>
+//             <Select
+//               size="small"
+//               className="w-full"
+//               labelId="demo-simple-select-helper-label"
+//               id="demo-simple-select-helper"
+//               value={category}
+//               label="Category"
+//               onChange={handleChange}
+//             >
+//               <MenuItem value="">
+//                 <em>None</em>
+//               </MenuItem>
+//               <MenuItem value={10}>Men</MenuItem>
+//               <MenuItem value={20}>Women</MenuItem>
+//               <MenuItem value={30}>Kids</MenuItem>
+//             </Select>
+//           </div>
+
+//           <div className="col w-[20%] ml-auto">
+//             <SearchBox />
+//           </div>
+//         </div>
+//         <TableContainer sx={{ maxHeight: 440 }}>
+//           <Table stickyHeader aria-label="sticky table">
+//             <TableHead>
+//               <TableRow width={60}>
+//                 <TableCell style={{ minWidth: columns.minWidth }}>
+//                   <Checkbox {...label} size="small" />
+//                 </TableCell>
+//                 {columns.map((column) => (
+//                   <TableCell key={column.id} align={column.align}>
+//                     {column.label}
+//                   </TableCell>
+//                 ))}
+//               </TableRow>
+//             </TableHead>
+//             <TableBody>
+//               {context.catData?.length !== 0 &&
+//                 context.catData?.map((item, index) => {
+//                   return (
+//                     <TableRow>
+//                       <TableCell style={{ minWidth: columns.minWidth }}>
+//                         <Checkbox {...label} size="small" />
+//                       </TableCell>
+
+//                       <TableCell style={{ minWidth: columns.minWidth }}>
+//                         <div className="flex items-center gap-4 w-[100px]">
+//                           <div className="img w-full h-20  rounded-md overflow-hidden group">
+//                             <Link to={"/product/4545"}>
+//                               <img
+//                                 src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fHww"
+//                                 className="w-full group-hover:scale-105 transition-all  h-full object-cover "
+//                                 alt=""
+//                               />
+//                             </Link>
+//                           </div>
+//                         </div>
+//                       </TableCell>
+//                       <TableCell>
+//                         <Chip label="Fashion" />
+//                       </TableCell>
+//                       <TableCell>
+//                         <div className="flex items-center gap-3">
+//                           <Chip label="Men" color={"primary"} />
+//                           <Chip label="Women" color={"primary"} />
+//                           <Chip label="Kids" color={"primary"} />
+//                         </div>
+//                       </TableCell>
+//                       <TableCell style={{ minWidth: columns.minWidth }}>
+//                         <div className="flex items-center gap-4">
+//                           <Tooltip1 title="Edit Product" placement="top-start">
+//                             <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
+//                               <AiOutlineEdit className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+//                             </Button>
+//                           </Tooltip1>
+
+//                           <Tooltip1
+//                             title="Remove Product"
+//                             placement="top-start"
+//                           >
+//                             <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
+//                               <FaTrash className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+//                             </Button>
+//                           </Tooltip1>
+//                         </div>
+//                       </TableCell>
+//                     </TableRow>
+//                   );
+//                 })}
+//             </TableBody>
+//           </Table>
+//         </TableContainer>
+//         <TablePagination
+//           rowsPerPageOptions={[10, 25, 100]}
+//           component="div"
+//           count={10}
+//           rowsPerPage={rowsPerPage}
+//           page={page}
+//           onPageChange={handleChangePage}
+//           onRowsPerPageChange={handleChangeRowsPerPage}
+//         />
+//       </div>
+//     </>
+//   );
+// };
+
+// export default SubCategoryList;

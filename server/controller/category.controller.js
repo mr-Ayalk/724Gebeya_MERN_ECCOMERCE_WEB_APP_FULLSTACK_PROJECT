@@ -85,13 +85,47 @@ export async function uploadImages(request, response) {
   }
 }
 
+// export async function createCategory(request, response) {
+//   try {
+//     let category = new Categorymodel({
+//       name: request.body.name,
+//       images: imagesArr,
+//       parentId: request.body.parentId,
+//       parentCatName: request.body.parentCatName,
+//     });
+
+//     if (!category) {
+//       return response.status(400).json({
+//         message: "Category not created",
+//         error: true,
+//         success: false,
+//       });
+//     }
+//     category = await category.save();
+//     imagesArr = [];
+//     return response.status(200).json({
+//       message: "Category Created",
+//       error: false,
+//       success: true,
+//       category: category,
+//     });
+//   } catch (error) {
+//     return response.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+
+//get all category
 export async function createCategory(request, response) {
   try {
     let category = new Categorymodel({
       name: request.body.name,
-      images: imagesArr,
-      parentId: request.body.parentId,
-      parentCatName: request.body.parentCatName,
+      images: request.body.images, // ✅ take directly from request
+      parentId: request.body.parentId || null,
+      parentCatName: request.body.parentCatName || "",
     });
 
     if (!category) {
@@ -102,12 +136,12 @@ export async function createCategory(request, response) {
       });
     }
     category = await category.save();
-    imagesArr = [];
+
     return response.status(200).json({
       message: "Category Created",
       error: false,
       success: true,
-      category: category,
+      category,
     });
   } catch (error) {
     return response.status(500).json({
@@ -118,38 +152,64 @@ export async function createCategory(request, response) {
   }
 }
 
-//get all category
+// export async function getCategories(request, response) {
+//   try {
+//     const categories = await Categorymodel.find();
+//     const categoryMap = {};
+//     categories.forEach((cat) => {
+//       categoryMap[cat._id] = { ...cat._doc, children: [] };
+//     });
+//     const rootCategories = [];
+//     categories.forEach((cat) => {
+//       if (cat.parentId) {
+//         categoryMap[cat.parentId].children.push(categoryMap[cat._id]);
+//       } else {
+//         rootCategories.push(categoryMap[cat._id]);
+//       }
+//     });
+//     return response.status(200).json({
+//       error: false,
+//       success: true,
+//       data: rootCategories,
+//     });
+//   } catch (error) {
+//     return response.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
 
-export async function getCategories(request, response) {
+//get category count
+
+export async function getCategories(req, res) {
   try {
     const categories = await Categorymodel.find();
     const categoryMap = {};
     categories.forEach((cat) => {
       categoryMap[cat._id] = { ...cat._doc, children: [] };
     });
+
     const rootCategories = [];
     categories.forEach((cat) => {
       if (cat.parentId) {
-        categoryMap[cat.parentId].children.push(categoryMap[cat._id]);
+        categoryMap[cat.parentId]?.children.push(categoryMap[cat._id]);
       } else {
         rootCategories.push(categoryMap[cat._id]);
       }
     });
-    return response.status(200).json({
+
+    return res.status(200).json({
       error: false,
       success: true,
-      daata: rootCategories,
+      data: rootCategories, // ✅ fixed typo
     });
   } catch (error) {
-    return response.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
+    return res.status(500).json({ error: true, message: error.message });
   }
 }
 
-//get category count
 export async function getCategoryCount(request, response) {
   try {
     const categoryCount = await Categorymodel.countDocuments({
@@ -272,106 +332,170 @@ export async function removeImageFromCloudinary(req, res) {
   }
 }
 
-export async function deleteCatagory(request, response) {
+// export async function deleteCatagory(request, response) {
+//   try {
+//     const category = await Categorymodel.findById(request.params.id);
+
+//     if (!category) {
+//       return response.status(404).json({
+//         success: false,
+//         error: true,
+//         message: "Category not found",
+//       });
+//     }
+
+//     // 1. Delete category images
+//     for (let imgUrl of category.images) {
+//       const urlArr = imgUrl.split("/");
+//       const image = urlArr[urlArr.length - 1];
+//       const imageName = image.split(".")[0];
+//       if (imageName) {
+//         await cloudinary.uploader.destroy(imageName);
+//       }
+//     }
+
+//     // 2. Delete subcategories (and third-level subcategories)
+//     const subCategories = await Categorymodel.find({ parentId: category._id });
+//     for (let i = 0; i < subCategories.length; i++) {
+//       const thirdLevelSubs = await Categorymodel.find({
+//         parentId: subCategories[i]._id,
+//       });
+
+//       for (let j = 0; j < thirdLevelSubs.length; j++) {
+//         await Categorymodel.findByIdAndDelete(thirdLevelSubs[j]._id);
+//       }
+
+//       await Categorymodel.findByIdAndDelete(subCategories[i]._id);
+//     }
+
+//     // 3. Delete main category
+//     await Categorymodel.findByIdAndDelete(category._id);
+
+//     return response.status(200).json({
+//       success: true,
+//       error: false,
+//       message: "Category Deleted",
+//     });
+//   } catch (error) {
+//     return response.status(500).json({
+//       error: true,
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// }
+export async function deleteCatagory(req, res) {
   try {
-    const category = await Categorymodel.findById(request.params.id);
+    const category = await Categorymodel.findById(req.params.id);
+    if (!category)
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
 
-    if (!category) {
-      return response.status(404).json({
-        success: false,
-        error: true,
-        message: "Category not found",
-      });
-    }
-
-    // 1. Delete category images
-    for (let imgUrl of category.images) {
-      const urlArr = imgUrl.split("/");
-      const image = urlArr[urlArr.length - 1];
-      const imageName = image.split(".")[0];
-      if (imageName) {
-        await cloudinary.uploader.destroy(imageName);
+    // Delete images properly
+    for (let img of category.images) {
+      if (img?.public_id) {
+        await cloudinary.uploader.destroy(img.public_id);
       }
     }
 
-    // 2. Delete subcategories (and third-level subcategories)
+    // Delete subcategories recursively
     const subCategories = await Categorymodel.find({ parentId: category._id });
-    for (let i = 0; i < subCategories.length; i++) {
-      const thirdLevelSubs = await Categorymodel.find({
-        parentId: subCategories[i]._id,
-      });
-
-      for (let j = 0; j < thirdLevelSubs.length; j++) {
-        await Categorymodel.findByIdAndDelete(thirdLevelSubs[j]._id);
-      }
-
-      await Categorymodel.findByIdAndDelete(subCategories[i]._id);
+    for (const sub of subCategories) {
+      await deleteCatagory({ params: { id: sub._id } }, res); // recursive
     }
 
-    // 3. Delete main category
     await Categorymodel.findByIdAndDelete(category._id);
 
-    return response.status(200).json({
-      success: true,
-      error: false,
-      message: "Category Deleted",
-    });
-  } catch (error) {
-    return response.status(500).json({
-      error: true,
-      success: false,
-      message: error.message,
-    });
+    return res.status(200).json({ success: true, message: "Category Deleted" });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
   }
 }
 
+// export async function updatedCategory(req, res) {
+//   try {
+//     let imageUrl = req.body.images; // fallback to existing
+
+//     // If new file(s) uploaded
+//     if (req.files && req.files.length > 0) {
+//       const uploaded = await cloudinary.uploader.upload(req.files[0].path, {
+//         use_filename: true,
+//         unique_filename: false,
+//         overwrite: false,
+//       });
+
+//       imageUrl = uploaded.secure_url;
+
+//       // cleanup local file
+//       fs.unlinkSync(`uploads/${req.files[0].filename}`);
+//     }
+
+//     const category = await Categorymodel.findByIdAndUpdate(
+//       req.params.id,
+//       {
+//         name: req.body.name,
+//         images: imageUrl,
+//         parentId: req.body.parentId,
+//         parentCatName: req.body.parentCatName,
+//       },
+//       { new: true }
+//     );
+
+//     if (!category) {
+//       return res.status(404).json({
+//         success: false,
+//         error: true,
+//         message: "Category cannot be updated",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       error: false,
+//       category,
+//     });
+//   } catch (err) {
+//     return res.status(500).json({
+//       success: false,
+//       error: true,
+//       message: err.message,
+//     });
+//   }
+// }
 export async function updatedCategory(req, res) {
   try {
-    let imageUrl = req.body.images; // fallback to existing
+    let images = req.body.images || [];
 
-    // If new file(s) uploaded
-    if (req.files && req.files.length > 0) {
-      const uploaded = await cloudinary.uploader.upload(req.files[0].path, {
-        use_filename: true,
-        unique_filename: false,
-        overwrite: false,
-      });
-
-      imageUrl = uploaded.secure_url;
-
-      // cleanup local file
-      fs.unlinkSync(`uploads/${req.files[0].filename}`);
+    if (req.files?.length > 0) {
+      const uploaded = await Promise.all(
+        req.files.map((file) => cloudinary.uploader.upload(file.path))
+      );
+      images = uploaded.map((u) => ({
+        url: u.secure_url,
+        public_id: u.public_id,
+      }));
+      req.files.forEach((f) => fs.unlinkSync(`uploads/${f.filename}`));
     }
 
     const category = await Categorymodel.findByIdAndUpdate(
       req.params.id,
       {
         name: req.body.name,
-        images: imageUrl,
-        parentId: req.body.parentId,
-        parentCatName: req.body.parentCatName,
+        images,
+        parentId: req.body.parentId || null,
+        parentCatName: req.body.parentCatName || "",
       },
       { new: true }
     );
 
-    if (!category) {
-      return res.status(404).json({
-        success: false,
-        error: true,
-        message: "Category cannot be updated",
-      });
-    }
+    if (!category)
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
 
-    return res.status(200).json({
-      success: true,
-      error: false,
-      category,
-    });
+    return res.json({ success: true, category });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      error: true,
-      message: err.message,
-    });
+    return res.status(500).json({ success: false, message: err.message });
   }
 }

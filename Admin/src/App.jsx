@@ -32,6 +32,8 @@ import { useEffect } from "react";
 import { fetchDataFromApi } from "./utils/api";
 import Profile from "./Pages/Profile/Profile";
 import AddAddress from "./Pages/Address/AddAddress";
+import EditCategory from "./Pages/Category/editCategory";
+import ProductDetails from "./Components/Products/productDetails";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -42,6 +44,7 @@ function App() {
   const [isLogin, setIslogin] = useState(false);
   const [userData, setUserData] = useState(null);
   const [address, setAddress] = useState([]);
+  const [catData, setCatData] = useState([]);
   useEffect(() => {
     const token = localStorage.getItem("accesstoken");
     if (token !== undefined && token !== null && token !== "") {
@@ -62,10 +65,18 @@ function App() {
       });
     }
   }, [isLogin]);
-
+  useEffect(() => {
+    getCat();
+  }, []);
+  const getCat = () => {
+    fetchDataFromApi("/api/category").then((res) => {
+      setCatData(res?.data);
+    });
+  };
   const [isOpenFullScreenPanel, setIsOpenFullScreenPanel] = useState({
     open: false,
     model: "",
+    id: "",
   });
 
   const openAlertBox = (status, msg) => {
@@ -315,6 +326,33 @@ function App() {
         // </MyContext.Provider>
       ),
     },
+    {
+      path: "/product/:id",
+      exact: true,
+      element: (
+        // <MyContext.Provider value={{ isSidebarOpen, setIsSidebarOpen }}>
+        <section className="main">
+          <Header />
+          <div className="contentMain flex">
+            <div
+              className={`overflow-hidden sidebarWrapper transition-all duration-500 ease-in-out 
+    ${isSidebarOpen ? "w-[18%] " : "w-[0%] px-0 opacity-0"}`}
+            >
+              <Sidebar />
+            </div>
+
+            <div
+              className={`contentRight !bg-gray-50 py-4 px-5 transition-all duration-500 ease-in-out ${
+                isSidebarOpen ? "w-[82%] " : "w-[100%] "
+              }`}
+            >
+              <ProductDetails />
+            </div>
+          </div>
+        </section>
+        // </MyContext.Provider>
+      ),
+    },
   ]);
 
   const values = {
@@ -329,6 +367,9 @@ function App() {
     setUserData,
     address,
     setAddress,
+    catData,
+    setCatData,
+    getCat,
   };
 
   return (
@@ -336,7 +377,8 @@ function App() {
       <MyContext.Provider value={values}>
         <RouterProvider router={router} />
         <Toaster />
-        <Dialog
+
+        {/* <Dialog
           fullScreen
           open={isOpenFullScreenPanel.open}
           onClose={() =>
@@ -369,7 +411,6 @@ function App() {
               </Typography>
             </Toolbar>
           </AppBar>
-
           {isOpenFullScreenPanel?.model === "Add Product" && <AddProduct />}
           {isOpenFullScreenPanel?.model === "Add Home Slide" && (
             <AddHomeSlide />
@@ -380,8 +421,9 @@ function App() {
           {isOpenFullScreenPanel?.model === "Add New Sub Category" && (
             <AddSubCategory />
           )}
-          {isOpenFullScreenPanel?.model === "Add New Address" && <AddAddress />}
-        </Dialog>
+          {isOpenFullScreenPanel?.model === "Add New Address" && <AddAddress />}{" "}
+          {isOpenFullScreenPanel?.model === "Edit Category" && <EditCategory />}
+        </Dialog> */}
       </MyContext.Provider>
     </>
   );

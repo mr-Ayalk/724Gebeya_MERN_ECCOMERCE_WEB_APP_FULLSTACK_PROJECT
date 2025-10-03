@@ -1,7 +1,7 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import MenuItem from "@mui/material/MenuItem";
-
+//
 import Select from "@mui/material/Select";
 import Rating from "@mui/material/Rating";
 import UploadBox from "../UploadBox/UploadBox";
@@ -11,12 +11,17 @@ import { IoMdClose } from "react-icons/io";
 import { Button, CircularProgress } from "@mui/material";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { MyContext } from "../../App";
-import { deleteImages, postData } from "../../utils/api";
-import { useNavigate } from "react-router-dom";
-const AddProduct = () => {
+import {
+  deleteImages,
+  editData,
+  fetchDataFromApi,
+  postData,
+} from "../../utils/api";
+import { useNavigate, useParams } from "react-router-dom";
+const EditProduct = () => {
   const [productCat, setProductCat] = useState("");
   const [productSubCat, setProductSubCat] = useState("");
-  const [productFeature, setProductSubFeature] = useState("");
+  const [productFeature, setProductFeature] = useState("");
   const [productRAM, setProductRAM] = useState([]);
   const [productWeight, setProductWeight] = useState([]);
   const [productSize, setProductSize] = useState([]);
@@ -56,6 +61,43 @@ const AddProduct = () => {
     setProductSize(typeof value === "string" ? value.split(",") : value);
     formFields.productSize = value;
   };
+  const { id } = useParams();
+  useEffect(() => {
+    fetchDataFromApi(
+      `/api/product/${context?.setIsOpenFullScreenPanel?._id}`
+    ).then((res) => {
+      // console.log(res);
+      setFormFields({
+        name: res?.product?.name,
+        description: res?.product?.description,
+        images: res?.product?.images,
+        brand: res?.product?.brand,
+        price: res?.product?.price,
+        oldPrice: res?.product?.oldPrice,
+        category: res?.product?.category,
+        catName: res?.product?.catName,
+        catId: res?.product?.catId,
+        subCatId: res?.product?.subCatId,
+        thirdsubCat: res?.product?.thirdsubCat,
+        thirdsubCatId: res?.product?.thirdsubCatId,
+        countInStock: res?.product?.countInStock,
+        rating: res?.product?.rating,
+        isFeatured: res?.product?.isFeatured,
+        discount: res?.product?.discount,
+        productRam: res?.product?.productRam,
+        size: res?.product?.size,
+        productWeight: res?.product?.productWeight,
+      });
+      setProductCat(res?.product?.catId);
+      setProductSubCat(res?.product?.subCatId);
+      setProductThirdLevelCat(res?.product?.thirdsubCatId);
+      setProductFeature(res?.product?.isFeatured);
+      setProductRAM(res?.product?.productRam);
+      setProductSize(res?.product?.size);
+      setProductWeight(res?.product?.productWeight);
+      setPreviews(res?.product?.images);
+    });
+  }, []);
   const handleChangeProductWeight = (event) => {
     // setProductWeight(event.target.value);
     const {
@@ -73,28 +115,17 @@ const AddProduct = () => {
     formFields.productRam = value;
   };
   const handleChangeProductFeature = (event) => {
-    setProductSubFeature(event.target.value);
+    setProductFeature(event.target.value);
     formFields.isFeatured = event.target.value;
   };
   const handleChangeProductSubCat = (event) => {
     setProductSubCat(event.target.value);
     formFields.subCatId = event.target.value;
   };
-  // const handleChangeProductCat = (event) => {
-  //   setProductCat(event.target.value);
-  //   formFields.catId = event.target.value;
-  // };
-
   const handleChangeProductCat = (event) => {
-    const value = event.target.value;
-    setProductCat(value);
-    setFormFields((prev) => ({
-      ...prev,
-      category: value, // ✅ this is what backend expects
-      catId: value,
-    }));
+    setProductCat(event.target.value);
+    formFields.catId = event.target.value;
   };
-
   const handleChangeProductThirdLevelCat = (event) => {
     setProductThirdLevelCat(event.target.value);
     formFields.thirdLevelCat = event.target.value;
@@ -136,16 +167,28 @@ const AddProduct = () => {
       },
     },
   };
+  // const setPreviewsFunction = (images) => {
+  //   setPreviews(images);
+  //   setFormFields((prev) => ({
+  //     ...prev,
+  //     images,
+  //   }));
+  // };
   const setPreviewsFunction = (images) => {
-    setPreviews(images);
-    setFormFields((prev) => ({
-      ...prev,
-      images,
-    }));
+    const imgArr = previews;
+    for (let i = 0; i < images.length; i++) {
+      imgArr.push(images[i]);
+    }
+    setPreviews([
+      setTimeout(() => {
+        setPreviews(imgArr);
+        formFields.images = imgArr;
+      }, 10),
+    ]);
   };
   const removeImg = (imageObj, index) => {
     deleteImages(
-      `/api/product/deleteImage?public_id=${imageObj.public_id}`
+      `/api/category/deleteImage?public_id=${imageObj.public_id}`
     ).then((res) => {
       console.log(res);
 
@@ -171,78 +214,27 @@ const AddProduct = () => {
       context.openAlertBox("error", "Please enter product image");
       return false;
     }
-    if (formFields.price === "") {
-      context.openAlertBox("error", "Please enter product price");
-      return false;
-    }
-    if (formFields.oldPrice === "") {
-      context.openAlertBox("error", "Please enter product old price");
-      return false;
-    }
-    if (formFields.rating === "") {
-      context.openAlertBox("error", "Please enter product rating");
-      return false;
-    }
-    if (formFields.discount === "") {
-      context.openAlertBox("error", "Please enter product discount");
-      return false;
-    }
-    if (formFields.countInStock === "") {
-      context.openAlertBox("error", "Please enter product countInStock");
-      return false;
-    }
     setIsLoading(true);
-    //     postData("/api/product/create", formFields).then((res) => {
-    //       // console.log(res);
-    //       // if (res?.error === false) {
-    //       //   context.openAlertBox(
-    //       //     "error",
-    //       //     res?.message || "Please select category image"
-    //       //   );
+    editData(
+      `/api/product/updateProduct/${context?.setIsOpenFullScreenPanel?._id}`,
+      formFields
+    ).then((res) => {
+      // console.log(res);
+      if (res?.data?.error === false) {
+        context.openAlertBox(
+          "error",
+          res?.data?.message || "Please select category image"
+        );
 
-    //       //   setTimeout(() => {
-    //       //     setIsLoading(false);
-    //       //     context.setIsOpenFullScreenPanel({
-    //       //       open: false,
-    //       //     });
-    //       //     history("/products");
-    //       //   }, 1000);
-    //       // }
-    //       if (res?.error === false) {
-    //   context.openAlertBox("success", res?.message || "Product created successfully!");
-    //   setTimeout(() => {
-    //     setIsLoading(false);
-    //     context.setIsOpenFullScreenPanel({ open: false });
-    //     history("/products");
-    //   }, 1000);
-    // } else {
-    //   context.openAlertBox("error", res?.message || "Something went wrong");
-    //   setIsLoading(false);
-    // }
-
-    //     });
-    postData("/api/product/create", formFields)
-      .then((res) => {
-        if (res?.error === false) {
-          context.openAlertBox(
-            "success",
-            res?.message || "Product created successfully!"
-          );
-          setTimeout(() => {
-            setIsLoading(false);
-            context.setIsOpenFullScreenPanel({ open: false });
-            history("/products");
-          }, 1000);
-        } else {
-          context.openAlertBox("error", res?.message || "Something went wrong");
+        setTimeout(() => {
           setIsLoading(false);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        context.openAlertBox("error", "Network or server error");
-        setIsLoading(false);
-      });
+          context.setIsOpenFullScreenPanel({
+            open: false,
+          });
+          history("/products");
+        }, 1000);
+      }
+    });
   };
   return (
     <section className="p-5 px-20 bg-gray-50  overflow-hidden">
@@ -283,7 +275,6 @@ const AddProduct = () => {
               <h3 className="text-[14px] font-[500] mb-1 !text-black">
                 Product Category
               </h3>
-
               {context?.catData?.length !== 0 && (
                 <Select
                   labelId="demo-simple-select-label"
@@ -298,6 +289,7 @@ const AddProduct = () => {
                     return (
                       <MenuItem
                         value={cat?._id}
+                        key={index}
                         onClick={() => selectCatByName(cat?.name)}
                       >
                         {cat?.name}
@@ -321,19 +313,20 @@ const AddProduct = () => {
                   label="Age"
                   onChange={handleChangeProductSubCat}
                 >
-                  {context?.catData?.map(
-                    (cat) =>
-                      cat?.children?.length !== 0 &&
-                      cat?.children?.map((subCat) => (
-                        <MenuItem
-                          key={subCat?._id}
-                          value={subCat?._id}
-                          onClick={() => selectSubCatByName(subCat?.name)}
-                        >
-                          {subCat?.name}
-                        </MenuItem>
-                      ))
-                  )}
+                  {context?.catData?.map((cat, index) => {
+                    return;
+                    cat?.children?.length !== 0 &&
+                      cat?.children?.map((subCat, index_) => {
+                        return (
+                          <MenuItem
+                            value={subCat?._id}
+                            onClick={() => selectSubCatByName(subCat?.name)}
+                          >
+                            {subCat?.name}
+                          </MenuItem>
+                        );
+                      });
+                  })}
                 </Select>
               )}
             </div>
@@ -352,25 +345,30 @@ const AddProduct = () => {
                   label="Age"
                   onChange={handleChangeProductThirdLevelCat}
                 >
-                  {context?.catData?.map(
-                    (cat) =>
-                      cat?.children?.length !== 0 &&
-                      cat?.children?.map(
-                        (subCat) =>
+                  {context?.catData?.map((cat) => {
+                    return;
+                    cat?.children?.length !== 0 &&
+                      cat?.children?.map((subCat) => {
+                        return (
                           subCat?.children?.length !== 0 &&
-                          subCat?.children?.map((thirdLevelCat) => (
-                            <MenuItem
-                              value={thirdLevelCat?._id}
-                              key={thirdLevelCat?._id}
-                              onClick={() =>
-                                selectCatByThirdLevel(thirdLevelCat?.name)
-                              }
-                            >
-                              {thirdLevelCat?.name}
-                            </MenuItem>
-                          ))
-                      )
-                  )}
+                          subCat?.children?.map((thirdLevelCat, index) => {
+                            return (
+                              <>
+                                <MenuItem
+                                  value={thirdLevelCat?._id}
+                                  key={index}
+                                  onClick={() =>
+                                    selectCatByThirdLevel(thirdLevelCat?.name)
+                                  }
+                                >
+                                  {thirdLevelCat?.name}
+                                </MenuItem>
+                              </>
+                            );
+                          })
+                        );
+                      });
+                  })}
                 </Select>
               )}
             </div>
@@ -630,4 +628,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default EditProduct;

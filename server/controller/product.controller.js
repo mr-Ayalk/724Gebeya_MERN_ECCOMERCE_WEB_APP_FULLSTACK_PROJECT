@@ -14,32 +14,37 @@ cloudinary.config({
 var imagesArr = [];
 export async function uploadImages(request, response) {
   try {
-    imagesArr = [];
+    const imagesArr = [];
+    const files = request.files;
 
-    const image = request.files;
+    if (!files || files.length === 0) {
+      return response
+        .status(400)
+        .json({ error: true, message: "No files uploaded" });
+    }
 
     const options = {
       use_filename: true,
       unique_filename: false,
       overwrite: false,
     };
-    for (let i = 0; i < image?.length; i++) {
-      const img = await cloudinary.uploader.upload(
-        image[i].path,
-        options,
-        function (error, result) {
-          // console.log(result);
-          imagesArr.push(result.secure_url);
-          fs.unlinkSync(`uploads/${request.files[i].filename}`);
-          console.log(request.files[i].filename);
-        }
-      );
+
+    for (let i = 0; i < files.length; i++) {
+      // Await the upload, no callback needed
+      const result = await cloudinary.uploader.upload(files[i].path, options);
+
+      imagesArr.push(result.secure_url);
+
+      // Remove local file after upload
+      fs.unlinkSync(files[i].path);
     }
 
     return response.status(200).json({
+      error: false,
       images: imagesArr,
     });
   } catch (error) {
+    console.error(error);
     return response.status(500).json({
       message: error.message || error,
       error: true,
@@ -61,6 +66,7 @@ export async function createProduct(request, response) {
       oldPrice: request.body.oldPrice,
       catName: request.body.catName,
       catId: request.body.catId,
+      category: request.body.category,
       subCatId: request.body.subCatId,
       subCat: request.body.subCat,
       thirdsubCat: request.body.thirdsubCat,
@@ -98,6 +104,7 @@ export async function createProduct(request, response) {
     });
   }
 }
+
 //get all products
 export async function getAllProducts(request, response) {
   try {
@@ -116,7 +123,7 @@ export async function getAllProducts(request, response) {
     }
 
     const products = await ProductModel.find()
-      .populate("category")
+      // .populate("category")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .exec();
@@ -165,7 +172,7 @@ export async function getAllProductsByCatId(request, response) {
     const products = await ProductModel.find({
       catId: request.params.id,
     })
-      .populate("category")
+      // .populate("category")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .exec();
@@ -214,7 +221,7 @@ export async function getAllProductsByCatName(request, response) {
     const products = await ProductModel.find({
       catName: request.query.catName,
     })
-      .populate("category")
+      // .populate("category")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .exec();
@@ -263,7 +270,7 @@ export async function getAllProductsBysubCatId(request, response) {
     const products = await ProductModel.find({
       subCatId: request.params.subCatId,
     })
-      .populate("category")
+      // .populate("category")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .exec();
@@ -312,7 +319,7 @@ export async function getAllProductsBysubCatName(request, response) {
     const products = await ProductModel.find({
       subCat: request.query.subCat,
     })
-      .populate("category")
+      // .populate("category")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .exec();
@@ -362,7 +369,7 @@ export async function getAllProductsByThirdLevelCatId(request, response) {
     const products = await ProductModel.find({
       thirdsubCatId: request.params.thirdsubCatId,
     })
-      .populate("category")
+      // .populate("category")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .exec();
@@ -411,7 +418,7 @@ export async function getAllProductsByThirdLevelCatName(request, response) {
     const products = await ProductModel.find({
       thirdsubCat: request.query.thirdsubCat,
     })
-      .populate("category")
+      // .populate("category")
       .skip((page - 1) * perPage)
       .limit(perPage)
       .exec();
@@ -513,7 +520,7 @@ export async function getAllProductsByRating(request, response) {
         //subCatId: request.query.subCatId,
         //   thirdsubCatId: request.query.thirdsubCatId,
       })
-        .populate("category")
+        // .populate("category")
         .skip((page - 1) * perPage)
         .limit(perPage)
         .exec();
@@ -525,7 +532,7 @@ export async function getAllProductsByRating(request, response) {
         subCatId: request.query.subCatId,
         //   thirdsubCatId: request.query.thirdsubCatId,
       })
-        .populate("category")
+        // .populate("category")
         .skip((page - 1) * perPage)
         .limit(perPage)
         .exec();
@@ -538,7 +545,7 @@ export async function getAllProductsByRating(request, response) {
         //   subCatId: request.query.subCatId,
         thirdsubCatId: request.query.thirdsubCatId,
       })
-        .populate("category")
+        // .populate("category")
         .skip((page - 1) * perPage)
         .limit(perPage)
         .exec();
@@ -662,6 +669,49 @@ export async function deleteProduct(request, response) {
     error: false,
     message: "Product Deleted!",
   });
+}
+
+//delete all products
+
+export async function deleteMultipleProduct(request, response) {
+  const { ids } = request.body;
+  if (!ids || !Array.isArray(ids)) {
+    return response.status(400).json({
+      error: true,
+      success: false,
+      message: "Invalid input",
+    });
+  }
+  for (let i = 0; i < ids?.length; i++) {
+    const product = await ProductModel.findById(ids[i]);
+    const images = product.images;
+    let img = "";
+    for (img of images) {
+      const imgUrl = img;
+      const urlArr = imgUrl.split("/");
+      const image = urlArr[urlArr.length - 1];
+      const imageName = image.split(".")[0];
+      if (imageName) {
+        cloudinary.uploader.destroy(imageName, (error, result) => {
+          //console.log(error,result)
+        });
+      }
+    }
+  }
+  try {
+    await ProductModel.deleteMany({ _id: { $in: ids } });
+    return response.status(200).json({
+      message: "Product deleted successfully",
+      success: true,
+      error: false,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
 }
 
 // get single product

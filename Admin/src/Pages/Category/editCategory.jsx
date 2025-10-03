@@ -4,13 +4,16 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoMdClose } from "react-icons/io";
 import { Button, CircularProgress } from "@mui/material";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { useContext, useState } from "react";
-import { deleteImages, postData } from "../../utils/api";
+import { useContext, useEffect, useState } from "react";
+import {
+  deleteImages,
+  editData,
+  fetchDataFromApi,
+  postData,
+} from "../../utils/api";
 import { MyContext } from "../../App";
-import { useNavigate } from "react-router-dom";
-const AddCategory = () => {
+const EditCategory = () => {
   const context = useContext(MyContext);
-  const history = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [previews, setPreviews] = useState([]);
   const [formFields, setFormFields] = useState({
@@ -26,6 +29,14 @@ const AddCategory = () => {
       images,
     }));
   };
+  useEffect(() => {
+    const id = context?.isOpenFullScreenPanel?.id;
+    fetchDataFromApi(`/api/category/${id}`).then((res) => {
+      console.log(res);
+      formFields.name = res?.category?.name;
+      setPreviews(res?.category?.images);
+    });
+  }, []);
 
   const onChangeInput = (e) => {
     const { name, value } = e.target;
@@ -36,11 +47,6 @@ const AddCategory = () => {
       };
     });
   };
-  // const removeImg = (image, index) => {
-  //   deleteImages(`/api/category/deleteImage?img=${image}`).then((res) => {
-  //     console.log(res);
-  //   });
-  // };
 
   const removeImg = (imageObj, index) => {
     deleteImages(
@@ -54,27 +60,7 @@ const AddCategory = () => {
       }
     });
   };
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   setIsLoading(true);
-  //   if (formFields.name.trim() === "") {
-  //     context.openAlertBox("error", "Category name is required");
-  //     setIsLoading(false);
-  //     return false;
-  //   }
-  //   if (previews.length === 0) {
-  //     context.openAlertBox("error", "Category image is required");
-  //     setIsLoading(false);
-  //     return false;
-  //   }
-  //   postData("/api/category/create", formFields).then((res) => {
-  //     if (res?.error) {
-  //       context.openAlertBox("error", res?.message || "Failed to add category");
-  //       console.log(res.message);
-  //       setIsLoading(false);
-  //     }
-  //   });
-  // };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -91,7 +77,7 @@ const AddCategory = () => {
     }
 
     // ✅ Make sure formFields.images is an array of objects [{url, public_id}, ...]
-    postData("/api/category/create", {
+    editData(`/api/category/${context?.isOpenFullScreenPanel?.id}`, {
       name: formFields.name,
       images: previews, // send full previews array
       parentId: formFields.parentId,
@@ -109,8 +95,6 @@ const AddCategory = () => {
           context.setIsOpenFullScreenPanel({
             open: false,
           });
-          context?.getCat();
-          history("/category/list")
         }, 2500);
       }
     });
@@ -176,8 +160,8 @@ const AddCategory = () => {
 
           <br />
         </div>
+
         <br />
-        //
         <div className="w-[250px]">
           <Button type="submit" className="btn-blue btn-lg w-full flex gap-2">
             <FaCloudUploadAlt className="text-[25px] text-white" />
@@ -193,4 +177,4 @@ const AddCategory = () => {
   );
 };
 
-export default AddCategory;
+export default EditCategory;

@@ -100,3 +100,47 @@ input[type="email"]:disabled {
 .react-international-phone-country-selector-button {
   width: 55px !important;
 }
+.Mui-focused fieldset legend {
+  display: none !important;
+}
+.zoomProductSliderThumbs .swiper-wrapper {
+  padding-top: 30px !important;
+}
+
+.zoomProductSliderThumbs .swiper-slide {
+  height: 80px !important;
+  overflow: hidden !important;
+  border-radius: 5px;
+}
+
+.zoomProductSliderThumbs .swiper-button-next {
+  bottom: 0px !important;
+  right: inherit !important;
+  width: 100% !important;
+  height: 30px !important;
+  border-radius: 8px !important;
+}
+
+.zoomProductSliderThumbs .swiper-button-next::after {
+  transform: rotate(90deg);
+}
+
+.zoomProductSliderThumbs .swiper-button-prev {
+  top: 20px !important;
+  left: inherit !important;
+  height: 30px !important;
+  border-radius: 8px !important;
+}
+
+.zoomProductSliderThumbs .swiper-button-prev::after {
+  transform: rotate(90deg);
+}
+
+.zoomProductSlider .swiper-slide {
+  height: 400px !important;
+  overflow: hidden !important;
+}
+.swiper-slider .iiz {
+  height: 400px !important;
+  overflow: hidden !important;
+}
