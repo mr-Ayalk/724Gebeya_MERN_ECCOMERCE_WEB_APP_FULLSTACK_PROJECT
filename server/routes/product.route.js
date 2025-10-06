@@ -3,8 +3,11 @@ import auth from "../middlewares/auth.js";
 import upload from "../middlewares/muller.js";
 import {
   createProduct,
+  createProductRAMS,
   deleteMultipleProduct,
+  deleteMultipleProductRAMS,
   deleteProduct,
+  deleteProductRAMS,
   getAllFeaturedProducts,
   getAllProducts,
   getAllProductsByCatId,
@@ -17,8 +20,11 @@ import {
   getAllProductsByThirdLevelCatName,
   getProduct,
   getProductCount,
+  getProductRAMS,
+  getProductRAMSById,
   removeImageFromCloudinary,
   updatedProduct,
+  updateProductRAMS,
   uploadImages,
 } from "../controller/product.controller.js";
 
@@ -49,5 +55,12 @@ productRoute.get("/:id", getProduct);
 productRoute.delete("/deleteImage", auth, removeImageFromCloudinary);
 productRoute.delete("/deleteMultiple", deleteMultipleProduct);
 productRoute.put("/updateProduct/:id", auth, updatedProduct);
+productRoute.post("/productRAMS/create", auth, createProductRAMS);
+productRoute.delete("/productRAMS/:id", deleteProductRAMS);
+productRoute.put("/productRAMS/:id", auth, updateProductRAMS);
+productRoute.delete("/deleteMultipleRAMS", deleteMultipleProductRAMS);
+// productRoute.get("/productRAMS/getAllProducts", getAllProducts);
+productRoute.get("/productRAMS/get", getProductRAMS);
 
+productRoute.get(`/productRAMS/:id`, getProductRAMSById);
 export default productRoute;

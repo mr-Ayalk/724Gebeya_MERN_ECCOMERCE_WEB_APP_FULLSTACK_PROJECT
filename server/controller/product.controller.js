@@ -1,6 +1,7 @@
 import ProductModel from "../models/product.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import ProductRAMSModel from "../models/productRAMS.js";
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
@@ -90,7 +91,7 @@ export async function createProduct(request, response) {
       });
     }
     imagesArr = [];
-    response.status(200).json({
+    return response.status(200).json({
       message: "Product Created Successfully",
       error: false,
       success: true,
@@ -820,6 +821,175 @@ export async function updatedProduct(request, response) {
       message: "The product is updated",
       success: true,
       error: false,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+//create ram
+
+export async function createProductRAMS(request, response) {
+  try {
+    let productRAMS = new ProductRAMSModel({
+      name: request.body.name,
+    });
+    productRAMS = await productRAMS.save();
+    if (!productRAMS) {
+      response.status(400).json({
+        message: "Product RAMS Not Created",
+        error: true,
+        success: false,
+      });
+    }
+    return response.status(200).json({
+      message: "ProductRAM Created Successfully",
+      error: false,
+      success: true,
+      product: productRAMS,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+// delete product
+
+export async function deleteProductRAMS(request, response) {
+  const productRAMS = await ProductRAMSModel.findById(request.params.id);
+  if (!productRAMS) {
+    return response.status(404).json({
+      message: "Product RAM Not found",
+      error: true,
+      success: false,
+    });
+  }
+
+  const deletedProductRAMS = await ProductRAMSModel.findByIdAndDelete(
+    request.params.id
+  );
+  if (!deletedProductRAMS) {
+    response.status(404).json({
+      message: "Product RAM not deleted !",
+      success: false,
+      error: true,
+    });
+  }
+  return response.status(200).json({
+    success: true,
+    error: false,
+    message: "Product RAM Deleted!",
+  });
+}
+
+//delete all products
+
+export async function deleteMultipleProductRAMS(request, response) {
+  const { ids } = request.body;
+  if (!ids || !Array.isArray(ids)) {
+    return response.status(400).json({
+      error: true,
+      success: false,
+      message: "Invalid input",
+    });
+  }
+  for (let i = 0; i < ids?.length; i++) {
+    const productRAMS = await ProductRAMSModel.findById(ids[i]);
+  }
+  try {
+    await ProductRAMSModel.deleteMany({ _id: { $in: ids } });
+    return response.status(200).json({
+      message: "Product Ram deleted successfully",
+      success: true,
+      error: false,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+//update product rams
+export async function updateProductRAMS(request, response) {
+  try {
+    const productRAMS = await ProductRAMSModel.findByIdAndUpdate(
+      request.params.id,
+      {
+        name: request.body.name,
+      },
+      {
+        new: true,
+      }
+    );
+    if (!productRAMS) {
+      return response.status(400).json({
+        message: "Product Ram can not be updated",
+        error: true,
+        success: false,
+      });
+    }
+    return response.status(200).json({
+      message: "The product ram is updated",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+//get rams
+export async function getProductRAMS(request, response) {
+  try {
+    const productRAMS = await ProductRAMSModel.find();
+    if (!productRAMS) {
+      return response.status(404).json({
+        message: "No Product RAMS found",
+        error: true,
+        success: false,
+      });
+    }
+    return response.status(200).json({
+      error: false,
+      success: true,
+      data: productRAMS,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+//get rams byID
+export async function getProductRAMSById(request, response) {
+  try {
+    const productRAMS = await ProductRAMSModel.findById(request.params.id);
+    if (!productRAMS) {
+      return response.status(404).json({
+        message: "No Product RAMS found",
+        error: true,
+        success: false,
+      });
+    }
+    return response.status(200).json({
+      error: false,
+      success: true,
+      data: productRAMS,
     });
   } catch (error) {
     return response.status(500).json({

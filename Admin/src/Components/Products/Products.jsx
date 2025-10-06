@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { FaPlus, FaRegEye, FaTrash } from "react-icons/fa";
 import Checkbox from "@mui/material/Checkbox";
@@ -59,6 +59,7 @@ const Products = () => {
   const [productCat, setProductCat] = useState("");
   const [productSubCat, setProductSubCat] = useState("");
   const [productThirdLevelCat, setProductThirdLevelCat] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const handleChange = (event) => {
     setCategory(event.target.value);
   };
@@ -100,7 +101,9 @@ const Products = () => {
     getProducts();
   }, [context?.setIsOpenFullScreenPanel]);
   const getProducts = async () => {
+    setIsLoading(true);
     fetchDataFromApi("/api/product/getAllProducts").then((res) => {
+      // setProductData(res?.products);
       let productArr = [];
       console.log(res);
       if (res?.error === false) {
@@ -108,7 +111,13 @@ const Products = () => {
           productArr[i] = res?.products[i];
           productArr[i].checked = false;
         }
-        setProductData(res?.products);
+        setTimeout(() => {
+          setProductData(productArr);
+          setIsLoading(false);
+        }, 500);
+        // setProductData(productArr);
+        // console.log(productArr);
+        // setProductData(res?.products);
       }
     });
   };
@@ -122,17 +131,20 @@ const Products = () => {
   }, []);
   const deleteProduct = (id) => {
     deleteData(`/api/product/${id}`).then((res) => {
+      getProducts();
+      context.openAlertBox("success", "Product deleted successfully");
       // console.log(res);
-      if (res?.error === false) {
-        getProducts();
-        // console.log(res);
-        context.openAlertBox(
-          "error",
-          res?.message || "Please enter product name"
-        );
-      } else {
-        context.openAlertBox("success", "Product deleted successfully");
-      }
+
+      // if (res?.error === false) {
+      //   getProducts();
+      //   // console.log(res);
+      //   context.openAlertBox(
+      //     "error",
+      //     res?.message || "Please enter product name"
+      //   );
+      // } else {
+      //   context.openAlertBox("success", "Product deleted successfully");
+      // }
     });
   };
   const deleteMultipleProduct = () => {
@@ -140,7 +152,7 @@ const Products = () => {
       context.openAlertBox("error", "Please select items to delete");
       return;
     }
-    console.log(sortedIds);
+    // console.log(sortedIds);
     try {
       deleteMultipleProduct(`/api/product/deleteMultiple`, {
         data: { ids: sortedIds },
@@ -150,11 +162,15 @@ const Products = () => {
         context.openAlertBox("success", "Product deleted");
       });
     } catch (error) {
-      context.openAlertBox("error", "Error deleting items.");
+      // context.openAlertBox("error", "Error deleting items.");
+      console.log(error);
     }
   };
   const handleChangeProductCat = (event) => {
     setProductCat(event.target.value);
+    setProductSubCat("");
+    setProductThirdLevelCat("");
+    setIsLoading(true);
     // formFields.catId = event.target.value;
     fetchDataFromApi(
       `/api/product/getAllProductsByCatId/${event.target.value}`
@@ -162,11 +178,18 @@ const Products = () => {
       // console.log(res);
       if (res?.error === false) {
         setProductData(res?.products);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 300);
       }
     });
   };
   const handleChangeProductSubCat = (event) => {
+    setIsLoading(true);
     setProductSubCat(event.target.value);
+    setProductCat("");
+
+    setProductThirdLevelCat("");
     // formFields.subCatId = event.target.value;
     fetchDataFromApi(
       `/api/product/getAllProductsBysubCatId/${event.target.value}`
@@ -174,11 +197,18 @@ const Products = () => {
       console.log(res);
       if (res?.error === false) {
         setProductData(res?.products);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 300);
       }
     });
   };
   const handleChangeProductThirdLevelCat = (event) => {
+    setIsLoading(true);
     setProductThirdLevelCat(event.target.value);
+    setProductCat("");
+    setProductSubCat("");
+
     // formFields.thirdLevelCat = event.target.value;
     fetchDataFromApi(
       `/api/product/getAllProductsthridLevelCatId/${event.target.value}`
@@ -187,9 +217,43 @@ const Products = () => {
       if (res?.error === false) {
         setProductData(res?.products);
       }
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
     });
   };
+  const handleSelectAll = (e) => {
+    const isChecked = e.target.checked;
+    //Update all items checked status
+    const updatedItems = productData.map((item) => ({
+      ...item,
+      checked: isChecked,
+    }));
+    setProductData(updatedItems);
 
+    //update the sorted IDs state
+    if (isChecked) {
+      const ids = updatedItems.map((item) => item._id).sort((a, b) => a - b);
+      console.log(ids);
+      setsortedIds(ids);
+    } else {
+      setsortedIds([]);
+    }
+  };
+  //Handler to toggle individual checkbox
+  const handleCheckboxChange = (e, id, index) => {
+    const updatedItems = productData.map((item) =>
+      item._id === id ? { ...item, checked: !item.checked } : item
+    );
+    setProductData(updatedItems);
+    //Update the sorted IDs state
+    const selectedIds = updatedItems
+      .filter((item) => item.checked)
+      .map((item) => item._id)
+      .sort((a, b) => a - b);
+    setsortedIds(selectedIds);
+    // console.log(selectedIds);
+  };
   return (
     <>
       <div className="flex items-center justify-between px-2 py-0 mt-3">
@@ -197,7 +261,19 @@ const Products = () => {
           Products
           <span className="font-[400] text-[14px]">(Material Ui Table)</span>
         </h2>
+
         <div className="col w-[30%] ml-auto flex items-center justify-end gap-3">
+          {sortedIds?.length !== 0 && (
+            <Button
+              variant="contained"
+              className="btn-sm"
+              size="small"
+              color="error"
+              onClick={deleteMultipleProduct}
+            >
+              Delete
+            </Button>
+          )}
           <Button className="btn !bg-green-600 !text-white btn-sm">
             <BiExport />
             Export
@@ -342,7 +418,16 @@ const Products = () => {
             <TableHead>
               <TableRow>
                 <TableCell style={{ minWidth: columns.minWidth }}>
-                  <Checkbox {...label} size="small" />
+                  <Checkbox
+                    {...label}
+                    size="small"
+                    onChange={handleSelectAll}
+                    checked={
+                      productData?.length > 0
+                        ? productData.every((item) => item.checked)
+                        : false
+                    }
+                  />
                 </TableCell>
                 {columns.map((column) => (
                   <TableCell
@@ -356,106 +441,132 @@ const Products = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {productData?.length !== 0 &&
-                productData?.map((product, index) => {
-                  return (
-                    <TableRow key={index}>
-                      <TableCell style={{ minWidth: columns.minWidth }}>
-                        <Checkbox {...label} size="small" />
-                      </TableCell>
-                      <TableCell style={{ minWidth: columns.minWidth }}>
-                        <div className="flex items-center gap-4 w-[300px]">
-                          <div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
-                            <Link to={`/product/${product?._id}`}>
-                              <LazyLoadImage
-                                className="w-full group-hover:scale-105 transition-all"
-                                alt={"category image"}
-                                effect="blur"
-                                src={product.images[0]} // ✅ use url field from object
-                              />
-                            </Link>
-                          </div>
-
-                          <div className="info w-[75%]">
-                            <h3 className="font-[600] text-[12px] leading-4 hover:text-[#3872fa]">
+              {isLoading === false ? (
+                productData?.length !== 0 &&
+                productData
+                  ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  ?.reverse()
+                  ?.map((product, index) => {
+                    return (
+                      <TableRow key={index}>
+                        <TableCell style={{ minWidth: columns.minWidth }}>
+                          <Checkbox
+                            {...label}
+                            size="small"
+                            checked={product.checked === true ? true : false}
+                            onChange={(e) =>
+                              handleCheckboxChange(e, product._id, index)
+                            }
+                          />
+                        </TableCell>
+                        <TableCell style={{ minWidth: columns.minWidth }}>
+                          <div className="flex items-center gap-4 w-[300px]">
+                            <div className="img w-[65px] h-[65px] rounded-md overflow-hidden group">
                               <Link to={`/product/${product?._id}`}>
-                                {product?.name}
+                                <LazyLoadImage
+                                  className="w-full group-hover:scale-105 transition-all"
+                                  alt={"category image"}
+                                  effect="blur"
+                                  src={product.images[0]} // ✅ use url field from object
+                                />
                               </Link>
-                            </h3>
-                            <span className="text-[12px]">
-                              {product?.brand}
+                            </div>
+
+                            <div className="info w-[75%]">
+                              <h3 className="font-[600] text-[12px] leading-4 hover:text-[#3872fa]">
+                                <Link to={`/product/${product?._id}`}>
+                                  {product?.name}
+                                </Link>
+                              </h3>
+                              <span className="text-[12px]">
+                                {product?.brand}
+                              </span>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell style={{ minWidth: columns.minWidth }}>
+                          {product?.catName}
+                        </TableCell>
+
+                        <TableCell style={{ minWidth: columns.minWidth }}>
+                          {product?.subCat}
+                        </TableCell>
+                        <TableCell style={{ minWidth: columns.minWidth }}>
+                          <div className="flex gap-1 flex-col">
+                            <span className="oldPrice line-through leading-3 text-gray-500 text-[14px] font-[500]">
+                              &#x20b9; {product?.price}
+                            </span>
+                            <span className="price text-[#3872fa] text-[14px] font-[600]">
+                              &#x20b9; {product?.oldPrice}
                             </span>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell style={{ minWidth: columns.minWidth }}>
-                        {product?.catName}
-                      </TableCell>
-
-                      <TableCell style={{ minWidth: columns.minWidth }}>
-                        {product?.subCat}
-                      </TableCell>
-                      <TableCell style={{ minWidth: columns.minWidth }}>
-                        <div className="flex gap-1 flex-col">
-                          <span className="oldPrice line-through leading-3 text-gray-500 text-[14px] font-[500]">
-                            &#x20b9; {product?.price}
-                          </span>
-                          <span className="price text-[#3872fa] text-[14px] font-[600]">
-                            &#x20b9; {product?.oldPrice}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell style={{ minWidth: columns.minWidth }}>
-                        <p className="text-[14px] w-[100px]">
-                          <span className="font-[600]">{product?.sale} </span>
-                          sale
-                          {/* <Progress value={40} type={"success"} /> */}
-                        </p>
-                      </TableCell>
-                      <TableCell style={{ minWidth: columns.minWidth }}>
-                        <div className="flex items-center gap-4">
-                          <Tooltip1 title="Edit Product" placement="top-start">
-                            <Button
-                              className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]"
-                              onClick={() =>
-                                context.setIsOpenFullScreenPanel({
-                                  open: true,
-                                  model: "Edit Product",
-                                  id: product?._id,
-                                })
-                              }
+                        </TableCell>
+                        <TableCell style={{ minWidth: columns.minWidth }}>
+                          <p className="text-[14px] w-[100px]">
+                            <span className="font-[600]">{product?.sale} </span>
+                            sale
+                            {/* <Progress value={40} type={"success"} /> */}
+                          </p>
+                        </TableCell>
+                        <TableCell style={{ minWidth: columns.minWidth }}>
+                          <div className="flex items-center gap-4">
+                            <Tooltip1
+                              title="Edit Product"
+                              placement="top-start"
                             >
-                              <AiOutlineEdit className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                            </Button>
-                          </Tooltip1>
-
-                          <Tooltip1
-                            title="View Product Details"
-                            placement="top-start"
-                          >
-                            <Link to={`/product/${product?._id}`}>
-                              <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                                <FaRegEye className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+                              <Button
+                                className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]"
+                                onClick={() =>
+                                  context.setIsOpenFullScreenPanel({
+                                    open: true,
+                                    model: "Edit Product",
+                                    id: product?._id,
+                                  })
+                                }
+                              >
+                                <AiOutlineEdit className="text-[rgba(0,0,0,0.7)] text-[20px]" />
                               </Button>
-                            </Link>
-                          </Tooltip1>
+                            </Tooltip1>
 
-                          <Tooltip1
-                            title="Remove Product"
-                            placement="top-start"
-                          >
-                            <Button
-                              className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]"
-                              onClick={() => deleteProduct(product?._id)}
+                            <Tooltip1
+                              title="View Product Details"
+                              placement="top-start"
                             >
-                              <FaTrash className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                            </Button>
-                          </Tooltip1>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                              <Link to={`/product/${product?._id}`}>
+                                <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
+                                  <FaRegEye className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+                                </Button>
+                              </Link>
+                            </Tooltip1>
+
+                            <Tooltip1
+                              title="Remove Product"
+                              placement="top-start"
+                            >
+                              <Button
+                                className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]"
+                                onClick={() => deleteProduct(product?._id)}
+                              >
+                                <FaTrash className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+                              </Button>
+                            </Tooltip1>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+              ) : (
+                <>
+                  <TableRow>
+                    <TableCell colSpan={8}>
+                      <div className="flex items-center justify-center w-full min-h-[400px] ">
+                        {" "}
+                        <CircularProgress color="inherit" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
