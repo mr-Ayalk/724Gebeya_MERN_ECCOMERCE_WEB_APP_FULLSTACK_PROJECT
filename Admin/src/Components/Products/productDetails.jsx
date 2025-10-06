@@ -33,12 +33,34 @@ const ProductDetails = () => {
     zoomSliderSml.current.swiper.slideTo(index);
     zoomSliderBig.current.swiper.slideTo(index);
   };
-
+ const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  //   useEffect(() => {
+  //     fetchDataFromApi(`/api/product/${id}`).then((res) => {
+  //       setProduct(res?.data);
+  //     });
+  //   });
   useEffect(() => {
-    fetchDataFromApi(`/api/product/${id}`).then((res) => {
-      setProduct(res?.data);
-    });
-  });
+    const fetchProduct = async () => {
+      try {
+        const res = await fetchDataFromApi(`/api/product/${id}`);
+        console.log("API Response:", res); // <-- check structure
+        if (res?.success) {
+          setProduct(res.product);
+        } else {
+          setError("Product not found");
+        }
+      } catch (err) {
+        setError(err.message || "Failed to fetch product");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+  if (!product) return <p>Product not available</p>;
   return (
     <>
       <div className="flex items-center justify-between px-2 py-0 mt-3">

@@ -34,6 +34,7 @@ import Profile from "./Pages/Profile/Profile";
 import AddAddress from "./Pages/Address/AddAddress";
 import EditCategory from "./Pages/Category/editCategory";
 import ProductDetails from "./Components/Products/productDetails";
+import AddRAMS from "./Components/Products/addRAMS";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -347,6 +348,33 @@ function App() {
               }`}
             >
               <ProductDetails />
+            </div>
+          </div>
+        </section>
+        // </MyContext.Provider>
+      ),
+    },
+    {
+      path: "/product/addRams",
+      exact: true,
+      element: (
+        // <MyContext.Provider value={{ isSidebarOpen, setIsSidebarOpen }}>
+        <section className="main">
+          <Header />
+          <div className="contentMain flex">
+            <div
+              className={`overflow-hidden sidebarWrapper transition-all duration-500 ease-in-out 
+    ${isSidebarOpen ? "w-[18%] " : "w-[0%] px-0 opacity-0"}`}
+            >
+              <Sidebar />
+            </div>
+
+            <div
+              className={`contentRight !bg-gray-50 py-4 px-5 transition-all duration-500 ease-in-out ${
+                isSidebarOpen ? "w-[82%] " : "w-[100%] "
+              }`}
+            >
+              <AddRAMS />
             </div>
           </div>
         </section>
