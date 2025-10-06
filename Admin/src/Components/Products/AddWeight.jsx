@@ -1,4 +1,4 @@
-import { Button, Checkbox, CircularProgress } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { AiOutlineEdit } from "react-icons/ai";
 import { FaCloudUploadAlt, FaTrash } from "react-icons/fa";
@@ -10,8 +10,6 @@ import {
   fetchDataFromApi,
   postData,
 } from "../../utils/api";
-
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const AddWEIGHT = () => {
   const context = useContext(MyContext);
@@ -150,11 +148,8 @@ const AddWEIGHT = () => {
             <table className="w-full text-sm text-left text-gray-500">
               <thead className="text-xs text-black font-semibold uppercase bg-gray-50">
                 <tr>
-                  <td className="px-6 py-3 pr-0 w-[10%]">
-                    <Checkbox {...label} size="small" />
-                  </td>
-                  <td className="px-0 py-2 w-[60%]">Product Weight</td>
-                  <td className="px-0 py-2 w-[30%]">Action</td>
+                  <td className="px-6 py-2 w-[60%]">Product Weight</td>
+                  <td className="px-6 py-2 w-[30%]">Action</td>
                 </tr>
               </thead>
 
@@ -164,11 +159,8 @@ const AddWEIGHT = () => {
                     key={index}
                     className="odd:bg-white border-b hover:bg-gray-50"
                   >
-                    <td className="px-6 py-3 pr-0">
-                      <Checkbox {...label} size="small" />
-                    </td>
-                    <td className="px-0 py-2">{item?.name}</td>
-                    <td className="px-0 py-2">
+                    <td className="px-6 py-2">{item?.name}</td>
+                    <td className="px-6 py-2">
                       <div className="flex items-center gap-4">
                         <Tooltip1 title="Edit Weight" placement="top-start">
                           <Button
