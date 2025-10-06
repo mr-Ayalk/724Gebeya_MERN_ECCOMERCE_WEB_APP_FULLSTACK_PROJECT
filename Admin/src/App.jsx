@@ -35,6 +35,8 @@ import AddAddress from "./Pages/Address/AddAddress";
 import EditCategory from "./Pages/Category/editCategory";
 import ProductDetails from "./Components/Products/productDetails";
 import AddRAMS from "./Components/Products/addRAMS";
+import AddWEIGHT from "./Components/Products/AddWeight";
+import AddSize from "./Components/Products/AddSize";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -375,6 +377,60 @@ function App() {
               }`}
             >
               <AddRAMS />
+            </div>
+          </div>
+        </section>
+        // </MyContext.Provider>
+      ),
+    },
+    {
+      path: "/product/addWeight",
+      exact: true,
+      element: (
+        // <MyContext.Provider value={{ isSidebarOpen, setIsSidebarOpen }}>
+        <section className="main">
+          <Header />
+          <div className="contentMain flex">
+            <div
+              className={`overflow-hidden sidebarWrapper transition-all duration-500 ease-in-out 
+    ${isSidebarOpen ? "w-[18%] " : "w-[0%] px-0 opacity-0"}`}
+            >
+              <Sidebar />
+            </div>
+
+            <div
+              className={`contentRight !bg-gray-50 py-4 px-5 transition-all duration-500 ease-in-out ${
+                isSidebarOpen ? "w-[82%] " : "w-[100%] "
+              }`}
+            >
+              <AddWEIGHT />
+            </div>
+          </div>
+        </section>
+        // </MyContext.Provider>
+      ),
+    },
+    {
+      path: "/product/addSize",
+      exact: true,
+      element: (
+        // <MyContext.Provider value={{ isSidebarOpen, setIsSidebarOpen }}>
+        <section className="main">
+          <Header />
+          <div className="contentMain flex">
+            <div
+              className={`overflow-hidden sidebarWrapper transition-all duration-500 ease-in-out 
+    ${isSidebarOpen ? "w-[18%] " : "w-[0%] px-0 opacity-0"}`}
+            >
+              <Sidebar />
+            </div>
+
+            <div
+              className={`contentRight !bg-gray-50 py-4 px-5 transition-all duration-500 ease-in-out ${
+                isSidebarOpen ? "w-[82%] " : "w-[100%] "
+              }`}
+            >
+              <AddSize />
             </div>
           </div>
         </section>
