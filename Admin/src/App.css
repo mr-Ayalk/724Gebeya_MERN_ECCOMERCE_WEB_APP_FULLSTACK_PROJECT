@@ -144,3 +144,6 @@ input[type="email"]:disabled {
   height: 400px !important;
   overflow: hidden !important;
 }
+.contentRight {
+  padding-top: 80px !important;
+}
