@@ -4,10 +4,16 @@ import upload from "../middlewares/muller.js";
 import {
   createProduct,
   createProductRAMS,
+  createProductSIZE,
+  createProductWEIGHT,
   deleteMultipleProduct,
   deleteMultipleProductRAMS,
+  deleteMultipleProductSIZE,
+  deleteMultipleProductWEIGHT,
   deleteProduct,
   deleteProductRAMS,
+  deleteProductSIZE,
+  deleteProductWEIGHT,
   getAllFeaturedProducts,
   getAllProducts,
   getAllProductsByCatId,
@@ -22,9 +28,15 @@ import {
   getProductCount,
   getProductRAMS,
   getProductRAMSById,
+  getProductSIZE,
+  getProductSIZEById,
+  getProductWEIGHT,
+  getProductWEIGHTById,
   removeImageFromCloudinary,
   updatedProduct,
   updateProductRAMS,
+  updateProductSIZE,
+  updateProductWEIGHT,
   uploadImages,
 } from "../controller/product.controller.js";
 
@@ -55,6 +67,8 @@ productRoute.get("/:id", getProduct);
 productRoute.delete("/deleteImage", auth, removeImageFromCloudinary);
 productRoute.delete("/deleteMultiple", deleteMultipleProduct);
 productRoute.put("/updateProduct/:id", auth, updatedProduct);
+
+// RAMS ROUTES
 productRoute.post("/productRAMS/create", auth, createProductRAMS);
 productRoute.delete("/productRAMS/:id", deleteProductRAMS);
 productRoute.put("/productRAMS/:id", auth, updateProductRAMS);
@@ -63,4 +77,28 @@ productRoute.delete("/deleteMultipleRAMS", deleteMultipleProductRAMS);
 productRoute.get("/productRAMS/get", getProductRAMS);
 
 productRoute.get(`/productRAMS/:id`, getProductRAMSById);
+
+/////////////////////////////////////////////////////////
+//WEIGHT ROUTES
+
+productRoute.post("/productWeight/create", auth, createProductWEIGHT);
+productRoute.delete("/productWeight/:id", deleteProductWEIGHT);
+productRoute.put("/productWeight/:id", auth, updateProductWEIGHT);
+productRoute.delete("/deleteMultipleWeight", deleteMultipleProductWEIGHT);
+// productRoute.get("/productRAMS/getAllProducts", getAllProducts);
+productRoute.get("/productWeight/get", getProductWEIGHT);
+
+productRoute.get(`/productWeight/:id`, getProductWEIGHTById);
+/////////////////////////////////////////////////////////
+//WEIGHT ROUTES
+
+productRoute.post("/productSize/create", auth, createProductSIZE);
+productRoute.delete("/productSize/:id", deleteProductSIZE);
+productRoute.put("/productSize/:id", auth, updateProductSIZE);
+productRoute.delete("/deleteMultipleSize", deleteMultipleProductSIZE);
+// productRoute.get("/productRAMS/getAllProducts", getAllProducts);
+productRoute.get("/productSize/get", getProductSIZE);
+
+productRoute.get(`/productSize/:id`, getProductSIZEById);
+
 export default productRoute;
