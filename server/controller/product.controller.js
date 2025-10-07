@@ -15,55 +15,126 @@ cloudinary.config({
 // image uploader
 
 var imagesArr = [];
+// export async function uploadImages(request, response) {
+//   try {
+//     const imagesArr = [];
+//     const files = request.files;
+
+//     if (!files || files.length === 0) {
+//       return response
+//         .status(400)
+//         .json({ error: true, message: "No files uploaded" });
+//     }
+
+//     const options = {
+//       use_filename: true,
+//       unique_filename: false,
+//       overwrite: false,
+//     };
+
+//     for (let i = 0; i < files.length; i++) {
+//       // Await the upload, no callback needed
+//       const result = await cloudinary.uploader.upload(files[i].path, options);
+
+//       imagesArr.push(result.secure_url);
+
+//       // Remove local file after upload
+//       fs.unlinkSync(files[i].path);
+//     }
+
+//     return response.status(200).json({
+//       error: false,
+//       images: imagesArr,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return response.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+
+//create product
+var imagesArr = [];
+// export async function uploadImages(request, response) {
+//   try {
+//     imagesArr = [];
+
+//     const image = request.files;
+
+//     const options = {
+//       use_filename: true,
+//       unique_filename: false,
+//       overwrite: false,
+//     };
+//     for (let i = 0; i < image?.length; i++) {
+//       const img = await cloudinary.uploader.upload(
+//         image[i].path,
+//         options,
+//         function (error, result) {
+//           // console.log(result);
+//           imagesArr.push(result.secure_url);
+//           fs.unlinkSync(`uploads/${request.files[i].filename}`);
+//           console.log(request.files[i].filename);
+//         }
+//       );
+//     }
+
+//     return response.status(200).json({
+//       images: imagesArr,
+//     });
+//   } catch (error) {
+//     return response.json({
+//       message: error.message || error,
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+//create cateory
 export async function uploadImages(request, response) {
   try {
-    const imagesArr = [];
-    const files = request.files;
+    imagesArr = [];
 
-    if (!files || files.length === 0) {
-      return response
-        .status(400)
-        .json({ error: true, message: "No files uploaded" });
-    }
-
+    const image = request.files;
     const options = {
       use_filename: true,
       unique_filename: false,
       overwrite: false,
     };
 
-    for (let i = 0; i < files.length; i++) {
-      // Await the upload, no callback needed
-      const result = await cloudinary.uploader.upload(files[i].path, options);
+    for (let i = 0; i < image?.length; i++) {
+      const result = await cloudinary.uploader.upload(image[i].path, options);
 
-      imagesArr.push(result.secure_url);
+      // Save both url and public_id
+      imagesArr.push({
+        url: result.secure_url,
+        public_id: result.public_id,
+      });
 
-      // Remove local file after upload
-      fs.unlinkSync(files[i].path);
+      // cleanup local file
+      fs.unlinkSync(`uploads/${request.files[i].filename}`);
     }
 
     return response.status(200).json({
-      error: false,
       images: imagesArr,
     });
   } catch (error) {
-    console.error(error);
-    return response.status(500).json({
+    return response.json({
       message: error.message || error,
       error: true,
       success: false,
     });
   }
 }
-
-//create product
-
 export async function createProduct(request, response) {
   try {
     let product = new ProductModel({
       name: request.body.name,
       description: request.body.description,
-      images: imagesArr,
+      images: request.body.images,
       brand: request.body.brand,
       price: request.body.price,
       oldPrice: request.body.oldPrice,
@@ -1176,10 +1247,6 @@ export async function getProductWEIGHTById(request, response) {
     });
   }
 }
-
-
-
-
 
 /////////////////////////////////////////////////////
 ///////////SIZE CONTROLLER////////////////

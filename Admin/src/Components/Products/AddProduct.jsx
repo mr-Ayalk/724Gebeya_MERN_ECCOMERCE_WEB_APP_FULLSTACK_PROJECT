@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import MenuItem from "@mui/material/MenuItem";
 
@@ -11,7 +11,7 @@ import { IoMdClose } from "react-icons/io";
 import { Button, CircularProgress } from "@mui/material";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { MyContext } from "../../App";
-import { deleteImages, postData } from "../../utils/api";
+import { deleteImages, fetchDataFromApi, postData } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 const AddProduct = () => {
   const [productCat, setProductCat] = useState("");
@@ -54,7 +54,7 @@ const AddProduct = () => {
       target: { value },
     } = event;
     setProductSize(typeof value === "string" ? value.split(",") : value);
-    formFields.productSize = value;
+    formFields.size = value;
   };
   const handleChangeProductWeight = (event) => {
     // setProductWeight(event.target.value);
@@ -155,95 +155,151 @@ const AddProduct = () => {
       }
     });
   };
-  const handleSubmit = (e) => {
-    e.preventDefault(0);
-    // console.log(formFields);
+  // const handleSubmit = (e) => {
+  //   e.preventDefault(0);
+  //   // console.log(formFields);
 
-    if (formFields.name === "") {
-      context.openAlertBox("error", "Please enter product name");
-      return false;
+  //   if (formFields.name === "") {
+  //     context.openAlertBox("error", "Please enter product name");
+  //     return false;
+  //   }
+  //   if (formFields.description === "") {
+  //     context.openAlertBox("error", "Please enter product description");
+  //     return false;
+  //   }
+  //   if (previews?.length === 0) {
+  //     context.openAlertBox("error", "Please enter product image");
+  //     return false;
+  //   }
+  //   if (formFields.price === "") {
+  //     context.openAlertBox("error", "Please enter product price");
+  //     return false;
+  //   }
+  //   if (formFields.oldPrice === "") {
+  //     context.openAlertBox("error", "Please enter product old price");
+  //     return false;
+  //   }
+  //   if (formFields.rating === "") {
+  //     context.openAlertBox("error", "Please enter product rating");
+  //     return false;
+  //   }
+  //   if (formFields.discount === "") {
+  //     context.openAlertBox("error", "Please enter product discount");
+  //     return false;
+  //   }
+  //   if (formFields.countInStock === "") {
+  //     context.openAlertBox("error", "Please enter product countInStock");
+  //     return false;
+  //   }
+  //   setIsLoading(true);
+  //   //  {   {
+  //   //     name: formFields.name,
+  //   //     images: previews, // send full previews array
+  //   //     description: formFields.description,
+  //   //     brand: formFields.brand,
+
+  //   //   price: formFields.price,
+  //   //     oldPrice: formFields.oldPrice,
+  //   //      category: formFields.category,
+  //   //     catName: formFields.catName,
+
+  //   //  //
+  //   //  catId: formFields.catId,
+  //   //     subCatId: formFields.subCatId,
+
+  //   //   subCat: formFields.subCat,
+  //   //     thirdsubCat: formFields.thirdsubCat,
+  //   //      countInStock: formFields.countInStock,
+  //   //     rating: formFields.rating,
+  //   // //
+  //   //  isFeatured: formFields.isFeatured,
+  //   //     discount: formFields.discount,
+  //   //      productRam: formFields.productRam,
+  //   //     size: formFields.size,
+  //   //      productWeight: formFields.productWeight,
+
+  //   //   })}
+  //   postData("/api/product/create", formFields)
+  //     .then((res) => {
+  //       if (res?.error === false) {
+  //         context.openAlertBox(
+  //           "success",
+  //           res?.message || "Product created successfully!"
+  //         );
+  //         setTimeout(() => {
+  //           setIsLoading(false);
+  //           context.setIsOpenFullScreenPanel({ open: false });
+  //           history("/products");
+  //         }, 1000);
+  //       } else {
+  //         context.openAlertBox("error", res?.message || "Something went wrong");
+  //         setIsLoading(false);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //       context.openAlertBox("error", "Network or server error");
+  //       setIsLoading(false);
+  //     });
+  // };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (previews.length === 0) {
+      context.openAlertBox("error", "Please upload product images");
+      return;
     }
-    if (formFields.description === "") {
-      context.openAlertBox("error", "Please enter product description");
-      return false;
-    }
-    if (previews?.length === 0) {
-      context.openAlertBox("error", "Please enter product image");
-      return false;
-    }
-    if (formFields.price === "") {
-      context.openAlertBox("error", "Please enter product price");
-      return false;
-    }
-    if (formFields.oldPrice === "") {
-      context.openAlertBox("error", "Please enter product old price");
-      return false;
-    }
-    if (formFields.rating === "") {
-      context.openAlertBox("error", "Please enter product rating");
-      return false;
-    }
-    if (formFields.discount === "") {
-      context.openAlertBox("error", "Please enter product discount");
-      return false;
-    }
-    if (formFields.countInStock === "") {
-      context.openAlertBox("error", "Please enter product countInStock");
-      return false;
-    }
+
+    const productData = {
+      ...formFields,
+      images: previews, // ✅ ensures images are included
+    };
+
     setIsLoading(true);
-    //     postData("/api/product/create", formFields).then((res) => {
-    //       // console.log(res);
-    //       // if (res?.error === false) {
-    //       //   context.openAlertBox(
-    //       //     "error",
-    //       //     res?.message || "Please select category image"
-    //       //   );
-
-    //       //   setTimeout(() => {
-    //       //     setIsLoading(false);
-    //       //     context.setIsOpenFullScreenPanel({
-    //       //       open: false,
-    //       //     });
-    //       //     history("/products");
-    //       //   }, 1000);
-    //       // }
-    //       if (res?.error === false) {
-    //   context.openAlertBox("success", res?.message || "Product created successfully!");
-    //   setTimeout(() => {
-    //     setIsLoading(false);
-    //     context.setIsOpenFullScreenPanel({ open: false });
-    //     history("/products");
-    //   }, 1000);
-    // } else {
-    //   context.openAlertBox("error", res?.message || "Something went wrong");
-    //   setIsLoading(false);
-    // }
-
-    //     });
-    postData("/api/product/create", formFields)
-      .then((res) => {
-        if (res?.error === false) {
-          context.openAlertBox(
-            "success",
-            res?.message || "Product created successfully!"
-          );
-          setTimeout(() => {
-            setIsLoading(false);
-            context.setIsOpenFullScreenPanel({ open: false });
-            history("/products");
-          }, 1000);
-        } else {
-          context.openAlertBox("error", res?.message || "Something went wrong");
+    try {
+      const res = await postData("/api/product/create", productData);
+      if (res?.error === false) {
+        context.openAlertBox(
+          "success",
+          res?.message || "Product created successfully!"
+        );
+        setTimeout(() => {
           setIsLoading(false);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        context.openAlertBox("error", "Network or server error");
+          context.setIsOpenFullScreenPanel({ open: false });
+          history("/products");
+        }, 1000);
+      } else {
+        context.openAlertBox("error", res?.message || "Something went wrong");
         setIsLoading(false);
-      });
+      }
+    } catch (err) {
+      console.error(err);
+      context.openAlertBox("error", "Network or server error");
+      setIsLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchDataFromApi("/api/product/productRAMS/get").then((res) => {
+      if (res?.error === false) {
+        setProductRAM(res?.data);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    fetchDataFromApi("/api/product/productWeight/get").then((res) => {
+      if (res?.error === false) {
+        setProductWeight(res?.data);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    fetchDataFromApi("/api/product/productSize/get").then((res) => {
+      if (res?.error === false) {
+        setProductSize(res?.data);
+      }
+    });
+  }, []);
   return (
     <section className="p-5 px-20 bg-gray-50  overflow-hidden">
       <form action="" className="form p-8 py-3 " onSubmit={handleSubmit}>
@@ -467,71 +523,71 @@ const AddProduct = () => {
               <h3 className="text-[14px] font-[500] mb-1 !text-black">
                 Product RAMS
               </h3>
-
-              <Select
-                multiple
-                labelId="demo-simple-select-label"
-                id="productCatDrop"
-                className="w-full bg-white "
-                size="small"
-                value={productRAM}
-                label="Age"
-                MenuProps={MenuProps}
-                onChange={handleChangeProductRAM}
-              >
-                <MenuItem value={""}>
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={"4GB"}>4GB</MenuItem>
-                <MenuItem value={"6GB"}>6GB</MenuItem>
-                <MenuItem value={"8GB"}>8GB</MenuItem>
-              </Select>
+              {productRAM?.length !== 0 && (
+                <Select
+                  multiple
+                  labelId="demo-simple-select-label"
+                  id="productCatDrop"
+                  className="w-full bg-white "
+                  size="small"
+                  value={productRAM}
+                  label="Age"
+                  MenuProps={MenuProps}
+                  onChange={handleChangeProductRAM}
+                >
+                  {productRAM?.map((ram) => (
+                    <MenuItem value={ram?.name} key={ram?._id}>
+                      {ram?.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
             </div>
             <div className="col">
               <h3 className="text-[14px] font-[500] mb-1 !text-black">
                 Product Weight
               </h3>
-
-              <Select
-                multiple
-                labelId="demo-simple-select-label"
-                id="productCatDrop"
-                className="w-full bg-white "
-                size="small"
-                value={productWeight}
-                label="Age"
-                onChange={handleChangeProductWeight}
-              >
-                <MenuItem value={""}>
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={10}>2KG</MenuItem>
-                <MenuItem value={20}>4KG</MenuItem>
-                <MenuItem value={30}>6KG</MenuItem>
-              </Select>
+              {productWeight?.length !== 0 && (
+                <Select
+                  multiple
+                  labelId="demo-simple-select-label"
+                  id="productCatDrop"
+                  className="w-full bg-white "
+                  size="small"
+                  value={productWeight}
+                  label="Age"
+                  onChange={handleChangeProductWeight}
+                >
+                  {productWeight?.map((weight) => (
+                    <MenuItem value={weight?.name} key={weight?._id}>
+                      {weight?.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
             </div>
             <div className="col">
               <h3 className="text-[14px] font-[500] mb-1 !text-black">
                 Product Size
               </h3>
-
-              <Select
-                multiple
-                labelId="demo-simple-select-label"
-                id="productCatDrop"
-                className="w-full bg-[#fafafa]"
-                size="small"
-                value={productSize}
-                label="Age"
-                onChange={handleChangeProductSize}
-              >
-                <MenuItem value={""}>
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={"S"}>S</MenuItem>
-                <MenuItem value={"M"}>M</MenuItem>
-                <MenuItem value={"L"}>L</MenuItem>
-              </Select>
+              {productSize?.length !== 0 && (
+                <Select
+                  multiple
+                  labelId="demo-simple-select-label"
+                  id="productCatDrop"
+                  className="w-full bg-[#fafafa]"
+                  size="small"
+                  value={productSize}
+                  label="Age"
+                  onChange={handleChangeProductSize}
+                >
+                  {productSize?.map((size) => (
+                    <MenuItem value={size?.name} key={size?._id}>
+                      {size?.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
             </div>
 
             <div className="col">

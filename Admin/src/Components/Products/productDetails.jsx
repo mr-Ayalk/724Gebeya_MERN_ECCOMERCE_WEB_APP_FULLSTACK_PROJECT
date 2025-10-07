@@ -33,7 +33,7 @@ const ProductDetails = () => {
     zoomSliderSml.current.swiper.slideTo(index);
     zoomSliderBig.current.swiper.slideTo(index);
   };
- const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   //   useEffect(() => {
   //     fetchDataFromApi(`/api/product/${id}`).then((res) => {
@@ -44,7 +44,8 @@ const ProductDetails = () => {
     const fetchProduct = async () => {
       try {
         const res = await fetchDataFromApi(`/api/product/${id}`);
-        console.log("API Response:", res); // <-- check structure
+        // console.log("API Response:", res); // <-- check structure
+        console.log("Fetched Product:", res.product);
         if (res?.success) {
           setProduct(res.product);
         } else {
@@ -122,9 +123,9 @@ const ProductDetails = () => {
                 >
                   {product?.images?.map((img, index) => {
                     return (
-                      <SwiperSlide>
+                      <SwiperSlide key={index}>
                         <InnerImageZoom
-                          src={img}
+                          src={img.url}
                           zoomScale={1}
                           zoomType="hover"
                           alt="Product"
@@ -208,6 +209,25 @@ const ProductDetails = () => {
               </div>
             </div>
           )}
+          {product?.productsize?.length !== 0 && (
+            <div className="flex items-center py-2">
+              <span className="w-[20px] font-[500] flex items-center gap-2">
+                <MdFilterVintage /> SIZE :
+              </span>
+              <div className="flex items-center gap-2">
+                {product?.size?.map((size, index) => {
+                  return (
+                    <span
+                      className="text-[12px] inline-block p-1 shadow-sm bg-[#fff] font-[500]"
+                      key={index}
+                    >
+                      {size}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div className="flex items-center py-1">
             <span className="w-[20px] font-[500] flex items-center gap-2">
               <MdRateReview /> Review :
@@ -241,7 +261,7 @@ const ProductDetails = () => {
             </div>
             <div className="info w-[80%]">
               <div className="flex items-center justify-between">
-                <h4 className="text-[16px] font-[500]">Ayaaaaaaaaaaalk</h4>
+                <h4 className="text-[16px] font-[500]">Ayalk</h4>
                 <Rating name="read-only" value={5} readOnly size="small" />
               </div>
 
