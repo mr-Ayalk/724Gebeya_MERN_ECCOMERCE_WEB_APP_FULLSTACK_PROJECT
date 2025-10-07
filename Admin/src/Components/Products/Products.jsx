@@ -467,7 +467,8 @@ const Products = () => {
                                   className="w-full group-hover:scale-105 transition-all"
                                   alt={"category image"}
                                   effect="blur"
-                                  src={product.images[0]} // ✅ use url field from object
+                                  src={product.images[0]?.url}
+                                  // ✅ use url field from object
                                 />
                               </Link>
                             </div>
