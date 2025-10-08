@@ -48,153 +48,65 @@ function Navigation() {
                   </Button>
                 </Link>
               </li>
-              {
-                catData?.length !== && catData?.map((cat,index)=>{
-                  return(
- <li className="list-none relative">
-                <Link to="/" className="link transition text-[14px] font-[500]">
-                  <Button className="link transition  text-capitalize  !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
-                    Fashion
-                  </Button>
-                </Link>
+              {catData?.length !== 0 &&
+                catData?.map((cat, index) => {
+                  return (
+                    <li className="list-none relative" key={index}>
+                      <Link
+                        to="/"
+                        className="link transition text-[14px] font-[500]"
+                      >
+                        <Button className="link transition  text-capitalize  !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
+                          {cat?.name}
+                        </Button>
+                      </Link>
+                      {cat?.children?.length !== 0 && (
+                        <div className="submenu absolute top-[120%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 transition-all">
+                          <ul>
+                            {cat?.children?.map((subcat, index_) => {
+                              return (
+                                <li
+                                  className="list-none w-full relative"
+                                  key={index_}
+                                >
+                                  <Link to="/" className="w-full">
+                                    <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none ">
+                                      {subcat?.name}
+                                    </Button>
+                                  </Link>
 
-                <div className="submenu absolute top-[120%] left-[0%] min-w-[150px] bg-white shadow-md opacity-0 transition-all">
-                  <ul>
-                    <li className="list-none w-full relative">
-                      <Link to="/" className="w-full">
-                        <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none ">
-                          Men
-                        </Button>
-                      </Link>
-
-                      <div className="submenu absolute top-[0%] left-[100%] min-w-[150px] bg-white shadow-md opacity-0 transition-all">
-                        <ul>
-                          <li className="list-none w-full">
-                            <Link to="/" className="w-full">
-                              <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none ">
-                                T-Shirt
-                              </Button>
-                            </Link>
-                          </li>
-                          <li className="list-none w-full">
-                            <Link to="/" className="w-full">
-                              <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none ">
-                                Jeans
-                              </Button>
-                            </Link>
-                          </li>
-                          <li className="list-none w-full">
-                            <Link to="/" className="w-full">
-                              <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none">
-                                Footwear
-                              </Button>
-                            </Link>
-                          </li>
-                          <li className="list-none w-full">
-                            <Link to="/" className="w-full">
-                              <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none">
-                                Watch
-                              </Button>
-                            </Link>
-                          </li>
-                          <li className="list-none w-full">
-                            <Link to="/" className="w-full">
-                              <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none">
-                                Pents
-                              </Button>
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
+                                  {subcat?.children?.length !== 0 && (
+                                    <div className="submenu absolute top-[0%] left-[100%] min-w-[150px] bg-white shadow-md opacity-0 transition-all">
+                                      <ul>
+                                        {subcat?.children?.map(
+                                          (thirdLevel, index__) => {
+                                            return (
+                                              <li className="list-none w-full">
+                                                <Link
+                                                  to="/"
+                                                  className="w-full"
+                                                  key={index__}
+                                                >
+                                                  <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none ">
+                                                    {thirdLevel?.name}
+                                                  </Button>
+                                                </Link>
+                                              </li>
+                                            );
+                                          }
+                                        )}
+                                      </ul>
+                                    </div>
+                                  )}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
                     </li>
-                    <li className="list-none w-full">
-                      <Link to="/" className="w-full">
-                        <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none ">
-                          Women
-                        </Button>
-                      </Link>
-                    </li>
-                    <li className="list-none w-full">
-                      <Link to="/" className="w-full">
-                        <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none">
-                          Kids
-                        </Button>
-                      </Link>
-                    </li>
-                    <li className="list-none w-full">
-                      <Link to="/" className="w-full">
-                        <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none">
-                          Girls
-                        </Button>
-                      </Link>
-                    </li>
-                    <li className="list-none w-full">
-                      <Link to="/" className="w-full">
-                        <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none">
-                          Boys
-                        </Button>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-                  )
-                }
-
-                )
-              }
-             
-              <li className="list-none">
-                <Link to="/" className="link transition text-[14px] font-[500]">
-                  <Button className="link transition  text-capitalize  !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
-                    Electronics
-                  </Button>
-                </Link>
-              </li>
-              <li className="list-none">
-                <Link to="/" className="link transition text-[14px] font-[500]">
-                  <Button className="link transition  text-capitalize  !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
-                    Bags
-                  </Button>
-                </Link>
-              </li>
-
-              <li className="list-none">
-                <Link to="/" className="link transition text-[14px] font-[500]">
-                  <Button className="link transition  text-capitalize  !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
-                    {" "}
-                    Footwear
-                  </Button>
-                </Link>
-              </li>
-              <li className="list-none">
-                <Link to="/" className="link transition text-[14px] font-[500]">
-                  <Button className="link transition  text-capitalize  !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
-                    Groceries
-                  </Button>
-                </Link>
-              </li>
-              <li className="list-none">
-                <Link to="/" className="link transition text-[14px] font-[500]">
-                  <Button className="link transition  text-capitalize  !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
-                    Beauty
-                  </Button>
-                </Link>
-              </li>
-              <li className="list-none">
-                <Link to="/" className="link transition text-[14px] font-[500]">
-                  <Button className="link transition  text-capitalize  !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
-                    Wellness
-                  </Button>
-                </Link>
-              </li>
-              <li className="list-none">
-                <Link to="/" className="link transition text-[14px] font-[500]">
-                  <Button className="link transition  text-capitalize  !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
-                    Jewellery
-                  </Button>
-                </Link>
-              </li>
+                  );
+                })}
             </ul>
           </div>
 
@@ -207,10 +119,13 @@ function Navigation() {
         </div>
       </nav>
       {/* category pannel componenets */}
-      <CategoryPanel
-        isOpenCatPanel={isOpenCatPanel}
-        setIsOpenCatPanel={setIsOpenCatPanel}
-      />
+      {catData?.length !== 0 && (
+        <CategoryPanel
+          isOpenCatPanel={isOpenCatPanel}
+          setIsOpenCatPanel={setIsOpenCatPanel}
+          data={catData}
+        />
+      )}
     </>
   );
 }

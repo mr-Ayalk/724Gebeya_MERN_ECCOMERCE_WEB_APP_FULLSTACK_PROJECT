@@ -38,215 +38,89 @@ function CategoryPanel(props) {
           className="cursor-pointer  text-[20px]"
         />
       </h3>
+      {props.data.length !== 0 && (
+        <div className="scroll">
+          <ul className="w-full">
+            {props.data.length !== 0 &&
+              props?.data?.map((cat, index) => {
+                return (
+                  <li
+                    className="list-none flex items-center relative flex-col"
+                    key={index}
+                  >
+                    <Link to="/" className="w-full">
+                      <Button className="w-full !text-left !justify-start !px-3 !text-[rgba(0,0,0,0.8)]">
+                        {cat?.name}
+                      </Button>
+                    </Link>
+                    {submenuIndex === index ? (
+                      <FiMinusSquare
+                        className="absolute top-[10px] right-[15px] cursor-pointer"
+                        onClick={() => openSubmenu(index)}
+                      />
+                    ) : (
+                      <FaRegSquarePlus
+                        className="absolute top-[10px] right-[15px] cursor-pointer"
+                        onClick={() => openSubmenu(index)}
+                      />
+                    )}
 
-      <div className="scroll">
-        <ul className="w-full">
-          <li className="list-none flex items-center relative flex-col">
-            <Link to="/" className="w-full">
-              <Button className="w-full !text-left !justify-start !px-3 !text-[rgba(0,0,0,0.8)]">
-                Fashion
-              </Button>
-            </Link>
-            {submenuIndex === 0 ? (
-              <FiMinusSquare
-                className="absolute top-[10px] right-[15px] cursor-pointer"
-                onClick={() => openSubmenu(0)}
-              />
-            ) : (
-              <FaRegSquarePlus
-                className="absolute top-[10px] right-[15px] cursor-pointer"
-                onClick={() => openSubmenu(0)}
-              />
-            )}
+                    {submenuIndex === index && (
+                      <ul className="submenu  w-full pl-3">
+                        {cat?.children?.length !== 0 &&
+                          cat?.children?.map((subcat, index_) => {
+                            return (
+                              <li className="list-non relative" key={index_}>
+                                <Link to="/">
+                                  <Button className="w-full !text-left !justify-start !px-3 !text-[rgba(0,0,0,0.8)]">
+                                    {subcat?.name}
+                                  </Button>
+                                </Link>
+                                {innersubmenuIndex === index_ ? (
+                                  <FiMinusSquare
+                                    className="absolute top-[10px] right-[15px] cursor-pointer"
+                                    onClick={() => openInnerSubmenu(index_)}
+                                  />
+                                ) : (
+                                  <FaRegSquarePlus
+                                    className="absolute top-[10px] right-[15px] cursor-pointer"
+                                    onClick={() => openInnerSubmenu(index_)}
+                                  />
+                                )}
 
-            {submenuIndex === 0 && (
-              <ul className="submenu  w-full pl-3">
-                <li className="list-non relative">
-                  <Link to="/">
-                    <Button className="w-full !text-left !justify-start !px-3 !text-[rgba(0,0,0,0.8)]">
-                      Apparel
-                    </Button>
-                  </Link>
-                  {innersubmenuIndex === 0 ? (
-                    <FiMinusSquare
-                      className="absolute top-[10px] right-[15px] cursor-pointer"
-                      onClick={() => openInnerSubmenu(0)}
-                    />
-                  ) : (
-                    <FaRegSquarePlus
-                      className="absolute top-[10px] right-[15px] cursor-pointer"
-                      onClick={() => openInnerSubmenu(0)}
-                    />
-                  )}
-
-                  {innersubmenuIndex === 0 && (
-                    <ul className=" inner_submenu w-full pl-3">
-                      <li className="list-non relative mb-1">
-                        <Link
-                          to="/"
-                          className="link w-full !text-left !justify-start !px-3 transition text-[14px]"
-                        >
-                          Smart Tablet
-                        </Link>
-                      </li>
-                      <li className="list-non relative mb-1">
-                        <Link
-                          to="/"
-                          className="link w-full !text-left !justify-start !px-3 transition text-[14px]"
-                        >
-                          Crepe T-Shirt
-                        </Link>
-                      </li>
-                      <li className="list-non relative mb-1">
-                        <Link
-                          to="/"
-                          className="link w-full !text-left !justify-start !px-3 transition text-[14px]"
-                        >
-                          Leather watch
-                        </Link>
-                      </li>
-                      <li className="list-non relative mb-1">
-                        <Link
-                          to="/"
-                          className="link w-full !text-left !justify-start !px-3 transition text-[14px]"
-                        >
-                          Rolling Diamond
-                        </Link>
-                      </li>
-                    </ul>
-                  )}
-                </li>
-              </ul>
-            )}
-          </li>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-               <li className="list-none flex items-center relative flex-col">
-            <Link to="/" className="w-full">
-              <Button className="w-full !text-left !justify-start !px-3 !text-[rgba(0,0,0,0.8)]">
-               Outerwear
-              </Button>
-            </Link>
-            {submenuIndex === 1 ? (
-              <FiMinusSquare
-                className="absolute top-[10px] right-[15px] cursor-pointer"
-                onClick={() => openSubmenu(1)}
-              />
-            ) : (
-              <FaRegSquarePlus
-                className="absolute top-[10px] right-[15px] cursor-pointer"
-                onClick={() => openSubmenu(1)}
-              />
-            )}
-
-            {submenuIndex === 1 && (
-              <ul className="submenu  w-full pl-3">
-                <li className="list-non relative">
-                  <Link to="/">
-                    <Button className="w-full !text-left !justify-start !px-3 !text-[rgba(0,0,0,0.8)]">
-                      Apparel
-                    </Button>
-                  </Link>
-                  {innersubmenuIndex === 1 ? (
-                    <FiMinusSquare
-                      className="absolute top-[10px] right-[15px] cursor-pointer"
-                      onClick={() => openInnerSubmenu(1)}
-                    />
-                  ) : (
-                    <FaRegSquarePlus
-                      className="absolute top-[10px] right-[15px] cursor-pointer"
-                      onClick={() => openInnerSubmenu(1)}
-                    />
-                  )}
-
-                  {innersubmenuIndex === 1 && (
-                    <ul className=" inner_submenu  w-full pl-3">
-                      <li className="list-non relative mb-1">
-                        <Link
-                          to="/"
-                          className="link w-full !text-left !justify-start !px-3 transition text-[14px]"
-                        >
-                          Smart Tablet
-                        </Link>
-                      </li>
-                      <li className="list-non relative mb-1">
-                        <Link
-                          to="/"
-                          className="link w-full !text-left !justify-start !px-3 transition text-[14px]"
-                        >
-                          Crepe T-Shirt
-                        </Link>
-                      </li>
-                      <li className="list-non relative mb-1">
-                        <Link
-                          to="/"
-                          className="link w-full !text-left !justify-start !px-3 transition text-[14px]"
-                        >
-                          Leather watch
-                        </Link>
-                      </li>
-                      <li className="list-non relative mb-1">
-                        <Link
-                          to="/"
-                          className="link w-full !text-left !justify-start !px-3 transition text-[14px]"
-                        >
-                          Rolling Diamond
-                        </Link>
-                      </li>
-                    </ul>
-                  )}
-                </li>
-              </ul>
-            )}
-          </li>
-        </ul>
-      </div>
+                                {innersubmenuIndex === index_ && (
+                                  <ul className=" inner_submenu w-full pl-3">
+                                    {subcat?.children?.length !== 0 &&
+                                      subcat?.children?.map(
+                                        (thirdLevel, index__) => {
+                                          return (
+                                            <li
+                                              className="list-non relative mb-1"
+                                              key={index__}
+                                            >
+                                              <Link
+                                                to="/"
+                                                className="link w-full !text-left !justify-start !px-3 transition text-[14px]"
+                                              >
+                                                {thirdLevel?.name}
+                                              </Link>
+                                            </li>
+                                          );
+                                        }
+                                      )}
+                                  </ul>
+                                )}
+                              </li>
+                            );
+                          })}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
+      )}
     </Box>
   );
   return (
