@@ -66,6 +66,7 @@ const history=useNavigate()
   };
 
   const context = useContext(MyContext);
+  
   return (
     <header className="bg-white">
       <div className="top-strip py-2 boarder-t-[1px] border-gray-250 border-b-[1px] ">

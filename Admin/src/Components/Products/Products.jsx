@@ -1,4 +1,4 @@
-import { Button, CircularProgress } from "@mui/material";
+import { Button, CircularProgress, Rating } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { FaPlus, FaRegEye, FaTrash } from "react-icons/fa";
 import Checkbox from "@mui/material/Checkbox";
@@ -43,6 +43,11 @@ const columns = [
   {
     id: "sales",
     label: "SALES",
+    minWidth: 100,
+  },
+  {
+    id: "rating",
+    label: "RATING",
     minWidth: 100,
   },
   {
@@ -507,6 +512,15 @@ const Products = () => {
                             <span className="font-[600]">{product?.sale} </span>
                             sale
                             {/* <Progress value={40} type={"success"} /> */}
+                          </p>
+                        </TableCell>
+                        <TableCell style={{ minWidth: columns.minWidth }}>
+                          <p className="text-[14px] w-[100px]">
+                            <Rating
+                              name="half-rating-read"
+                              defaultValue={product?.rating}
+                              precision={0.5}
+                            />
                           </p>
                         </TableCell>
                         <TableCell style={{ minWidth: columns.minWidth }}>
