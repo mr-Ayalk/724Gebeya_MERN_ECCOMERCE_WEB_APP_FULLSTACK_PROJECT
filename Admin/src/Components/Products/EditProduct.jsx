@@ -144,24 +144,45 @@ const EditProduct = () => {
 
   // ✅ Image handling
   const setPreviewsFunction = (uploadedImages) => {
+    // ✅ ensure always an array
+    const newUploads = Array.isArray(uploadedImages)
+      ? uploadedImages
+      : [uploadedImages];
+
     setPreviews((prev) => {
-      const newArr = [...prev, ...uploadedImages];
+      const newArr = [...prev, ...newUploads];
       setFormFields((f) => ({ ...f, images: newArr }));
       return newArr;
     });
   };
 
-  const removeImg = async (imageObj, index) => {
-    const res = await deleteImages(
+  // const removeImg = async (imageObj, index) => {
+  //   const res = await deleteImages(
+  //     `/api/product/deleteImage?public_id=${imageObj.public_id}`
+  //   );
+  //   if (res?.success) {
+  //     setPreviews((prev) => {
+  //       const filtered = prev.filter((_, i) => i !== index);
+  //       setFormFields((f) => ({ ...f, images: filtered }));
+  //       return filtered;
+  //     });
+  //   }
+  // };
+  const removeImg = (imageObj, index) => {
+    deleteImages(
       `/api/product/deleteImage?public_id=${imageObj.public_id}`
-    );
-    if (res?.success) {
-      setPreviews((prev) => {
-        const filtered = prev.filter((_, i) => i !== index);
-        setFormFields((f) => ({ ...f, images: filtered }));
-        return filtered;
-      });
-    }
+    ).then((res) => {
+      console.log(res);
+
+      // Remove from UI state after successful delete
+      if (res?.success) {
+        setPreviews((prev) => {
+          const filtered = prev.filter((_, i) => i !== index);
+          setFormFields((f) => ({ ...f, images: filtered }));
+          return filtered;
+        });
+      }
+    });
   };
 
   // ✅ Submit update
@@ -184,15 +205,17 @@ const EditProduct = () => {
         images: previews,
       });
 
-      if (res?.data?.error === false) {
+      if (res?.error === false) {
         context.openAlertBox("success", "Product updated successfully!");
+        console.log("updated", res);
         setTimeout(() => {
           setIsLoading(false);
           context.setIsOpenFullScreenPanel({ open: false });
           navigate("/products");
         }, 800);
       } else {
-        context.openAlertBox("error", res?.data?.message || "Update failed");
+        context.openAlertBox("success", res?.message || "Update failed");
+        console.log("failed", res);
         setIsLoading(false);
       }
     } catch (err) {
@@ -317,10 +340,10 @@ const EditProduct = () => {
               {previews.map((img, index) => (
                 <div key={index} className="relative">
                   <span
-                    className="absolute w-[20px] h-[20px] rounded-full bg-red-600 top-1 right-1 flex items-center justify-center cursor-pointer"
+                    className="absolute w-[20px] h-[20px] rounded-full overflow-hidden bg-red-700 -top-[5px] -right-[5px] flex items-center justify-center z-50 cursor-pointer"
                     onClick={() => removeImg(img, index)}
                   >
-                    <IoMdClose className="text-white text-[14px]" />
+                    <IoMdClose className="text-white text-[17px]" />
                   </span>
                   <div className="border h-[150px] w-[170px] rounded-md overflow-hidden">
                     <LazyLoadImage

@@ -110,7 +110,7 @@ const AddCategory = () => {
             open: false,
           });
           context?.getCat();
-          history("/category/list")
+          history("/category/list");
         }, 2500);
       }
     });
@@ -177,7 +177,7 @@ const AddCategory = () => {
           <br />
         </div>
         <br />
-        //
+
         <div className="w-[250px]">
           <Button type="submit" className="btn-blue btn-lg w-full flex gap-2">
             <FaCloudUploadAlt className="text-[25px] text-white" />

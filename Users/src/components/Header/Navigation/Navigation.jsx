@@ -6,12 +6,23 @@ import { GoRocket } from "react-icons/go";
 import CategoryPanel from "./CategoryPanel";
 import { useState } from "react";
 import "../Navigation/Navigation.css";
+import { use } from "react";
+import { useEffect } from "react";
+import { fetchDataFromApi } from "../../../utils/api";
 function Navigation() {
   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
-
+  const [catData, setCatData] = useState([]);
   const openCategoryPanel = () => {
     setIsOpenCatPanel(true);
   };
+  useEffect(() => {
+    fetchDataFromApi("/api/category").then((res) => {
+      if (res?.error === false) {
+        setCatData(res?.data);
+      }
+      // console.log(res);
+    });
+  });
 
   return (
     <>
@@ -37,7 +48,10 @@ function Navigation() {
                   </Button>
                 </Link>
               </li>
-              <li className="list-none relative">
+              {
+                catData?.length !== && catData?.map((cat,index)=>{
+                  return(
+ <li className="list-none relative">
                 <Link to="/" className="link transition text-[14px] font-[500]">
                   <Button className="link transition  text-capitalize  !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
                     Fashion
@@ -124,6 +138,12 @@ function Navigation() {
                   </ul>
                 </div>
               </li>
+                  )
+                }
+
+                )
+              }
+             
               <li className="list-none">
                 <Link to="/" className="link transition text-[14px] font-[500]">
                   <Button className="link transition  text-capitalize  !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
