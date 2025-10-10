@@ -1,73 +1,22 @@
-// import UploadBox from "../../Components/UploadBox/UploadBox";
-// import { LazyLoadImage } from "react-lazy-load-image-component";
-// import "react-lazy-load-image-component/src/effects/blur.css";
-// import { IoMdClose } from "react-icons/io";
-// import { Button } from "@mui/material";
-// import { FaCloudUploadAlt } from "react-icons/fa";
-// const AddHomeSlide = () => {
-//   return (
-//     <section className="p-5 px-20 bg-gray-50  overflow-hidden">
-//       <form action="" className="form p-8 py-3 ">
-//         <div className="scroll max-h-[75vh] overflow-y-scroll pr-4 pt-3">
-//           <div className="grid grid-cols-6 gap-4">
-//             <div className="uploadBoxWrapper relative">
-//               <span className="absolute w-[20px] h-[20px] rounded-full overflow-hidden bg-red-700 -top-[5px] -right-[5px] flex items-center justify-center z-50 cursor-pointer">
-//                 <IoMdClose className="text-white text-[17px]" />
-//               </span>
-
-//               <div className="uploadBox p-0  rounded-md overflow-hidden border border-dashed border-[rgba(0,0,0,0.3)] h-[150px] w-[170px] bg-gray-100 cursor-pointer hover:bg-gray-200 flex items-center justify-center flex-col relative">
-//                 <LazyLoadImage
-//                   className="w-full h-full object-cover"
-//                   alt={"image.alt"}
-//                   effect="blur"
-//                   wrapperProps={{
-//                     // If you need to, you can tweak the effect transition using the wrapper style.
-//                     style: { transitionDelay: "1s" },
-//                   }}
-//                   src={
-//                     "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fHww"
-//                   }
-//                 />
-//               </div>
-//             </div>
-//             <UploadBox multiple={true} />
-//           </div>
-
-//           <br />
-//         </div>
-
-//         <br />
-//         <div className="w-[250px]">
-//           <Button type="button" className="btn-blue btn-lg w-full flex gap-2">
-//             <FaCloudUploadAlt className="text-[25px] text-white" />
-//             Publish and View
-//           </Button>
-//         </div>
-//       </form>
-//     </section>
-//   );
-// };
-
-// export default AddHomeSlide;
-
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoMdClose } from "react-icons/io";
 import { Button, CircularProgress } from "@mui/material";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { MyContext } from "../../App";
-import { useNavigate } from "react-router-dom";
-import { deleteImages, postData } from "../../utils/api";
+import { deleteImages, editData, fetchDataFromApi } from "../../utils/api";
 import UploadBox from "../../Components/UploadBox/UploadBox";
-const AddHomeSlide = () => {
+const EditHomeSlider = () => {
   const context = useContext(MyContext);
-  const history = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [previews, setPreviews] = useState([]);
   const [formFields, setFormFields] = useState({
+    name: "",
     images: [],
+    // parentCatName: "",
+    // parentId: "",
   });
   const setPreviewsFunction = (images) => {
     setPreviews(images);
@@ -76,6 +25,14 @@ const AddHomeSlide = () => {
       images,
     }));
   };
+  useEffect(() => {
+    const id = context?.isOpenFullScreenPanel?.id;
+    fetchDataFromApi(`/api/homeSlider/${id}`).then((res) => {
+      console.log(res);
+      formFields.name = res?.category?.name;
+      setPreviews(res?.category?.images);
+    });
+  }, []);
 
   const onChangeInput = (e) => {
     const { name, value } = e.target;
@@ -104,18 +61,26 @@ const AddHomeSlide = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    if (formFields.name.trim() === "") {
+      context.openAlertBox("error", "Category name is required");
+      setIsLoading(false);
+      return;
+    }
     if (previews.length === 0) {
-      context.openAlertBox("error", "Slider image is required");
+      context.openAlertBox("error", "Category image is required");
       setIsLoading(false);
       return;
     }
 
     // ✅ Make sure formFields.images is an array of objects [{url, public_id}, ...]
-    postData("/api/homeSlider/add", {
+    editData(`/api/homeSlider/${context?.isOpenFullScreenPanel?.id}`, {
       images: previews, // send full previews array
     }).then((res) => {
       if (res?.error) {
-        context.openAlertBox("error", res?.message || "Failed to add slider");
+        context.openAlertBox(
+          "error",
+          res?.message || "Failed to add home slider"
+        );
         setIsLoading(false);
       }
       if (res?.error === false) {
@@ -126,8 +91,6 @@ const AddHomeSlide = () => {
           context.setIsOpenFullScreenPanel({
             open: false,
           });
-          context?.getCat();
-          // history("homeSlider/list");
         }, 2500);
       }
     });
@@ -163,18 +126,24 @@ const AddHomeSlide = () => {
                 );
               })}
 
+            {/* <UploadBox
+              multiple={true}
+              name="images"
+              url="/api/category/uploadImages"
+              setPreviewsFunction={setPreviewsFunction}
+            /> */}
             <UploadBox
               multiple={true}
               name="images"
-              url="/api/homeSlider/uploadImages"
+              url="/api/category/uploadImages"
               setPreviewsFunction={setPreviewsFunction}
             />
           </div>
 
           <br />
         </div>
-        <br />
 
+        <br />
         <div className="w-[250px]">
           <Button type="submit" className="btn-blue btn-lg w-full flex gap-2">
             <FaCloudUploadAlt className="text-[25px] text-white" />
@@ -190,4 +159,4 @@ const AddHomeSlide = () => {
   );
 };
 
-export default AddHomeSlide;
+export default EditHomeSlider;
