@@ -22,7 +22,7 @@ function Navigation() {
       }
       // console.log(res);
     });
-  });
+  }, []);
 
   return (
     <>

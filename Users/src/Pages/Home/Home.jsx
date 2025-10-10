@@ -16,19 +16,33 @@ import HomeSliderV2 from "../../components/HomeSliderV2/HomeSliderV2";
 import AdsBannerSliderV2 from "../../components/AdsBannerSliderV2/AdsBannerSliderV2";
 // import BannerBoxV2 from "../../components/BannerBoxV2/BannerBoxV2.jsx";
 import BannerBoxV2 from "../../components/BannerBoxV2/BannerBoxV2";
+import { useState } from "react";
+import { useEffect } from "react";
+import { fetchDataFromApi } from "../../utils/api";
 
 function Home() {
-  const [value, setValue] = React.useState(0);
-
+  const [value, setValue] = useState(0);
+  const [homeSlidesData, setHomeSlidesData] = useState([]);
+  useEffect(() => {
+    fetchDataFromApi("/api/homeSlider").then((res) => {
+      if (res?.error === false) {
+        setHomeSlidesData(res?.data);
+      }
+      console.log("home slides", res);
+    });
+  }, []);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
   return (
     <>
-      <HomeSlider />
+      {homeSlidesData.length !== 0 && <HomeSlider data={homeSlidesData} />}
 
-      <section className="py-6">
+   
+
+      <CatSlider />
+         <section className="py-6">
         <div className="container flex items-center gap-5">
           <div className="part1 w-[70%]">
             <HomeSliderV2 />
@@ -49,8 +63,6 @@ function Home() {
           </div>
         </div>
       </section>
-
-      <CatSlider />
       <section className="bg-white py-8">
         <div className="container">
           <div className="flex items-center justify-between">
@@ -90,7 +102,7 @@ function Home() {
 
       <section className="py-4 pt-2  bg-white">
         <div className="container">
-          <div className="freeShipping w-[80%] mx-auto py-4 p-4 border-2 border border-[#ff5252] flex items-center justify-between rounded-md mb-7">
+          <div className="freeShipping w-[80%] mx-auto py-4 p-4 border-2  border-[#ff5252] flex items-center justify-between rounded-md mb-7">
             <div className="col1 flex items-center gap-4">
               <LiaShippingFastSolid className="text-[50px]" />
               <span className="text-[20px] font-[600]">FREE SHIPPING</span>

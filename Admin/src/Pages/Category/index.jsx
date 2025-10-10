@@ -45,6 +45,7 @@ const Category = () => {
       context.setCatData(res?.data);
     });
   }, [context?.isOpenFullScreenPanel]);
+  
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -55,7 +56,10 @@ const Category = () => {
   };
   const deleteCat = (id) => {
     deleteData(`/api/category/${id}`).then((res) => {
-      context.openAlertBox("success",res?.message || "Category deleted successfully");
+      context.openAlertBox(
+        "success",
+        res?.message || "Category deleted successfully"
+      );
       fetchDataFromApi("/api/category").then((res) => {
         console.log(res?.data);
         context.setCatData(res?.data);

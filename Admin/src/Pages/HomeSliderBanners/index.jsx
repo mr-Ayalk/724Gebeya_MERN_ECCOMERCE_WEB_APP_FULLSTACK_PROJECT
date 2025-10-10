@@ -19,6 +19,8 @@ import { BiExport } from "react-icons/bi";
 
 import { MyContext } from "../../App";
 import SearchBox from "../../Components/SearchBox/SearchBox";
+import { useEffect } from "react";
+import { deleteData, fetchDataFromApi } from "../../utils/api";
 
 const columns = [
   { id: "image", label: "IMAGE", minWidth: 250 },
@@ -29,13 +31,21 @@ const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const HomeSliderBanners = () => {
   const context = useContext(MyContext);
   const [category, setCategory] = useState("");
-
+  const [slidesData, setSlidesData] = useState([]);
   const handleChange = (event) => {
     setCategory(event.target.value);
   };
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  useEffect(() => {
+    fetchDataFromApi("/api/homeSlider").then((res) => {
+      if (res?.error === false) {
+        setSlidesData(res?.data);
+      }
+      console.log("home slides", res);
+    });
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -44,6 +54,19 @@ const HomeSliderBanners = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  };
+  const deleteSlide = (id) => {
+    deleteData(`/api/homeSlider/${id}`).then((res) => {
+      context.openAlertBox(
+        "success",
+        res?.message || "Home Slider deleted successfully"
+      );
+      console.log(res);
+      fetchDataFromApi("/api/homeSlider").then((res) => {
+        console.log(res?.data);
+        context.setCatData(res?.data);
+      });
+    });
   };
   return (
     <>
@@ -71,7 +94,7 @@ const HomeSliderBanners = () => {
           </Button>
         </div>
       </div>
-     
+
       <div className="card my-4 pt-5 shadow-md sm:rounded-lg bg-white">
         <div className="flex items-center w-full px-5 justify-between ">
           <div className="col w-[20%] py-3">
@@ -113,49 +136,66 @@ const HomeSliderBanners = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <Checkbox {...label} size="small" />
-                </TableCell>
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <div className="flex items-center gap-4 w-[300px]">
-                    <div className="img w-full h-32  rounded-md overflow-hidden group">
-                      <Link to={"/product/4545"}>
-                        <img
-                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fHww"
-                          className="w-full group-hover:scale-105 transition-all  h-full object-cover "
-                          alt=""
-                        />
-                      </Link>
-                    </div>
-                  </div>
-                </TableCell>
+              {slidesData
+                ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((slide, index) => {
+                  return (
+                    <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        <Checkbox {...label} size="small" />
+                      </TableCell>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        <div className="flex items-center gap-4 w-[300px]">
+                          <div className="img w-full h-32  rounded-md overflow-hidden group">
+                            <Link to={"/product/4545"}>
+                              <img src={slide?.images[0]?.url} alt="" />
+                            </Link>
+                          </div>
+                        </div>
+                      </TableCell>
 
-                <TableCell style={{ minWidth: columns.minWidth }}>
-                  <div className="flex items-center gap-4">
-                    <Tooltip1 title="Edit Product" placement="top-start">
-                      <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                        <AiOutlineEdit className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                      </Button>
-                    </Tooltip1>
+                      <TableCell style={{ minWidth: columns.minWidth }}>
+                        <div className="flex items-center gap-4">
+                          <Tooltip1 title="Edit Product" placement="top-start">
+                            <Button
+                              className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]"
+                              onClick={() =>
+                                context.setIsOpenFullScreenPanel({
+                                  open: true,
+                                  model: "Edit Home Slider",
+                                  id: slide?._id,
+                                })
+                              }
+                            >
+                              <AiOutlineEdit className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+                            </Button>
+                          </Tooltip1>
 
-                    <Tooltip1
-                      title="View Product Details"
-                      placement="top-start"
-                    >
-                      <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                        <FaRegEye className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                      </Button>
-                    </Tooltip1>
+                          {/* <Tooltip1
+                            title="View Product Details"
+                            placement="top-start"
+                          >
+                            <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
+                              <FaRegEye className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+                            </Button>
+                          </Tooltip1> */}
 
-                    <Tooltip1 title="Remove Product" placement="top-start">
-                      <Button className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]">
-                        <FaTrash className="text-[rgba(0,0,0,0.7)] text-[20px]" />
-                      </Button>
-                    </Tooltip1>
-                  </div>
-                </TableCell>
-              </TableRow>
+                          <Tooltip1
+                            title="Remove Product"
+                            placement="top-start"
+                          >
+                            <Button
+                              className="!w-[35px] !h-[35px] !min-w-[35px] bg-[#f1f1f1] !border !border-[rgba(0,0,0,0.2)] !rounded-lg hover:bg-[#f1faff]"
+                              onClick={() => deleteSlide(slide?._id)}
+                            >
+                              <FaTrash className="text-[rgba(0,0,0,0.7)] text-[20px]" />
+                            </Button>
+                          </Tooltip1>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </TableContainer>
@@ -169,8 +209,6 @@ const HomeSliderBanners = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </div>
-
-  
     </>
   );
 };
