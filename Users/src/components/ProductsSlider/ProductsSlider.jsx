@@ -1,4 +1,3 @@
-
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css/navigation";
@@ -19,42 +18,13 @@ function ProductsSlider(props) {
         modules={[Navigation]}
         className="mySwiper"
       >
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProductItem />
-        </SwiperSlide>
+        {props?.data?.map((item, index) => {
+          return (
+            <SwiperSlide key={index}>
+              <ProductItem item={item} />
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
     </div>
   );
