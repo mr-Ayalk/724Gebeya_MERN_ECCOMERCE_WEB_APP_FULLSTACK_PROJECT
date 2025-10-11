@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import HomeSlider from "../../components/HomeSlider/HomeSlider";
 import CatSlider from "../../components/CatSlider/CatSlider";
 import { LiaShippingFastSolid } from "react-icons/lia";
@@ -12,82 +12,93 @@ import AdsBannerSlider from "../../components/AdsBannerSlider/AdsBannerSlider";
 import ProductsSlider from "../../components/ProductsSlider/ProductsSlider";
 import BlogItem from "../../components/BlogItem/BlogItem";
 import HomeSliderV2 from "../../components/HomeSliderV2/HomeSliderV2";
-
 import AdsBannerSliderV2 from "../../components/AdsBannerSliderV2/AdsBannerSliderV2";
-
 import BannerBoxV2 from "../../components/BannerBoxV2/BannerBoxV2";
-import { useState } from "react";
-import { useEffect } from "react";
 import { fetchDataFromApi } from "../../utils/api";
-import { useContext } from "react";
 import { MyContext } from "../../App";
 
 function Home() {
   const context = useContext(MyContext);
+
   const [value, setValue] = useState(0);
   const [homeSlidesData, setHomeSlidesData] = useState([]);
   const [popularProduct, setPopularProducts] = useState([]);
+  const [productData, setProductData] = useState([]);
+  const [featuredProduct, setFeaturedProduct] = useState([]);
+  // Fetch home slider + all products
   useEffect(() => {
     fetchDataFromApi("/api/homeSlider").then((res) => {
-      if (res?.error === false) {
-        setHomeSlidesData(res?.data);
+      if (res?.error === false && Array.isArray(res?.data)) {
+        setHomeSlidesData(res.data);
       }
-      // console.log("home slides", res);
     });
+
     fetchDataFromApi("/api/product/getAllProducts").then((res) => {
-      if (res?.error === false) {
-        setPopularProducts(res?.data);
-      }
-      // console.log("products", res);
+      setProductData(res.products);
+    });
+    fetchDataFromApi("/api/product/getAllFeaturedProducts").then((res) => {
+      setFeaturedProduct(res.products);
     });
   }, []);
 
+  // Fetch popular products based on first category
   useEffect(() => {
-    fetchDataFromApi(
-      `/api/product/getAllProductsByCatId/${context?.catData[0]?._id}`
-    ).then((res) => {
-      // console.log(res);
-      setPopularProducts(res?.products);
-    });
+    if (Array.isArray(context?.catData) && context.catData.length > 0) {
+      fetchDataFromApi(
+        `/api/product/getAllProductsByCatId/${context.catData[0]?._id}`
+      ).then((res) => {
+        if (Array.isArray(res?.products)) {
+          setPopularProducts(res.products);
+        }
+      });
+    }
   }, [context?.catData]);
+
   const handleChange = (event, newValue) => {
-    //console.log(event.target.value);
     setValue(newValue);
   };
+
   const filterByCatId = (id) => {
+    if (!id) return;
     fetchDataFromApi(`/api/product/getAllProductsByCatId/${id}`).then((res) => {
-      // console.log(res);
-      setPopularProducts(res?.products);
+      if (Array.isArray(res?.products)) {
+        setPopularProducts(res.products);
+      }
     });
   };
 
   return (
     <>
-      {homeSlidesData.length !== 0 && <HomeSlider data={homeSlidesData} />}
+      {/* 🖼️ Home Slider */}
+      {Array.isArray(homeSlidesData) && homeSlidesData.length > 0 && (
+        <HomeSlider data={homeSlidesData} />
+      )}
 
-      {context?.catData?.length !== 0 && <CatSlider data={context?.catData} />}
+      {/* 🧭 Category Slider */}
+      {Array.isArray(context?.catData) && context.catData.length > 0 && (
+        <CatSlider data={context.catData} />
+      )}
 
+      {/* 🏠 Banner Section */}
       <section className="py-6">
         <div className="container flex items-center gap-5">
           <div className="part1 w-[70%]">
             <HomeSliderV2 />
           </div>
-          <div className="part2 w-[30%] flex items-center justify-between flex-col gap-5">
+          <div className="part2 w-[30%] flex flex-col items-center justify-between gap-5">
             <BannerBoxV2
               info="right"
-              image={
-                "https://serviceapi.spicezgold.com/download/1741664665391_1741497254110_New_Project_50.jpg"
-              }
+              image="https://serviceapi.spicezgold.com/download/1741664665391_1741497254110_New_Project_50.jpg"
             />
             <BannerBoxV2
               info="left"
-              image={
-                "https://serviceapi.spicezgold.com/download/1741664496923_1737020250515_New_Project_47.jpg"
-              }
+              image="https://serviceapi.spicezgold.com/download/1741664496923_1737020250515_New_Project_47.jpg"
             />
           </div>
         </div>
       </section>
+
+      {/* 💥 Popular Products */}
       <section className="bg-white py-8">
         <div className="container">
           <div className="flex items-center justify-between">
@@ -108,59 +119,71 @@ function Home() {
                 scrollButtons="auto"
                 aria-label="scrollable auto tabs example"
               >
-                {context?.catData?.length !== 0 &&
-                  context?.catData?.map((cat, index) => {
-                    return (
-                      <Tab
-                        label={cat?.name}
-                        key={index}
-                        onClick={() => filterByCatId(cat?._id)}
-                      />
-                    );
-                  })}
+                {Array.isArray(context?.catData) &&
+                  context.catData.map((cat, index) => (
+                    <Tab
+                      label={cat?.name}
+                      key={cat?._id || index}
+                      onClick={() => filterByCatId(cat?._id)}
+                    />
+                  ))}
               </Tabs>
             </div>
           </div>
-          {popularProduct.length !== 0 && (
+
+          {Array.isArray(popularProduct) && popularProduct.length > 0 && (
             <ProductsSlider items={6} data={popularProduct} />
           )}
         </div>
       </section>
 
-      <section className="py-4 pt-2  bg-white">
+      {/* 🚚 Free Shipping */}
+      <section className="py-4 pt-2 bg-white">
         <div className="container">
-          <div className="freeShipping w-[80%] mx-auto py-4 p-4 border-2  border-[#ff5252] flex items-center justify-between rounded-md mb-7">
+          <div className="freeShipping w-[80%] mx-auto py-4 p-4 border-2 border-[#ff5252] flex items-center justify-between rounded-md mb-7">
             <div className="col1 flex items-center gap-4">
               <LiaShippingFastSolid className="text-[50px]" />
               <span className="text-[20px] font-[600]">FREE SHIPPING</span>
             </div>
 
-            <div className="col2 ">
-              <p className="mb-0 font-[500] ">
+            <div className="col2">
+              <p className="mb-0 font-[500]">
                 Free Delivery Now On Your First Order and Over $200
               </p>
             </div>
             <p className="font-bold text-[25px]">-Only $200*</p>
           </div>
+
           <AdsBannerSliderV2 items={4} />
-          {/* <AdsBannerSlider items={4} /> */}
         </div>
       </section>
 
+      {/* 🆕 Latest Products */}
       <section className="py-5 bg-white pt-0">
         <div className="container">
           <h2 className="text-[20px] font-[600]">Latest Products</h2>
-          <ProductsSlider items={6} />
+
+          {productData.length > 0 && (
+            <ProductsSlider items={6} data={productData} />
+          )}
+
           <AdsBannerSlider items={3} />
         </div>
       </section>
+
+      {/* 🌟 Featured Products */}
       <section className="py-5 bg-white pt-0">
         <div className="container">
           <h2 className="text-[20px] font-[600]">Featured Products</h2>
-          <ProductsSlider items={6} />
+          {Array.isArray(featuredProduct) && featuredProduct.length > 0 && (
+            <ProductsSlider items={6} data={featuredProduct} />
+          )}
+
           <AdsBannerSlider items={4} />
         </div>
       </section>
+
+      {/* 📰 Blog Section */}
       <section className="py-5 pb-8 bg-white pt-0 blogSection">
         <div className="container">
           <h2 className="text-[20px] mb-4 font-[600]">From Blogs</h2>
@@ -168,36 +191,14 @@ function Home() {
             navigation={true}
             slidesPerView={4}
             spaceBetween={30}
-            pagination={{
-              clickable: true,
-            }}
             modules={[Navigation]}
             className="blogSlider"
           >
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
-            <SwiperSlide>
-              <BlogItem />
-            </SwiperSlide>
+            {[...Array(8)].map((_, i) => (
+              <SwiperSlide key={i}>
+                <BlogItem />
+              </SwiperSlide>
+            ))}
           </Swiper>
         </div>
       </section>
