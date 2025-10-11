@@ -1,4 +1,4 @@
-import  { useContext } from "react";
+import { useContext } from "react";
 import "../ProductItem/ProductItem.css";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
@@ -8,7 +8,7 @@ import { IoGitCompareOutline } from "react-icons/io5";
 import { MdZoomOutMap } from "react-icons/md";
 import Tooltip from "@mui/material/Tooltip";
 import { MyContext } from "../../App";
-function ProductItem() {
+function ProductItem(props) {
   const context = useContext(MyContext);
 
   return (
@@ -19,29 +19,31 @@ function ProductItem() {
       }}
     >
       <div className="group imgWrapper w-[100%]   rounded-md relative">
-        <Link to="/">
+        <Link to={`/product/${props?.item?._id}`}>
           <div className="img h-[220px] overflow-hidden">
             <img
-              src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZmFzaGlvbnxlbnwwfHwwfHx8MA%3D%3D"
+              src={props?.item?.images[0]?.url}
               alt="  "
               className="w-full"
             />
             <img
-              src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZmFzaGlvbnxlbnwwfHwwfHx8MA%3D%3D"
+              src={props?.item?.images[1]?.url}
               alt="  "
               className="w-full h-[85%] absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150"
             />
           </div>
         </Link>
         <span className="discount flex items-center absolute top-[18px] left-[10px] z-50 bg-primary text-white rounded-lg p-1 text-[12px] font-[500]">
-          10%
+          {props?.item?.discount}% OFF
         </span>
 
         <div className="actions absolute top-[-200px] right-[5px] z-50 flex items-center gap-2 flex-col w-[50px] transition-all duration-800 group-hover:top-[15px]">
           <Tooltip title="Zoom" placement="left-start">
             <Button
               className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-primary hover:text-white  group"
-              onClick={() => context.setOpenProductDetailsModel(true)}
+              onClick={() =>
+                context.handleOpenProductDetailsModel(true, props?.item)
+              }
             >
               <MdZoomOutMap className="text-[18px] !text-black group-hover:text-white hover:!text-white" />
             </Button>
@@ -61,22 +63,36 @@ function ProductItem() {
 
       <div className="info p-3 py-5">
         <h6 className="text-[13px] !font-[400]">
-          <Link to="/" className="link transition-all">
-            Soylent Green
+          <Link
+            to={`/product/${props?.item?._id}`}
+            className="link transition-all"
+          >
+            {props?.item?.brand}
           </Link>
         </h6>
         <h3 className="text-[13px] title mt-1 font-[600] text-[#000]">
-          <Link to="/" className="link transition-all">
-            Siril Geortte Pink Saree with Blouse piece
+          <Link
+            to={`/product/${props?.item?._id}`}
+            className="link transition-all"
+          >
+            {props?.item?.name}
           </Link>
         </h3>
-        <Rating name="size-small" defaultValue={4} size="small" readOnly />
+        <Rating
+          name="size-small"
+          defaultValue={props?.item?.rating}
+          size="small"
+          readOnly
+        />
 
         <div className="flex items-center gap-4">
           <span className="oldPrice line-through text-gray-500 text-[15px]">
-            $58.00
+            ${props?.item?.oldPrice.toFixed(2)}
           </span>
-          <span className="price text-primary font-bold">$50.00</span>
+          <span className="price text-primary font-bold">
+            {" "}
+            ${props?.item?.price.toFixed(2)}
+          </span>
         </div>
       </div>
     </div>

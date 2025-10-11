@@ -14,35 +14,60 @@ import BlogItem from "../../components/BlogItem/BlogItem";
 import HomeSliderV2 from "../../components/HomeSliderV2/HomeSliderV2";
 
 import AdsBannerSliderV2 from "../../components/AdsBannerSliderV2/AdsBannerSliderV2";
-// import BannerBoxV2 from "../../components/BannerBoxV2/BannerBoxV2.jsx";
+
 import BannerBoxV2 from "../../components/BannerBoxV2/BannerBoxV2";
 import { useState } from "react";
 import { useEffect } from "react";
 import { fetchDataFromApi } from "../../utils/api";
+import { useContext } from "react";
+import { MyContext } from "../../App";
 
 function Home() {
+  const context = useContext(MyContext);
   const [value, setValue] = useState(0);
   const [homeSlidesData, setHomeSlidesData] = useState([]);
+  const [popularProduct, setPopularProducts] = useState([]);
   useEffect(() => {
     fetchDataFromApi("/api/homeSlider").then((res) => {
       if (res?.error === false) {
         setHomeSlidesData(res?.data);
       }
-      console.log("home slides", res);
+      // console.log("home slides", res);
+    });
+    fetchDataFromApi("/api/product/getAllProducts").then((res) => {
+      if (res?.error === false) {
+        setPopularProducts(res?.data);
+      }
+      // console.log("products", res);
     });
   }, []);
+
+  useEffect(() => {
+    fetchDataFromApi(
+      `/api/product/getAllProductsByCatId/${context?.catData[0]?._id}`
+    ).then((res) => {
+      // console.log(res);
+      setPopularProducts(res?.products);
+    });
+  }, [context?.catData]);
   const handleChange = (event, newValue) => {
+    //console.log(event.target.value);
     setValue(newValue);
+  };
+  const filterByCatId = (id) => {
+    fetchDataFromApi(`/api/product/getAllProductsByCatId/${id}`).then((res) => {
+      // console.log(res);
+      setPopularProducts(res?.products);
+    });
   };
 
   return (
     <>
       {homeSlidesData.length !== 0 && <HomeSlider data={homeSlidesData} />}
 
-   
+      {context?.catData?.length !== 0 && <CatSlider data={context?.catData} />}
 
-      <CatSlider />
-         <section className="py-6">
+      <section className="py-6">
         <div className="container flex items-center gap-5">
           <div className="part1 w-[70%]">
             <HomeSliderV2 />
@@ -67,7 +92,9 @@ function Home() {
         <div className="container">
           <div className="flex items-center justify-between">
             <div className="leftSec">
-              <h2 className="text-[20px] font-[600]">Popular Products</h2>
+              <h2 className="text-[20px] font-[600] mt-0 mb-0">
+                Popular Products
+              </h2>
               <p className="text-[14px] font-[400]">
                 Do not miss the current offers until the end of March
               </p>
@@ -81,22 +108,22 @@ function Home() {
                 scrollButtons="auto"
                 aria-label="scrollable auto tabs example"
               >
-                <Tab label="Fashion" />
-                <Tab label="Electronics" />
-                <Tab label="Bags" />
-                <Tab label="Footwear" />
-                <Tab label="Groceries" />
-                <Tab label="Beauty" />
-                <Tab label="Wellness" />
-                <Tab label="Jewellery" />
-                <Tab label="Food" />
-                <Tab label="Fruits" />
-                <Tab label="Furniture" />
-                <Tab label="Books" />
+                {context?.catData?.length !== 0 &&
+                  context?.catData?.map((cat, index) => {
+                    return (
+                      <Tab
+                        label={cat?.name}
+                        key={index}
+                        onClick={() => filterByCatId(cat?._id)}
+                      />
+                    );
+                  })}
               </Tabs>
             </div>
           </div>
-          <ProductsSlider items={6} />
+          {popularProduct.length !== 0 && (
+            <ProductsSlider items={6} data={popularProduct} />
+          )}
         </div>
       </section>
 

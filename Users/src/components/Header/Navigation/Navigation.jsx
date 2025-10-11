@@ -9,20 +9,15 @@ import "../Navigation/Navigation.css";
 import { use } from "react";
 import { useEffect } from "react";
 import { fetchDataFromApi } from "../../../utils/api";
+import { useContext } from "react";
+import { MyContext } from "../../../App";
 function Navigation() {
+  const context = useContext(MyContext);
   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
-  const [catData, setCatData] = useState([]);
+
   const openCategoryPanel = () => {
     setIsOpenCatPanel(true);
   };
-  useEffect(() => {
-    fetchDataFromApi("/api/category").then((res) => {
-      if (res?.error === false) {
-        setCatData(res?.data);
-      }
-      // console.log(res);
-    });
-  }, []);
 
   return (
     <>
@@ -48,8 +43,8 @@ function Navigation() {
                   </Button>
                 </Link>
               </li>
-              {catData?.length !== 0 &&
-                catData?.map((cat, index) => {
+              {context.catData?.length !== 0 &&
+                context.catData?.map((cat, index) => {
                   return (
                     <li className="list-none relative" key={index}>
                       <Link
@@ -119,11 +114,11 @@ function Navigation() {
         </div>
       </nav>
       {/* category pannel componenets */}
-      {catData?.length !== 0 && (
+      {context.catData?.length !== 0 && (
         <CategoryPanel
           isOpenCatPanel={isOpenCatPanel}
           setIsOpenCatPanel={setIsOpenCatPanel}
-          data={catData}
+          data={context.catData}
         />
       )}
     </>

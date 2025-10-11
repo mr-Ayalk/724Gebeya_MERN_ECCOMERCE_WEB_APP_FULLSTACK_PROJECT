@@ -31,12 +31,24 @@ import Address from "./Pages/MyAccount/address";
 // import Drawer from "@mui/materia/Drawer";
 const MyContext = createContext();
 function App() {
-  const [openProductDetailsModel, setOpenProductDetailsModel] = useState(false);
+  const [openProductDetailsModel, setOpenProductDetailsModel] = useState({
+    open: false,
+    item: {},
+  });
   const [maxWidth, setMaxWidth] = useState("md");
   const [fullWidth, setFullWidth] = useState(true);
   const [openCartPanel, setOpenCartPanel] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [catData, setCatData] = useState([]);
+  useEffect(() => {
+    fetchDataFromApi("/api/category").then((res) => {
+      if (res?.error === false) {
+        setCatData(res?.data);
+      }
+      // console.log(res);
+    });
+  }, []);
   const apiUrl = import.meta.env.VITE_API_URL;
   const toggleCartPanel = (newOpen) => () => {
     setOpenCartPanel(newOpen);
@@ -63,7 +75,16 @@ function App() {
     }
   }, [isLogin]);
   const handleCloseProductDetailsModel = () => {
-    setOpenProductDetailsModel(false);
+    setOpenProductDetailsModel({
+      open: false,
+      item: {},
+    });
+  };
+  const handleOpenProductDetailsModel = (status, item) => {
+    setOpenProductDetailsModel({
+      open: status,
+      item: item,
+    });
   };
   const openAlertBox = (status, msg) => {
     if (status === "success") {
@@ -75,6 +96,8 @@ function App() {
   };
   const values = {
     setOpenProductDetailsModel,
+    handleOpenProductDetailsModel,
+    handleCloseProductDetailsModel,
     setOpenCartPanel,
     openCartPanel,
     toggleCartPanel,
@@ -83,6 +106,8 @@ function App() {
     setIsLogin,
     setUserData,
     userData,
+    catData,
+    setCatData,
   };
   return (
     <>
@@ -109,7 +134,7 @@ function App() {
       </BrowserRouter>
       <Toaster />
       <Dialog
-        open={openProductDetailsModel}
+        open={openProductDetailsModel.open}
         onClose={handleCloseProductDetailsModel}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
