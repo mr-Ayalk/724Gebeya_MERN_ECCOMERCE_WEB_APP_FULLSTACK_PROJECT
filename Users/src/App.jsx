@@ -150,12 +150,19 @@ function App() {
             >
               <IoCloseSharp className="text-[20px]" />
             </Button>
-            <div className="col1 w-[40%] px-3">
-              <ProductZoom />
-            </div>
-            <div className="col2 w-[60%] py-8 px-8 pr-16 productContent">
-              <ProductDetailsComponent />
-            </div>
+            {openProductDetailsModel?.item?.length !== 0 && (
+              <>
+                {" "}
+                <div className="col1 w-[40%] px-3">
+                  <ProductZoom images={openProductDetailsModel?.item?.images} />
+                </div>
+                <div className="col2 w-[60%] py-8 px-8 pr-16 productContent">
+                  <ProductDetailsComponent
+                    data={openProductDetailsModel?.item}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>
