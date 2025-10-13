@@ -110,7 +110,7 @@ const Products = () => {
     fetchDataFromApi("/api/product/getAllProducts").then((res) => {
       // setProductData(res?.products);
       let productArr = [];
-      console.log(res);
+      // console.log(res);
       if (res?.error === false) {
         for (let i = 0; i < res?.products?.length; i++) {
           productArr[i] = res?.products[i];
@@ -162,7 +162,7 @@ const Products = () => {
       deleteMultipleProduct(`/api/product/deleteMultiple`, {
         data: { ids: sortedIds },
       }).then((res) => {
-        console.log(res);
+        // console.log(res);
         getProducts();
         context.openAlertBox("success", "Product deleted");
       });

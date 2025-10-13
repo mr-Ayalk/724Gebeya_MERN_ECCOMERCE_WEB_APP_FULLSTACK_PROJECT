@@ -16,6 +16,7 @@ import AdsBannerSliderV2 from "../../components/AdsBannerSliderV2/AdsBannerSlide
 import BannerBoxV2 from "../../components/BannerBoxV2/BannerBoxV2";
 import { fetchDataFromApi } from "../../utils/api";
 import { MyContext } from "../../App";
+import ProductLoading from "../../components/ProductLoading/ProductLoading";
 
 function Home() {
   const context = useContext(MyContext);
@@ -60,6 +61,7 @@ function Home() {
 
   const filterByCatId = (id) => {
     if (!id) return;
+    setPopularProducts([]);
     fetchDataFromApi(`/api/product/getAllProductsByCatId/${id}`).then((res) => {
       if (Array.isArray(res?.products)) {
         setPopularProducts(res.products);
@@ -130,6 +132,7 @@ function Home() {
               </Tabs>
             </div>
           </div>
+          {popularProduct.length === 0 && <ProductLoading />}
 
           {Array.isArray(popularProduct) && popularProduct.length > 0 && (
             <ProductsSlider items={6} data={popularProduct} />
@@ -162,7 +165,7 @@ function Home() {
       <section className="py-5 bg-white pt-0">
         <div className="container">
           <h2 className="text-[20px] font-[600]">Latest Products</h2>
-
+          {productData.length === 0 && <ProductLoading />}
           {productData.length > 0 && (
             <ProductsSlider items={6} data={productData} />
           )}
@@ -175,6 +178,7 @@ function Home() {
       <section className="py-5 bg-white pt-0">
         <div className="container">
           <h2 className="text-[20px] font-[600]">Featured Products</h2>
+          {featuredProduct.length === 0 && <ProductLoading />}
           {Array.isArray(featuredProduct) && featuredProduct.length > 0 && (
             <ProductsSlider items={6} data={featuredProduct} />
           )}

@@ -15,85 +15,7 @@ cloudinary.config({
 // image uploader
 
 var imagesArr = [];
-// export async function uploadImages(request, response) {
-//   try {
-//     const imagesArr = [];
-//     const files = request.files;
 
-//     if (!files || files.length === 0) {
-//       return response
-//         .status(400)
-//         .json({ error: true, message: "No files uploaded" });
-//     }
-
-//     const options = {
-//       use_filename: true,
-//       unique_filename: false,
-//       overwrite: false,
-//     };
-
-//     for (let i = 0; i < files.length; i++) {
-//       // Await the upload, no callback needed
-//       const result = await cloudinary.uploader.upload(files[i].path, options);
-
-//       imagesArr.push(result.secure_url);
-
-//       // Remove local file after upload
-//       fs.unlinkSync(files[i].path);
-//     }
-
-//     return response.status(200).json({
-//       error: false,
-//       images: imagesArr,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return response.status(500).json({
-//       message: error.message || error,
-//       error: true,
-//       success: false,
-//     });
-//   }
-// }
-
-//create product
-var imagesArr = [];
-// export async function uploadImages(request, response) {
-//   try {
-//     imagesArr = [];
-
-//     const image = request.files;
-
-//     const options = {
-//       use_filename: true,
-//       unique_filename: false,
-//       overwrite: false,
-//     };
-//     for (let i = 0; i < image?.length; i++) {
-//       const img = await cloudinary.uploader.upload(
-//         image[i].path,
-//         options,
-//         function (error, result) {
-//           // console.log(result);
-//           imagesArr.push(result.secure_url);
-//           fs.unlinkSync(`uploads/${request.files[i].filename}`);
-//           console.log(request.files[i].filename);
-//         }
-//       );
-//     }
-
-//     return response.status(200).json({
-//       images: imagesArr,
-//     });
-//   } catch (error) {
-//     return response.json({
-//       message: error.message || error,
-//       error: true,
-//       success: false,
-//     });
-//   }
-// }
-//create cateory
 export async function uploadImages(request, response) {
   try {
     imagesArr = [];
@@ -129,12 +51,50 @@ export async function uploadImages(request, response) {
     });
   }
 }
+var bannerimage = [];
+export async function uploadBannerImages(request, response) {
+  try {
+    bannerimage = [];
+
+    const image = request.files;
+    const options = {
+      use_filename: true,
+      unique_filename: false,
+      overwrite: false,
+    };
+
+    for (let i = 0; i < image?.length; i++) {
+      const result = await cloudinary.uploader.upload(image[i].path, options);
+
+      // Save both url and public_id
+      bannerimage.push({
+        url: result.secure_url,
+        public_id: result.public_id,
+      });
+
+      // cleanup local file
+      fs.unlinkSync(`uploads/${request.files[i].filename}`);
+    }
+
+    return response.status(200).json({
+      images: bannerimage,
+    });
+  } catch (error) {
+    return response.json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
 export async function createProduct(request, response) {
   try {
     let product = new ProductModel({
       name: request.body.name,
+      bannerTitlename: request.body.bannerTitlename,
       description: request.body.description,
       images: request.body.images,
+      bannerimages: request.body.bannerimages,
       brand: request.body.brand,
       price: request.body.price,
       oldPrice: request.body.oldPrice,
@@ -821,17 +781,13 @@ export async function getProduct(request, response) {
 
 export async function removeImageFromCloudinary(req, res) {
   try {
-    const imgUrl = req.query.img;
-    if (!imgUrl) {
+    const publicId = req.query.public_id;
+
+    if (!publicId) {
       return res
         .status(400)
-        .json({ error: true, message: "Image URL required" });
+        .json({ error: true, message: "public_id required" });
     }
-
-    // Extract the file name part
-    const fileName = imgUrl.split("/").pop(); // "1755768104262_image1_large_1.jpg"
-
-    const publicId = fileName.split(".")[0]; // "1755768104262_image1_large_1"
 
     console.log("Deleting Cloudinary public_id:", publicId);
 
@@ -850,7 +806,6 @@ export async function removeImageFromCloudinary(req, res) {
     return res.status(500).json({ error: true, message: error.message });
   }
 }
-
 //updated product
 
 export async function updatedProduct(request, response) {
@@ -861,6 +816,9 @@ export async function updatedProduct(request, response) {
         name: request.body.name,
         description: request.body.description,
         //   images: imagesArr,
+        bannerTitlename: request.body.bannerTitlename,
+
+        bannerimages: request.body.bannerimages,
         images: request.body.images,
         brand: request.body.brand,
         price: request.body.price,

@@ -105,6 +105,16 @@ const productSchema = mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    bannerimages: [
+      {
+        url: { type: String, required: true },
+        public_id: { type: String, required: true },
+      },
+    ],
+    bannerTitlename: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

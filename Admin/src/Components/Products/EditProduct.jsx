@@ -25,7 +25,7 @@ const EditProduct = () => {
   const [productRAM, setProductRAM] = useState([]);
   const [productWeight, setProductWeight] = useState([]);
   const [productSize, setProductSize] = useState([]);
-
+  const [bannerPreviews, setBannerPreviews] = useState([]);
   const [formFields, setFormFields] = useState({
     name: "",
     description: "",
@@ -46,6 +46,8 @@ const EditProduct = () => {
     productRam: [],
     size: [],
     productWeight: [],
+    bannerTitlename: "",
+    bannerimages: [],
   });
 
   // ✅ Fetch product details on load
@@ -79,6 +81,8 @@ const EditProduct = () => {
           productRam: p.productRam || [],
           size: p.size || [],
           productWeight: p.productWeight || [],
+          bannerTitlename: p.bannerTitlename || "",
+          bannerimages: p.bannerimages || [],
         });
 
         // ✅ Set related states
@@ -92,6 +96,7 @@ const EditProduct = () => {
 
         // ✅ Show previously uploaded images
         setPreviews(p.images || []);
+        setBannerPreviews(p.bannerimages || []);
       }
     });
   }, [context?.isOpenFullScreenPanel?.id]);
@@ -156,18 +161,6 @@ const EditProduct = () => {
     });
   };
 
-  // const removeImg = async (imageObj, index) => {
-  //   const res = await deleteImages(
-  //     `/api/product/deleteImage?public_id=${imageObj.public_id}`
-  //   );
-  //   if (res?.success) {
-  //     setPreviews((prev) => {
-  //       const filtered = prev.filter((_, i) => i !== index);
-  //       setFormFields((f) => ({ ...f, images: filtered }));
-  //       return filtered;
-  //     });
-  //   }
-  // };
   const removeImg = (imageObj, index) => {
     deleteImages(
       `/api/product/deleteImage?public_id=${imageObj.public_id}`
@@ -224,7 +217,29 @@ const EditProduct = () => {
       setIsLoading(false);
     }
   };
+  const setbannerPreviewsFunction = (updateFn) => {
+    setBannerPreviews((prev) => {
+      const newArr = typeof updateFn === "function" ? updateFn(prev) : updateFn;
+      setFormFields((prevFields) => ({
+        ...prevFields,
+        bannerimages: newArr,
+      }));
+      return newArr;
+    });
+  };
 
+  const removebannerImg = (imageObj, index) => {
+    deleteImages(
+      `/api/category/deleteImage?public_id=${imageObj.public_id}`
+    ).then((res) => {
+      console.log(res);
+
+      // Remove from UI state after successful delete
+      if (res.success) {
+        setBannerPreviews((prev) => prev.filter((_, i) => i !== index));
+      }
+    });
+  };
   // ✅ UI
   return (
     <section className="p-5 px-20 bg-gray-50 overflow-hidden">
@@ -364,6 +379,50 @@ const EditProduct = () => {
                 setPreviewsFunction={setPreviewsFunction}
               />
             </div>
+          </div>
+          <div className="col w-full p-5 px-0">
+            <h3 className="font-[700] text-[18px] mb-3">Banner Images</h3>
+
+            <div className="grid grid-cols-6 gap-4">
+              {bannerPreviews?.length > 0 &&
+                bannerPreviews
+                  .filter((bannerimg) => bannerimg && bannerimg.url)
+                  .map((bannerimg, index) => {
+                    return (
+                      <div key={index} className="uploadBoxWrapper relative">
+                        <span
+                          className="absolute w-[20px] h-[20px] rounded-full overflow-hidden bg-red-700 -top-[5px] -right-[5px] flex items-center justify-center z-50 cursor-pointer"
+                          onClick={() => removebannerImg(bannerimg, index)}
+                        >
+                          <IoMdClose className="text-white text-[17px]" />
+                        </span>
+                        <div className="uploadBox p-0  rounded-md overflow-hidden border border-dashed border-[rgba(0,0,0,0.3)] h-[150px] w-[170px] bg-gray-100 cursor-pointer hover:bg-gray-200 flex items-center justify-center flex-col relative">
+                          <LazyLoadImage
+                            className="w-full h-full object-cover"
+                            alt={"category image"}
+                            effect="blur"
+                            src={bannerimg.url} // ✅ use url field from object
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+
+              <UploadBox
+                multiple={true}
+                name="bannerImages"
+                url="/api/product/uploadBannerImages"
+                setPreviewsFunction={setbannerPreviewsFunction}
+              />
+            </div>
+            <h3 className="font-[700] text-[18px] mb-3">Banner Title</h3>
+            <input
+              type="text"
+              className="w-full h-[40px] border border-[rgba(0,0,0,0.3)] focus:outline-none focus:border-blue-600 rounded-sm p-3 text-sm bg-white "
+              name="bannerTitlename"
+              value={formFields.bannerTitlename}
+              onChange={onchangeInput}
+            />
           </div>
         </div>
 

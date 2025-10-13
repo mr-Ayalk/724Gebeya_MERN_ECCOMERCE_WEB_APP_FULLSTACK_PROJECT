@@ -25,6 +25,8 @@ const AddProduct = () => {
   const history = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [previews, setPreviews] = useState([]);
+  const [bannerPreviews, setBannerPreviews] = useState([]);
+
   const [formFields, setFormFields] = useState({
     name: "",
     description: "",
@@ -46,6 +48,8 @@ const AddProduct = () => {
     productRam: [],
     size: [],
     productWeight: [],
+    bannerTitlename: "",
+    bannerimages: [],
   });
   const handleChangeProductSize = (event) => {
     // setProductSize(event.target.value);
@@ -143,15 +147,39 @@ const AddProduct = () => {
       images,
     }));
   };
+
+  const setbannerPreviewsFunction = (updateFn) => {
+    setBannerPreviews((prev) => {
+      const newArr = typeof updateFn === "function" ? updateFn(prev) : updateFn;
+      setFormFields((prevFields) => ({
+        ...prevFields,
+        bannerimages: newArr,
+      }));
+      return newArr;
+    });
+  };
+
   const removeImg = (imageObj, index) => {
     deleteImages(
-      `/api/product/deleteImage?public_id=${imageObj.public_id}`
+      `/api/category/deleteImage?public_id=${imageObj.public_id}`
     ).then((res) => {
       console.log(res);
 
       // Remove from UI state after successful delete
       if (res.success) {
         setPreviews((prev) => prev.filter((_, i) => i !== index));
+      }
+    });
+  };
+  const removebannerImg = (imageObj, index) => {
+    deleteImages(
+      `/api/category/deleteImage?public_id=${imageObj.public_id}`
+    ).then((res) => {
+      console.log(res);
+
+      // Remove from UI state after successful delete
+      if (res.success) {
+        setBannerPreviews((prev) => prev.filter((_, i) => i !== index));
       }
     });
   };
@@ -253,6 +281,7 @@ const AddProduct = () => {
     const productData = {
       ...formFields,
       images: previews, // ✅ ensures images are included
+      bannerimages: bannerPreviews,
     };
 
     setIsLoading(true);
@@ -398,6 +427,7 @@ const AddProduct = () => {
               <h3 className="text-[14px] font-[500] mb-1 !text-black">
                 Product Third Level Category
               </h3>
+
               {context?.catData?.length !== 0 && (
                 <Select
                   labelId="demo-simple-select-label"
@@ -607,30 +637,6 @@ const AddProduct = () => {
           <div className="col w-full p-5 px-0">
             <h3 className="font-[700] text-[18px] mb-3">Media & Images</h3>
 
-            {/* <div className="grid grid-cols-6 gap-4">
-              <div className="uploadBoxWrapper relative">
-                <span className="absolute w-[20px] h-[20px] rounded-full overflow-hidden bg-red-700 -top-[5px] -right-[5px] flex items-center justify-center z-50 cursor-pointer">
-                  <IoMdClose className="text-white text-[17px]" />
-                </span>
-
-                <div className="uploadBox p-0  rounded-md overflow-hidden border border-dashed border-[rgba(0,0,0,0.3)] h-[150px] w-[170px] bg-gray-100 cursor-pointer hover:bg-gray-200 flex items-center justify-center flex-col relative">
-                  <LazyLoadImage
-                    className="w-full h-full object-cover"
-                    alt={"image.alt"}
-                    effect="blur"
-                    wrapperProps={{
-                      // If you need to, you can tweak the effect transition using the wrapper style.
-                      style: { transitionDelay: "1s" },
-                    }}
-                    src={
-                      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fHww"
-                    }
-                  />
-                </div>
-              </div>
-              <UploadBox multiple={true} />
-            </div> */}
-
             <div className="grid grid-cols-6 gap-4">
               {previews?.length !== 0 &&
                 previews?.map((img, index) => {
@@ -654,12 +660,6 @@ const AddProduct = () => {
                   );
                 })}
 
-              {/* <UploadBox
-                          multiple={true}
-                          name="images"
-                          url="/api/category/uploadImages"
-                          setPreviewsFunction={setPreviewsFunction}
-                        /> */}
               <UploadBox
                 multiple={true}
                 name="images"
@@ -668,7 +668,50 @@ const AddProduct = () => {
               />
             </div>
           </div>
+          <div className="col w-full p-5 px-0">
+            <h3 className="font-[700] text-[18px] mb-3">Banner Images</h3>
 
+            <div className="grid grid-cols-6 gap-4">
+              {bannerPreviews?.length > 0 &&
+                bannerPreviews
+                  .filter((bannerimg) => bannerimg && bannerimg.url)
+                  .map((bannerimg, index) => {
+                    return (
+                      <div key={index} className="uploadBoxWrapper relative">
+                        <span
+                          className="absolute w-[20px] h-[20px] rounded-full overflow-hidden bg-red-700 -top-[5px] -right-[5px] flex items-center justify-center z-50 cursor-pointer"
+                          onClick={() => removebannerImg(bannerimg, index)}
+                        >
+                          <IoMdClose className="text-white text-[17px]" />
+                        </span>
+                        <div className="uploadBox p-0  rounded-md overflow-hidden border border-dashed border-[rgba(0,0,0,0.3)] h-[150px] w-[170px] bg-gray-100 cursor-pointer hover:bg-gray-200 flex items-center justify-center flex-col relative">
+                          <LazyLoadImage
+                            className="w-full h-full object-cover"
+                            alt={"category image"}
+                            effect="blur"
+                            src={bannerimg.url} // ✅ use url field from object
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+
+              <UploadBox
+                multiple={true}
+                name="bannerImages"
+                url="/api/product/uploadBannerImages"
+                setPreviewsFunction={setbannerPreviewsFunction}
+              />
+            </div>
+            <h3 className="font-[700] text-[18px] mb-3">Banner Title</h3>
+            <input
+              type="text"
+              className="w-full h-[40px] border border-[rgba(0,0,0,0.3)] focus:outline-none focus:border-blue-600 rounded-sm p-3 text-sm bg-white "
+              name="bannerTitlename"
+              value={formFields.bannerTitlename}
+              onChange={onchangeInput}
+            />
+          </div>
           <br />
         </div>
         <hr />
