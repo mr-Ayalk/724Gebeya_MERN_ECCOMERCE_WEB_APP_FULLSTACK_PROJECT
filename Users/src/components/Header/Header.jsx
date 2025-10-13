@@ -38,7 +38,7 @@ function Header() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-const history=useNavigate()
+  const history = useNavigate();
   // const logout = () => {
   //   setAnchorEl(null);
   //   fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accesstoken')}`, { withCredentials: true }).then(
@@ -66,9 +66,9 @@ const history=useNavigate()
   };
 
   const context = useContext(MyContext);
-  
+
   return (
-    <header className="bg-white">
+    <header className="bg-white sticky top-0 z-50 shadow-sm">
       <div className="top-strip py-2 boarder-t-[1px] border-gray-250 border-b-[1px] ">
         <div className="container">
           <div className="flex items-center justify-between">

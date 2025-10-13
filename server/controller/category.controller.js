@@ -273,37 +273,7 @@ export async function getCategory(request, response) {
   }
 }
 
-// export async function removeImageFromCloudinary(req, res) {
-//   try {
-//     const imgUrl = req.query.img;
-//     if (!imgUrl) {
-//       return res
-//         .status(400)
-//         .json({ error: true, message: "Image URL required" });
-//     }
 
-//     // Extract the file name part
-//     const fileName = imgUrl.split("/").pop(); // "1755768104262_image1_large_1.jpg"
-
-//     const publicId = fileName.split(".")[0]; // "1755768104262_image1_large_1"
-
-//     console.log("Deleting Cloudinary public_id:", publicId);
-
-//     const result = await cloudinary.uploader.destroy(publicId);
-
-//     if (result.result === "ok") {
-//       return res
-//         .status(200)
-//         .json({ success: true, message: "Image deleted", result });
-//     } else {
-//       return res
-//         .status(404)
-//         .json({ success: false, message: "Image not found", result });
-//     }
-//   } catch (error) {
-//     return res.status(500).json({ error: true, message: error.message });
-//   }
-// }
 export async function removeImageFromCloudinary(req, res) {
   try {
     const publicId = req.query.public_id;
