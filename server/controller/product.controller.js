@@ -95,6 +95,7 @@ export async function createProduct(request, response) {
       description: request.body.description,
       images: request.body.images,
       bannerimages: request.body.bannerimages,
+      isDisplayOnHomeBanner: request.body.isDisplayOnHomeBanner,
       brand: request.body.brand,
       price: request.body.price,
       oldPrice: request.body.oldPrice,
@@ -817,7 +818,7 @@ export async function updatedProduct(request, response) {
         description: request.body.description,
         //   images: imagesArr,
         bannerTitlename: request.body.bannerTitlename,
-
+        isDisplayOnHomeBanner: request.body.isDisplayOnHomeBanner,
         bannerimages: request.body.bannerimages,
         images: request.body.images,
         brand: request.body.brand,

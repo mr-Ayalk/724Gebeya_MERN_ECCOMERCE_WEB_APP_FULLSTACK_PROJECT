@@ -115,6 +115,10 @@ const productSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    isDisplayOnHomeBanner: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

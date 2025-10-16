@@ -8,11 +8,12 @@ import UploadBox from "../UploadBox/UploadBox";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoMdClose } from "react-icons/io";
-import { Button, CircularProgress } from "@mui/material";
+import { Button, CircularProgress, Switch } from "@mui/material";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { MyContext } from "../../App";
 import { deleteImages, fetchDataFromApi, postData } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
+const label = { inputProps: { "aria-label": "Switch demo" } };
 const AddProduct = () => {
   const [productCat, setProductCat] = useState("");
   const [productSubCat, setProductSubCat] = useState("");
@@ -26,6 +27,7 @@ const AddProduct = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [previews, setPreviews] = useState([]);
   const [bannerPreviews, setBannerPreviews] = useState([]);
+  const [checkedSwitch, setCheckedSwitch] = useState(false);
 
   const [formFields, setFormFields] = useState({
     name: "",
@@ -50,6 +52,7 @@ const AddProduct = () => {
     productWeight: [],
     bannerTitlename: "",
     bannerimages: [],
+    isDisplayOnHomeBanner: false,
   });
   const handleChangeProductSize = (event) => {
     // setProductSize(event.target.value);
@@ -329,6 +332,11 @@ const AddProduct = () => {
       }
     });
   }, []);
+  const handleChangeSwitch = (event) => {
+    setCheckedSwitch(event.target.checked);
+    formFields.isDisplayOnHomeBanner = event.target.checked;
+  };
+
   return (
     <section className="p-5 px-20 bg-gray-50  overflow-hidden">
       <form action="" className="form p-8 py-3 " onSubmit={handleSubmit}>
@@ -668,8 +676,16 @@ const AddProduct = () => {
               />
             </div>
           </div>
-          <div className="col w-full p-5 px-0">
-            <h3 className="font-[700] text-[18px] mb-3">Banner Images</h3>
+          <div className="col w-full p-5 px-0 bg-white">
+            <div className="flex justify-between">
+              {" "}
+              <h3 className="font-[700] text-[18px] mb-3">Banner Images</h3>
+              <Switch
+                {...label}
+                onChange={handleChangeSwitch}
+                checked={checkedSwitch}
+              />
+            </div>
 
             <div className="grid grid-cols-6 gap-4">
               {bannerPreviews?.length > 0 &&

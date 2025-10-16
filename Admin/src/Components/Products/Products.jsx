@@ -128,7 +128,7 @@ const Products = () => {
   };
   useEffect(() => {
     fetchDataFromApi("/api/product/getAllProducts").then((res) => {
-      console.log(res);
+      // console.log(res);
       if (res?.error === false) {
         setProductData(res?.products);
       }
@@ -520,6 +520,7 @@ const Products = () => {
                               name="half-rating-read"
                               defaultValue={product?.rating}
                               precision={0.5}
+                              readOnly
                             />
                           </p>
                         </TableCell>

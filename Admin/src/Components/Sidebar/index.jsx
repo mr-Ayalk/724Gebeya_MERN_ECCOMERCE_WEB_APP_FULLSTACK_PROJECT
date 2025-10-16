@@ -242,6 +242,7 @@ const Sidebar = () => {
               </ul>
             </Collapse>
           </li>
+
           <li>
             <Link to="/orders">
               <Button className="w-full !justify-start flex gap-3 text-[14px] !text-[rgba(0,0,0,0.8)] !font-[500] items-center !py-2 hover:!bg[#f1f1f1]">
@@ -249,6 +250,52 @@ const Sidebar = () => {
                 <span>Orders</span>
               </Button>
             </Link>
+          </li>
+          <li>
+            <Button
+              className="w-full !justify-start flex gap-3 text-[14px] !text-[rgba(0,0,0,0.8)] !font-[500] items-center !py-2 hover:!bg[#f1f1f1]"
+              onClick={() => isOpenSubMenu(5)}
+            >
+              <TbCategory className="text-[20px]" />
+
+              <span>BannerV1</span>
+              <span className="ml-auto flex items-center justify-center w-[30px] h-[30px]">
+                <FaAngleDown
+                  className={`text-[16px] font-extralight transition-all ${
+                    submenuIndex === 5 ? "rotate-180" : ""
+                  }`}
+                />
+              </span>
+            </Button>
+
+            <Collapse isOpened={submenuIndex === 5 ? true : false}>
+              <ul className="w-full">
+                <li className="w-full">
+                  <Link to="/bannerV1List">
+                    <Button className="!text-[rgba(0,0,0,0.6)] !capitalize !justify-start !w-full !text-[13px] !font-[500] !pl-9 flex gap-3">
+                      <span className="block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.2)]">
+                        {" "}
+                      </span>{" "}
+                      Banner List
+                    </Button>
+                  </Link>
+                </li>
+                <li className="w-full">
+                  <Button
+                    className="!text-[rgba(0,0,0,0.6)] !capitalize !justify-start w-full !text-[13px] !font-[500] !pl-9 flex gap-3"
+                    onClick={() =>
+                      context.setIsOpenFullScreenPanel({
+                        open: true,
+                        model: "Add BannerV1",
+                      })
+                    }
+                  >
+                    <span className="block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.2)]"></span>{" "}
+                    Add BannerList
+                  </Button>
+                </li>
+              </ul>
+            </Collapse>
           </li>
           <li>
             <Link to="/login">

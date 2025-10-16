@@ -36,11 +36,7 @@ const AddCategory = () => {
       };
     });
   };
-  // const removeImg = (image, index) => {
-  //   deleteImages(`/api/category/deleteImage?img=${image}`).then((res) => {
-  //     console.log(res);
-  //   });
-  // };
+  
 
   const removeImg = (imageObj, index) => {
     deleteImages(
@@ -160,13 +156,7 @@ const AddCategory = () => {
                 );
               })}
 
-            {/* <UploadBox
-              multiple={true}
-              name="images"
-              url="/api/category/uploadImages"
-              setPreviewsFunction={setPreviewsFunction}
-            /> */}
-            <UploadBox
+             <UploadBox
               multiple={true}
               name="images"
               url="/api/category/uploadImages"

@@ -6,12 +6,12 @@ import UploadBox from "../UploadBox/UploadBox";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoMdClose } from "react-icons/io";
-import { Button, CircularProgress } from "@mui/material";
+import { Button, CircularProgress, Switch } from "@mui/material";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { MyContext } from "../../App";
 import { deleteImages, editData, fetchDataFromApi } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
-
+const label = { inputProps: { "aria-label": "Switch demo" } };
 const EditProduct = () => {
   const context = useContext(MyContext);
   const navigate = useNavigate();
@@ -26,6 +26,7 @@ const EditProduct = () => {
   const [productWeight, setProductWeight] = useState([]);
   const [productSize, setProductSize] = useState([]);
   const [bannerPreviews, setBannerPreviews] = useState([]);
+  const [checkedSwitch, setCheckedSwitch] = useState(false);
   const [formFields, setFormFields] = useState({
     name: "",
     description: "",
@@ -48,6 +49,7 @@ const EditProduct = () => {
     productWeight: [],
     bannerTitlename: "",
     bannerimages: [],
+    isDisplayOnHomeBanner: false,
   });
 
   // ✅ Fetch product details on load
@@ -77,6 +79,7 @@ const EditProduct = () => {
           countInStock: p.countInStock || "",
           rating: p.rating || 0,
           isFeatured: p.isFeatured || false,
+          isDisplayOnHomeBanner: p.isDisplayOnHomeBanner || false,
           discount: p.discount || "",
           productRam: p.productRam || [],
           size: p.size || [],
@@ -93,6 +96,7 @@ const EditProduct = () => {
         setProductRAM(p.productRam);
         setProductWeight(p.productWeight);
         setProductSize(p.size);
+        setCheckedSwitch(p.isDisplayOnHomeBanner || false);
 
         // ✅ Show previously uploaded images
         setPreviews(p.images || []);
@@ -240,6 +244,10 @@ const EditProduct = () => {
       }
     });
   };
+  const handleChangeSwitch = (event) => {
+    setCheckedSwitch(event.target.checked);
+    formFields.isDisplayOnHomeBanner = event.target.checked;
+  };
   // ✅ UI
   return (
     <section className="p-5 px-20 bg-gray-50 overflow-hidden">
@@ -381,8 +389,15 @@ const EditProduct = () => {
             </div>
           </div>
           <div className="col w-full p-5 px-0">
-            <h3 className="font-[700] text-[18px] mb-3">Banner Images</h3>
-
+            <div className="flex justify-between">
+              {" "}
+              <h3 className="font-[700] text-[18px] mb-3">Banner Images</h3>
+              <Switch
+                {...label}
+                onChange={handleChangeSwitch}
+                checked={checkedSwitch}
+              />
+            </div>
             <div className="grid grid-cols-6 gap-4">
               {bannerPreviews?.length > 0 &&
                 bannerPreviews
