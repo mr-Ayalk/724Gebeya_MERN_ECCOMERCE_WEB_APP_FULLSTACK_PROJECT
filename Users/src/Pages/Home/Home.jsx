@@ -26,6 +26,7 @@ function Home() {
   const [popularProduct, setPopularProducts] = useState([]);
   const [productData, setProductData] = useState([]);
   const [featuredProduct, setFeaturedProduct] = useState([]);
+  const [bannerData, setBannerData] = useState([]);
   // Fetch home slider + all products
   useEffect(() => {
     fetchDataFromApi("/api/homeSlider").then((res) => {
@@ -41,6 +42,10 @@ function Home() {
     fetchDataFromApi("/api/product/getAllFeaturedProducts").then((res) => {
       setFeaturedProduct(res.products);
       console.log("featured products", res);
+    });
+    fetchDataFromApi(`/api/bannerV1`).then((res) => {
+      setBannerData(res.data);
+      // console.log(res);
     });
   }, []);
 
@@ -134,7 +139,7 @@ function Home() {
                       onClick={() => filterByCatId(cat?._id)}
                     />
                   ))}
-              </Tabs> 
+              </Tabs>
             </div>
           </div>
           {popularProduct.length === 0 && <ProductLoading />}
@@ -161,8 +166,9 @@ function Home() {
             </div>
             <p className="font-bold text-[25px]">-Only $200*</p>
           </div>
-
-          <AdsBannerSliderV2 items={4} />
+          {bannerData?.length > 0 && (
+            <AdsBannerSliderV2 items={4} data={bannerData} />
+          )}
         </div>
       </section>
 
@@ -174,8 +180,9 @@ function Home() {
           {productData.length > 0 && (
             <ProductsSlider items={6} data={productData} />
           )}
-
-          <AdsBannerSlider items={3} />
+          {bannerData?.length > 0 && (
+            <AdsBannerSlider items={3} data={bannerData} />
+          )}
         </div>
       </section>
 

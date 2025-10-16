@@ -271,7 +271,7 @@ const Sidebar = () => {
             <Collapse isOpened={submenuIndex === 5 ? true : false}>
               <ul className="w-full">
                 <li className="w-full">
-                  <Link to="/bannerV1List">
+                  <Link to="/bannerV1/list">
                     <Button className="!text-[rgba(0,0,0,0.6)] !capitalize !justify-start !w-full !text-[13px] !font-[500] !pl-9 flex gap-3">
                       <span className="block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.2)]">
                         {" "}
