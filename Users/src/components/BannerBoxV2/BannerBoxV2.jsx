@@ -4,7 +4,7 @@ function BannerBoxV2(props) {
   return (
     <div className="bannerBoxV2 w-full overflow-hidden rounded-md group relative">
       <img
-        src={props.image}
+        src={props.img}
         alt=""
         className="w-full transition-all duration-150 group-hover:scale-105"
       />
@@ -15,9 +15,9 @@ function BannerBoxV2(props) {
         ${props.info === "left" ? "" : "pl-12"}
         `}
       >
-        <h2 className="text-[18px] font-[600]">Samsung Gear VR Camera</h2>
+        <h2 className="text-[18px] font-[600]">{props.item?.bannerTitle}</h2>
         <span className="text-[20px] text-primary font-[600] w-full">
-          $129.00
+          ${props.item?.price}
         </span>
         <div className="w-full">
           <Link to="/" className="text-[16px] font-[600] link">
