@@ -12,6 +12,7 @@ import cartRoute from "./routes/cart.route.js";
 import myListRouter from "./routes/myList.route.js";
 import addressRouter from "./routes/address.route.js";
 import homeSliderRouter from "./routes/homeSlides.route.js";
+import bannerV1Router from "./routes/bannerV1.js";
 dotenv.config();
 const PORT = process.env.PORT || 8000; // <-- FIXED
 
@@ -40,6 +41,7 @@ app.use("/api/product", productRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/myList", myListRouter);
 app.use("/api/address", addressRouter);
+app.use("/api/bannerV1", bannerV1Router);
 app.use("/api/homeSlider", homeSliderRouter);
 connectDB().then(() => {
   app.listen(PORT, () => {
