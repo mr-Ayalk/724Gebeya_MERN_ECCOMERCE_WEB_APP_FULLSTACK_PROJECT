@@ -36,9 +36,11 @@ function Home() {
 
     fetchDataFromApi("/api/product/getAllProducts").then((res) => {
       setProductData(res.products);
+      console.log(res);
     });
     fetchDataFromApi("/api/product/getAllFeaturedProducts").then((res) => {
       setFeaturedProduct(res.products);
+      console.log("featured products", res);
     });
   }, []);
 
@@ -85,7 +87,10 @@ function Home() {
       <section className="py-6">
         <div className="container flex items-center gap-5">
           <div className="part1 w-[70%]">
-            <HomeSliderV2 />
+            {Array.isArray(featuredProduct) && featuredProduct?.length > 0 && (
+              <HomeSliderV2 data={featuredProduct} />
+            )}
+            {/* {productData?.length !== 0 && <HomeSliderV2 data={productData} />} */}
           </div>
           <div className="part2 w-[30%] flex flex-col items-center justify-between gap-5">
             <BannerBoxV2
@@ -129,7 +134,7 @@ function Home() {
                       onClick={() => filterByCatId(cat?._id)}
                     />
                   ))}
-              </Tabs>
+              </Tabs> 
             </div>
           </div>
           {popularProduct.length === 0 && <ProductLoading />}

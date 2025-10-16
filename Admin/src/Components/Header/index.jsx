@@ -36,6 +36,7 @@ import AddSubCategory from "../../Pages/Category/AddSubCategory";
 import AddAddress from "../../Pages/Address/AddAddress";
 import EditCategory from "../../Pages/Category/editCategory";
 import EditHomeSlider from "../../Pages/HomeSliderBanners/EditHomeSlider";
+import AddBannerV1 from "../../Pages/Banners/addBannerV1";
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
     right: -3,
@@ -252,6 +253,9 @@ const Header = () => {
         )}
         {context.isOpenFullScreenPanel?.model === "Edit Home Slider" && (
           <EditHomeSlider />
+        )}
+         {context.isOpenFullScreenPanel?.model === "Add BannerV1" && (
+          <AddBannerV1 />
         )}
       </Dialog>
     </>
