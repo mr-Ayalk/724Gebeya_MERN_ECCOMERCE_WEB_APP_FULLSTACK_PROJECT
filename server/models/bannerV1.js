@@ -21,6 +21,12 @@ const bannerV1Schema = new mongoose.Schema(
       required: true,
       default: "",
     },
+    images: [
+      {
+        url: { type: String, required: true },
+        public_id: { type: String, required: true },
+      },
+    ],
     price: {
       type: Number,
       required: true,
