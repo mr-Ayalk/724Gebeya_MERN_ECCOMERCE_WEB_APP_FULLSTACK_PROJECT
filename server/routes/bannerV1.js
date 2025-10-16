@@ -8,7 +8,8 @@ import {
   getBanners,
   removeImageFromCloudinary,
   updatedBanner,
-} from "../controller/bannerV1.controller";
+  uploadImages,
+} from "../controller/bannerV1.controller.js";
 
 const bannerV1Router = Router();
 

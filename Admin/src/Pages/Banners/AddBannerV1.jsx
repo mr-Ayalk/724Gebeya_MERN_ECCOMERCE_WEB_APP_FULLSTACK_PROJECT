@@ -8,7 +8,8 @@ import { IoMdClose } from "react-icons/io";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import UploadBox from "../../Components/UploadBox/UploadBox";
 import { MenuItem, Select } from "@mui/material";
-
+import { Button, CircularProgress } from "@mui/material";
+import { FaCloudUploadAlt } from "react-icons/fa";
 const AddBannerV1 = () => {
   const context = useContext(MyContext);
   const history = useNavigate();
@@ -37,12 +38,9 @@ const AddBannerV1 = () => {
     setProductCat(value);
     setFormFields((prev) => ({
       ...prev,
-      category: value, // ✅ this is what backend expects
+
       catId: value,
     }));
-  };
-  const selectCatByName = (name) => {
-    formFields.catName = name;
   };
 
   const onChangeInput = (e) => {
@@ -66,15 +64,40 @@ const AddBannerV1 = () => {
       }
     });
   };
+
+  const handleChangeProductSubCat = (event) => {
+    const value = event.target.value;
+    setProductSubCat(value);
+    setFormFields((prev) => ({
+      ...prev,
+      subCatId: value,
+    }));
+  };
+
+  const handleChangeProductThirdLevelCat = (event) => {
+    const value = event.target.value;
+    setProductThirdLevelCat(value);
+    setFormFields((prev) => ({
+      ...prev,
+      thirdsubCatId: value,
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (formFields.name.trim() === "") {
-      context.openAlertBox("error", "Category name is required");
+    if (formFields.bannerTitle.trim() === "") {
+      context.openAlertBox("error", "Banner Title is required");
       setIsLoading(false);
       return;
     }
+    if (formFields.price === "") {
+      context.openAlertBox("error", "Please enter price");
+      setIsLoading(false);
+      return;
+    }
+
     if (previews.length === 0) {
       context.openAlertBox("error", "Category image is required");
       setIsLoading(false);
@@ -82,43 +105,31 @@ const AddBannerV1 = () => {
     }
 
     // ✅ Make sure formFields.images is an array of objects [{url, public_id}, ...]
-    postData("/api/category/create", {
-      name: formFields.name,
+    postData("/api/bannerV1/add", {
+      bannerTitle: formFields.bannerTitle,
       images: previews, // send full previews array
-      parentId: formFields.parentId,
-      parentCatName: formFields.parentCatName,
+      catId: formFields.catId,
+      subCatId: formFields.subCatId,
+      thirdsubCatId: formFields.thirdsubCatId,
+      price: formFields.price,
     }).then((res) => {
       if (res?.error) {
-        context.openAlertBox("error", res?.message || "Failed to add category");
+        context.openAlertBox("error", res?.message || "Failed to add banner");
         setIsLoading(false);
       }
       if (res?.error === false) {
         setTimeout(() => {
           setIsLoading(false);
-          context.openAlertBox("success", res?.message || "Category added");
+          context.openAlertBox("success", res?.message || "Banner added");
 
           context.setIsOpenFullScreenPanel({
             open: false,
           });
           context?.getCat();
-          history("/category/list");
+          history("/bannerV1/list");
         }, 2500);
       }
     });
-  };
-  const selectSubCatByName = (name) => {
-    formFields.subCat = name;
-  };
-  const selectCatByThirdLevel = (name) => {
-    formFields.catName = name;
-  };
-  const handleChangeProductThirdLevelCat = (event) => {
-    setProductThirdLevelCat(event.target.value);
-    formFields.thirdLevelCat = event.target.value;
-  };
-  const handleChangeProductSubCat = (event) => {
-    setProductSubCat(event.target.value);
-    formFields.subCatId = event.target.value;
   };
   return (
     <div>
@@ -134,7 +145,7 @@ const AddBannerV1 = () => {
                 <input
                   type="text"
                   className="w-full h-[40px] border border-[rgba(0,0,0,0.3)] focus:outline-none focus:border-blue-600 rounded-sm p-3 text-sm bg-white "
-                  name="name"
+                  name="bannerTitle"
                   value={formFields.bannerTitle}
                   onChange={onChangeInput}
                 />
@@ -271,6 +282,16 @@ const AddBannerV1 = () => {
               />
             </div>
             <br />
+          </div>
+          <div className="w-[250px]">
+            <Button type="submit" className="btn-blue btn-lg w-full flex gap-2">
+              <FaCloudUploadAlt className="text-[25px] text-white" />
+              {isLoading === true ? (
+                <CircularProgress color="inherit" />
+              ) : (
+                " Publish and View"
+              )}
+            </Button>
           </div>
         </form>
       </section>

@@ -1,4 +1,4 @@
-import BannerV1Model from "../models/bannerV1";
+import BannerV1Model from "../models/bannerV1.js";
 import { v2 as cloudinary } from "cloudinary";
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
