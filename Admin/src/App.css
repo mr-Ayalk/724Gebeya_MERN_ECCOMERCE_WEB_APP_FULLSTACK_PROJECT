@@ -147,3 +147,8 @@ input[type="email"]:disabled {
 .contentRight {
   padding-top: 80px !important;
 }
+
+.rsw-editor {
+  min-height: 200px !important;
+  background: #fff !important;
+}

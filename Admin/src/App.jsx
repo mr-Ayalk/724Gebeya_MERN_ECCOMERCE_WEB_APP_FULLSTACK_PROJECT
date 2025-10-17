@@ -38,6 +38,7 @@ import AddRAMS from "./Components/Products/addRAMS";
 import AddWEIGHT from "./Components/Products/AddWeight";
 import AddSize from "./Components/Products/AddSize";
 import BannerV1List from "./Pages/Banners/BannerV1List";
+import BlogList from "./Components/Blog/BlogList";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -118,6 +119,7 @@ function App() {
         // </MyContext.Provider>
       ),
     },
+
     {
       path: "/login",
       exact: true,
@@ -458,6 +460,33 @@ function App() {
               }`}
             >
               <BannerV1List />
+            </div>
+          </div>
+        </section>
+        // </MyContext.Provider>
+      ),
+    },
+
+    {
+      path: "/blog/list",
+      element: (
+        // <MyContext.Provider value={{ isSidebarOpen, setIsSidebarOpen }}>
+        <section className="main">
+          <Header />
+          <div className="contentMain flex">
+            <div
+              className={`overflow-hidden sidebarWrapper transition-all duration-500 ease-in-out 
+    ${isSidebarOpen ? "w-[18%] " : "w-[0%] px-0 opacity-0"}`}
+            >
+              <Sidebar />
+            </div>
+
+            <div
+              className={`contentRight py-4 px-5 transition-all duration-500 ease-in-out ${
+                isSidebarOpen ? "w-[82%] " : "w-[100%] "
+              }`}
+            >
+              <BlogList />
             </div>
           </div>
         </section>
