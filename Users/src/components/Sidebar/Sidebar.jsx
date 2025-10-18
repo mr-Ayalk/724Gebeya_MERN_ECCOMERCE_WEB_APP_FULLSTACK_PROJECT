@@ -569,20 +569,51 @@ function Sidebar(props) {
         <h3 className="w-full pr-5 mb-3 text-[16px] font-[600] flex items-center">
           Filter By Rating
         </h3>
-        {[5, 4, 3, 2, 1].map((ratingValue) => (
-          <div
-            key={ratingValue}
-            className="w-full cursor-pointer"
-            onClick={() => handleRatingFilter(ratingValue)}
-          >
-            <Rating
-              name={`rating-${ratingValue}`}
-              value={ratingValue}
-              size="small"
-              readOnly
-            />
-          </div>
-        ))}
+        <div className="flex items-center">
+          <FormControlLabel
+            value={5}
+            control={<Checkbox size="small" />}
+            checked={filters?.rating?.includes(5)}
+            onChange={() => handleCheckboxChange("rating", 5)}
+          />
+          <Rating name="size-small" value={5} size="small" readOnly />
+        </div>
+        <div className="flex items-center">
+          <FormControlLabel
+            value={4}
+            control={<Checkbox size="small" />}
+            checked={filters?.rating?.includes(4)}
+            onChange={() => handleCheckboxChange("rating", 4)}
+          />
+          <Rating name="size-small" value={4} size="small" readOnly />
+        </div>
+        <div className="flex items-center">
+          <FormControlLabel
+            value={3}
+            control={<Checkbox size="small" />}
+            checked={filters?.rating?.includes(3)}
+            onChange={() => handleCheckboxChange("rating", 3)}
+          />
+          <Rating name="size-small" value={3} size="small" readOnly />
+        </div>
+        <div className="flex items-center">
+          <FormControlLabel
+            value={2}
+            control={<Checkbox size="small" />}
+            checked={filters?.rating?.includes(2)}
+            onChange={() => handleCheckboxChange("rating", 2)}
+          />
+          <Rating name="size-small" value={2} size="small" readOnly />
+        </div>
+        <div className="flex items-center">
+          <FormControlLabel
+            value={1}
+            control={<Checkbox size="small" />}
+            checked={filters?.rating?.includes(1)}
+            onChange={() => handleCheckboxChange("rating", 1)}
+          />
+          <Rating name="size-small" value={1} size="small" readOnly />
+        </div>
       </div>
     </aside>
   );
