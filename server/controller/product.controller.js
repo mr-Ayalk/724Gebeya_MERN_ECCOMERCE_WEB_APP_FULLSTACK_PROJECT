@@ -1441,3 +1441,28 @@ export async function filters(request, response) {
     });
   }
 }
+
+const sortItems = (products, sortBy, order) => {
+  return products.sort((a, b) => {
+    if (sortBy === "name") {
+      return order === "asc"
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    }
+
+    if (sortBy === "price") {
+      return order === "asc" ? a.price - b.price : b.price - a.price;
+    }
+
+    return 0;
+  });
+};
+
+export async function sortBy(request, response) {
+  const { products, sortBy, order } = request.body;
+  const sortedItems = sortItems([...products?.products], sortBy, order);
+  return response.status(200).json({
+    success: true,
+    products: sortedItems,
+  });
+}

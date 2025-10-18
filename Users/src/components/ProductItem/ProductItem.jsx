@@ -5,7 +5,11 @@ import Rating from "@mui/material/Rating";
 import Button from "@mui/material/Button";
 import { FaRegHeart } from "react-icons/fa";
 import { IoGitCompareOutline } from "react-icons/io5";
-import { MdZoomOutMap } from "react-icons/md";
+import {
+  MdOutlineShop,
+  MdOutlineShoppingCart,
+  MdZoomOutMap,
+} from "react-icons/md";
 import Tooltip from "@mui/material/Tooltip";
 import { MyContext } from "../../App";
 function ProductItem(props) {
@@ -61,7 +65,7 @@ function ProductItem(props) {
         </div>
       </div>
 
-      <div className="info p-3 py-5">
+      <div className="info p-1 py-3 relative pb-[50px] h-[220px]">
         <h6 className="text-[13px] !font-[400]">
           <Link
             to={`/product/${props?.item?._id}`}
@@ -75,7 +79,7 @@ function ProductItem(props) {
             to={`/product/${props?.item?._id}`}
             className="link transition-all"
           >
-            {props?.item?.name.substring(0, 40)}...
+            {props?.item?.name.substring(0, 30)}...
           </Link>
         </h3>
         <Rating
@@ -85,7 +89,7 @@ function ProductItem(props) {
           readOnly
         />
 
-        <div className="flex items-center gap-4">
+        <div className="flex z-[50] items-center gap-4">
           <span className="oldPrice line-through text-gray-500 text-[15px]">
             ${props?.item?.oldPrice.toFixed(2)}
           </span>
@@ -93,6 +97,15 @@ function ProductItem(props) {
             {" "}
             ${props?.item?.price.toFixed(2)}
           </span>
+        </div>
+        <div className="!absolute bottom-[15px] left-0 pl-3 pr-3 w-full">
+          <Button
+            className="btn-org btn-border flex w-full btn-sm gap-2 "
+            size="small"
+          >
+            <MdOutlineShoppingCart className="text-[18px]" />
+            Add to Cart
+          </Button>
         </div>
       </div>
     </div>
