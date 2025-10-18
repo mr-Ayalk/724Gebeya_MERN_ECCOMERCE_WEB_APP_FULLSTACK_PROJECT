@@ -404,7 +404,7 @@ function Sidebar(props) {
       thirdsubCatId: [],
       rating: "",
       page: 1,
-      limit: 5,
+      limit: 25,
       minPrice: filters.minPrice,
       maxPrice: filters.maxPrice,
     };
@@ -455,7 +455,7 @@ function Sidebar(props) {
 
   // ---------- UI ----------
   return (
-    <aside className="sidebar py-5">
+    <aside className="sidebar py-5 ">
       {/* -------- CATEGORY FILTER -------- */}
       <div className="box mb-3">
         <h3 className="w-full pr-5 mb-3 text-[16px] font-[600] flex items-center">
