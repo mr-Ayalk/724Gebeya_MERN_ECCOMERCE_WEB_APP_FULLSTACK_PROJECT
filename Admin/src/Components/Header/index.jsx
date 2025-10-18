@@ -39,6 +39,7 @@ import EditHomeSlider from "../../Pages/HomeSliderBanners/EditHomeSlider";
 import AddBannerV1 from "../../Pages/Banners/addBannerV1";
 import EditBannerV1 from "../../Pages/Banners/EditBannerV1";
 import AddBlog from "../Blog/AddBlog";
+import EditBlog from "../Blog/EditBlog";
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
     right: -3,
@@ -263,7 +264,7 @@ const Header = () => {
           <EditBannerV1 />
         )}
         {context.isOpenFullScreenPanel?.model === "Add Blog" && <AddBlog />}
-         {context.isOpenFullScreenPanel?.model === "Edit Blog" && <EditBlog />}
+        {context.isOpenFullScreenPanel?.model === "Edit Blog" && <EditBlog />}
       </Dialog>
     </>
   );

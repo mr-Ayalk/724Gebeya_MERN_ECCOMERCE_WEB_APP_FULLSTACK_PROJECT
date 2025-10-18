@@ -64,17 +64,17 @@ const VerificationEmail = (username, otp) => {
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
+  <div className="container">
+    <div className="header">
       <h1>Verify Your Email Address</h1>
     </div>
-    <div class="content">
-      <p>Hello <span class="highlight">${username}</span>,</p>
+    <div className="content">
+      <p>Hello <span className="highlight">${username}</span>,</p>
       <p>Thank you for registering with <strong>724 Gebeya</strong>. Please use the OTP below to verify your email address:</p>
-      <div class="otp">${otp}</div>
+      <div className="otp">${otp}</div>
       <p>If you didn’t create an account, you can safely ignore this email.</p>
     </div>
-    <div class="footer">
+    <div className="footer">
       <p>&copy; 2024 724 Gebeya. All rights reserved.</p>
     </div>
   </div>
