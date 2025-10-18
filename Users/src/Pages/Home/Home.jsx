@@ -27,6 +27,7 @@ function Home() {
   const [productData, setProductData] = useState([]);
   const [featuredProduct, setFeaturedProduct] = useState([]);
   const [bannerData, setBannerData] = useState([]);
+  const [blogData, setBlogData] = useState([]);
   // Fetch home slider + all products
   useEffect(() => {
     fetchDataFromApi("/api/homeSlider").then((res) => {
@@ -37,7 +38,7 @@ function Home() {
 
     fetchDataFromApi("/api/product/getAllProducts").then((res) => {
       setProductData(res.products);
-      console.log(res);
+      // console.log(res);
     });
     fetchDataFromApi("/api/product/getAllFeaturedProducts").then((res) => {
       setFeaturedProduct(res.products);
@@ -46,6 +47,10 @@ function Home() {
     fetchDataFromApi(`/api/bannerV1`).then((res) => {
       setBannerData(res.data);
       // console.log(res);
+    });
+    fetchDataFromApi(`/api/blog`).then((res) => {
+      setBlogData(res?.blogs);
+      console.log("blog response",res?.blogs);
     });
   }, []);
 
@@ -200,24 +205,29 @@ function Home() {
       </section>
 
       {/* 📰 Blog Section */}
-      <section className="py-5 pb-8 bg-white pt-0 blogSection">
-        <div className="container">
-          <h2 className="text-[20px] mb-4 font-[600]">From Blogs</h2>
-          <Swiper
-            navigation={true}
-            slidesPerView={4}
-            spaceBetween={30}
-            modules={[Navigation]}
-            className="blogSlider"
-          >
-            {[...Array(8)].map((_, i) => (
-              <SwiperSlide key={i}>
-                <BlogItem />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      </section>
+      {blogData?.length !== 0 && (
+        <section className="py-5 pb-8 bg-white pt-0 blogSection">
+          <div className="container">
+            <h2 className="text-[20px] mb-4 font-[600]">From Blogs</h2>
+
+            <Swiper
+              navigation={true}
+              slidesPerView={4}
+              spaceBetween={30}
+              modules={[Navigation]}
+              className="blogSlider"
+            >
+              {blogData?.map((item, i) => {
+                return (
+                  <SwiperSlide key={i}>
+                    <BlogItem item={item} />
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+          </div>
+        </section>
+      )}
     </>
   );
 }

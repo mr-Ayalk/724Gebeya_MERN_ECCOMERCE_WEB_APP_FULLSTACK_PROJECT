@@ -93,7 +93,7 @@ export async function getBolgs(req, res) {
     return res.status(200).json({
       error: false,
       success: true,
-      data:blogs,
+      blogs,
     });
   } catch (error) {
     return res
@@ -208,9 +208,9 @@ export async function updatedBlog(req, res) {
     const blog = await BlogModel.findByIdAndUpdate(
       req.params.id,
       {
-        title: request.body.title,
-        images: request.body.images,
-        description: request.body.description,
+        title: req.body.title,
+        images: req.body.images,
+        description: req.body.description,
       },
       { new: true }
     );

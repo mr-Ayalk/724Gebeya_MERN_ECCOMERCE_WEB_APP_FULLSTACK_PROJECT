@@ -14,6 +14,7 @@ import {
   deleteProductRAMS,
   deleteProductSIZE,
   deleteProductWEIGHT,
+  filters,
   getAllFeaturedProducts,
   getAllProducts,
   getAllProductsByCatId,
@@ -108,5 +109,5 @@ productRoute.delete("/deleteMultipleSize", deleteMultipleProductSIZE);
 productRoute.get("/productSize/get", getProductSIZE);
 
 productRoute.get(`/productSize/:id`, getProductSIZEById);
-
+productRoute.post("/filter", filters);
 export default productRoute;

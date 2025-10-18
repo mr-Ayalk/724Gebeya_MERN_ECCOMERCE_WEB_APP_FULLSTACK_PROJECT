@@ -1379,3 +1379,65 @@ export async function getProductSIZEById(request, response) {
     });
   }
 }
+
+export async function filters(request, response) {
+  try {
+    let {
+      catId,
+      subCatId,
+      thirdsubCatId,
+      minPrice,
+      maxPrice,
+      rating,
+      page = 1,
+      limit = 10,
+    } = request.body;
+
+    const filters = {};
+
+    // Category filters
+    if (catId?.length) filters.catId = { $in: catId };
+    if (subCatId?.length) filters.subCatId = { $in: subCatId };
+    if (thirdsubCatId?.length) filters.thirdsubCatId = { $in: thirdsubCatId };
+
+    // Price filter
+    if (minPrice || maxPrice) {
+      filters.price = {
+        $gte: Number(minPrice) || 0,
+        $lte: Number(maxPrice) || Number.MAX_SAFE_INTEGER,
+      };
+    }
+
+    // Rating filter
+    if (rating?.length) filters.rating = { $in: rating };
+
+    // Pagination calculation
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const skip = (page - 1) * limit;
+
+    // Fetch data
+    const products = await ProductModel.find(filters)
+      .populate("catId") // <-- use correct field name (e.g., category, catId, etc.)
+      .skip(skip)
+      .limit(limit);
+
+    // Count total
+    const total = await ProductModel.countDocuments(filters);
+
+    return response.status(200).json({
+      error: false,
+      success: true,
+      products,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
