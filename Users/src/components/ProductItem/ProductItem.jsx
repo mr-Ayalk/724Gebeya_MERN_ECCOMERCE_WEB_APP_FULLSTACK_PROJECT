@@ -94,7 +94,6 @@ function ProductItem(props) {
             ${props?.item?.oldPrice.toFixed(2)}
           </span>
           <span className="price text-primary font-bold">
-            {" "}
             ${props?.item?.price.toFixed(2)}
           </span>
         </div>
