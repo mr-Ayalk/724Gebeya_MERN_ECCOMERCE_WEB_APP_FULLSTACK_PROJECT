@@ -1,15 +1,29 @@
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Rating from "@mui/material/Rating";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ProductZoom from "../../components/ProductZoom/ProductZoom";
 import Button from "@mui/material/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import ProductsSlider from "../../components/ProductsSlider/ProductsSlider";
 import ProductDetailsComponent from "../../components/ProductDetailsComponent/ProductDetailsComponent";
-
+import { fetchDataFromApi } from "../../utils/api";
+// http://localhost:5173/ProductDetails/99
 function ProductDetails() {
   const [activeTab, setActiveTab] = useState(0);
+  const [productData, setProductData] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { id } = useParams();
+  useEffect(() => {
+    // alert(`Product ID: ${id}`);
+    fetchDataFromApi(`/api/product/${id}`).then((res) => {
+      console.log("Product details:", res);
+      if (res?.error !== false) {
+        setProductData(res?.product);
+      }
+    });
+  }, [id]);
   return (
     <>
       <div className="py-5 ">
@@ -46,11 +60,11 @@ function ProductDetails() {
       <section className="bg-white py-5 ">
         <div className="container flex gap-8 items-center">
           <div className="productZoomContainer w-[30%]  ">
-            <ProductZoom />
+            <ProductZoom images={productData?.images} />
           </div>
 
           <div className="productContent w-[70%] pr-10 pl-10 ">
-            <ProductDetailsComponent />
+            <ProductDetailsComponent item={productData} />
           </div>
         </div>
 
