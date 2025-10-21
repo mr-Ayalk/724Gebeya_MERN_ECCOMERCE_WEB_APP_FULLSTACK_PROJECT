@@ -58,6 +58,7 @@ function Header() {
         localStorage.removeItem("accesstoken");
         localStorage.removeItem("refreshToken");
         context.setIsLogin(false);
+        context.setCatData([]);
         history("/");
       }
 

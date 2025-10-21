@@ -7,8 +7,12 @@ import { FcGoogle } from "react-icons/fc";
 import { postData } from "../../utils/api";
 import { MyContext } from "../../App";
 import { CircularProgress } from "@mui/material";
+import { useEffect } from "react";
 function Register() {
   const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [formFields, setFormFields] = useState({
     name: "",

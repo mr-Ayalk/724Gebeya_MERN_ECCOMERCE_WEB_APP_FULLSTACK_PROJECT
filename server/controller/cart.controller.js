@@ -8,7 +8,16 @@ import mongoose from "mongoose";
 export const addToCartItemController = async (request, response) => {
   try {
     const userId = request.userId;
-    const { productId } = request.body;
+    const {
+      productId,
+      productTitle,
+      image,
+      rating,
+      price,
+      quantity,
+      subTotal,
+      countInStock,
+    } = request.body;
     if (!productId) {
       return response.status(402).json({
         message: "Provide productId",
@@ -27,20 +36,27 @@ export const addToCartItemController = async (request, response) => {
       });
     }
     const cartItem = new CartProductModel({
-      quantity: 1,
-      userId: userId,
+      productTitle: productTitle,
+      image: image,
+      rating: rating,
+      price: price,
+      quantity: quantity,
+      subTotal: subTotal,
+
       productId: productId,
+      countInStock: countInStock,
+      userId: userId,
     });
     const save = await cartItem.save();
 
-    const updateCartUser = await UserModel.updateOne(
-      { _id: userId },
-      {
-        $push: {
-          shopping_cart: productId,
-        },
-      }
-    );
+    // const updateCartUser = await UserModel.updateOne(
+    //   { _id: userId },
+    //   {
+    //     $push: {
+    //       shopping_cart: productId,
+    //     },
+    //   }
+    // );
     return response.status(200).json({
       data: save,
       message: "Item added successfully",
@@ -63,8 +79,8 @@ export const getCartItemController = async (request, response) => {
     const userId = request.userId;
     const cartItem = await CartProductModel.find({
       userId: userId,
-    }).populate("productId");
-    return response.json({
+    });
+    return response.status(200).json({
       data: cartItem,
       success: true,
       error: false,
@@ -113,7 +129,6 @@ export const updateCartItemQtyController = async (request, response) => {
     });
   }
 };
-
 
 export const deleteCartItemWtyController = async (req, res) => {
   try {
