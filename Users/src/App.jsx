@@ -26,7 +26,7 @@ import Checkout from "./Pages/Checkout/Checkout";
 import MyAccount from "./Pages/MyAccount/MyAccount";
 import MyList from "./Pages/MyList/MyList";
 import Orders from "./Pages/Orders/Orders";
-import { fetchDataFromApi } from "./utils/api";
+import { fetchDataFromApi, postData } from "./utils/api";
 import Address from "./Pages/MyAccount/address";
 // import Drawer from "@mui/materia/Drawer";
 const MyContext = createContext();
@@ -41,6 +41,7 @@ function App() {
   const [isLogin, setIsLogin] = useState(false);
   const [userData, setUserData] = useState(null);
   const [catData, setCatData] = useState([]);
+  const [cartData, setCartData] = useState([]);
   useEffect(() => {
     fetchDataFromApi("/api/category").then((res) => {
       if (res?.error === false) {
@@ -94,6 +95,39 @@ function App() {
       toast.error(msg);
     }
   };
+  const addToCart = (product, userId, quantity) => {
+    // console.log(product, userId);
+    // console.log(catData);
+    // console.log(userData);
+    if (userId === undefined) {
+      openAlertBox("error", "You are not login Please login first.");
+      return false;
+    }
+    const data = {
+      productTitle: product?.name,
+      image: product?.images[0],
+      rating: product?.rating,
+      price: product?.price,
+      quantity: quantity,
+      subTotal: parseInt(product?.price * quantity),
+      productId: product?._id,
+      countInStock: product?.countInStock,
+      userId: userId,
+      cartData,
+    };
+    postData("/api/cart/add", data).then((res) => {
+      if (res?.error === false) {
+        openAlertBox("success", res?.message);
+        fetchDataFromApi(`/api/cart/add`, data).then((res) => {
+          if (res?.error === false) {
+            setCartData(res?.data);
+          }
+        });
+      } else {
+        openAlertBox("error", res?.message);
+      }
+    });
+  };
   const values = {
     setOpenProductDetailsModel,
     handleOpenProductDetailsModel,
@@ -107,8 +141,10 @@ function App() {
     setUserData,
     userData,
     catData,
+    addToCart,
     setCatData,
   };
+
   return (
     <>
       <BrowserRouter>

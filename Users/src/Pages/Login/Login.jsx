@@ -7,7 +7,11 @@ import { FcGoogle } from "react-icons/fc";
 import { MyContext } from "../../App";
 import { postData } from "../../utils/api";
 import { CircularProgress } from "@mui/material";
+import { useEffect } from "react";
 function Login() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const context = useContext(MyContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isShowPassword, setIsShowPassword] = useState(false);

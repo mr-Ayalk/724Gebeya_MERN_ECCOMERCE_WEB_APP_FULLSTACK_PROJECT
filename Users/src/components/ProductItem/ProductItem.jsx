@@ -14,7 +14,9 @@ import Tooltip from "@mui/material/Tooltip";
 import { MyContext } from "../../App";
 function ProductItem(props) {
   const context = useContext(MyContext);
-
+  const addToCart = (product, userId, quantity) => {
+    context.addToCart(product, userId, quantity);
+  };
   return (
     <div
       className="productItem rounded-md overflow-hidden  border-[rgba(0,0,0,0.2)] shadow-sm "
@@ -101,6 +103,7 @@ function ProductItem(props) {
           <Button
             className="btn-org btn-border flex w-full btn-sm gap-2 "
             size="small"
+            onClick={() => addToCart(props?.item, context?.userData?._id, 1)}
           >
             <MdOutlineShoppingCart className="text-[18px]" />
             Add to Cart
