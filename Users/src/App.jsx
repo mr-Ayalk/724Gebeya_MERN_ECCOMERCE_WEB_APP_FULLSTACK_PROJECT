@@ -74,6 +74,7 @@ function App() {
         }
       });
       getCartItems();
+      console.log("cart data", cartData);
     }
   }, [isLogin]);
   const handleCloseProductDetailsModel = () => {
@@ -128,7 +129,6 @@ function App() {
     fetchDataFromApi(`/api/cart/get`).then((res) => {
       if (res?.error === false) {
         setCartData(res?.data);
-       
       }
     });
   };

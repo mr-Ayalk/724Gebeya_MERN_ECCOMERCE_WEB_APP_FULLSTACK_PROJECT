@@ -99,7 +99,7 @@ export const getCartItemController = async (request, response) => {
 export const updateCartItemQtyController = async (request, response) => {
   try {
     const userId = request.userId;
-    const { _id, qty } = request.body;
+    const { _id, qty, subTotal } = request.body;
     if (!_id || !qty) {
       return response.status(400).json({
         message: "Provide _id ,qty",
@@ -112,7 +112,9 @@ export const updateCartItemQtyController = async (request, response) => {
       },
       {
         quantity: qty,
-      }
+        subTotal: subTotal,
+      },
+      { new: true }
     );
 
     return response.status(200).json({

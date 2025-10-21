@@ -9,6 +9,7 @@ import { MyContext } from "../../App";
 import { CircularProgress } from "@mui/material";
 import { useEffect } from "react";
 function Register() {
+  
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     window.scrollTo(0, 0);

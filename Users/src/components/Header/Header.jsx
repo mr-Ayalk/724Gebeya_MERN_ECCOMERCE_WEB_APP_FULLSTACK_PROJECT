@@ -30,6 +30,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 function Header() {
+  const context = useContext(MyContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -65,8 +66,6 @@ function Header() {
       console.log(res);
     });
   };
-
-  const context = useContext(MyContext);
 
   return (
     <header className="bg-white sticky top-0 z-50 shadow-sm">
