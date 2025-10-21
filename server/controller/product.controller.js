@@ -107,7 +107,7 @@ export async function createProduct(request, response) {
       thirdsubCat: request.body.thirdsubCat,
       thirdsubCatId: request.body.thirdsubCatId,
       countInStock: request.body.countInStock,
-
+      review: request.body.review,
       rating: request.body.rating,
       isFeatured: request.body.isFeatured,
       discount: request.body.discount,
@@ -381,7 +381,6 @@ export async function getAllProductsBysubCatName(request, response) {
     });
   }
 }
-
 
 //get all products by Third Level Category Id
 
@@ -833,6 +832,7 @@ export async function updatedProduct(request, response) {
         countInStock: request.body.countInStock,
         category: request.body.category,
         rating: request.body.rating,
+         review: request.body.review,
         isFeatured: request.body.isFeatured,
         discount: request.body.discount,
         productRam: request.body.productRam,
@@ -862,7 +862,6 @@ export async function updatedProduct(request, response) {
     });
   }
 }
-
 
 ///////////RAMS CONTROLLER////////////////
 //create ram
@@ -1206,7 +1205,6 @@ export async function getProductWEIGHTById(request, response) {
     });
   }
 }
-
 
 ///////////SIZE CONTROLLER////////////////
 
