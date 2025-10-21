@@ -225,7 +225,10 @@ function Header() {
               <li>
                 <Tooltip title="Compare">
                   <IconButton aria-label="cart">
-                    <StyledBadge badgeContent={4} color="secondary">
+                    <StyledBadge
+                      badgeContent={context?.cartData?.length}
+                      color="secondary"
+                    >
                       <IoGitCompareOutline />
                     </StyledBadge>
                   </IconButton>
@@ -242,12 +245,15 @@ function Header() {
               </li>
 
               <li>
-                <Tooltip title="compare">
+                <Tooltip title="Cart">
                   <IconButton
                     aria-label="cart"
                     onClick={() => context.setOpenCartPanel(true)}
                   >
-                    <StyledBadge badgeContent={4} color="secondary">
+                    <StyledBadge
+                      badgeContent={context?.cartData?.length}
+                      color="secondary"
+                    >
                       <ShoppingCartIcon />
                     </StyledBadge>
                   </IconButton>
