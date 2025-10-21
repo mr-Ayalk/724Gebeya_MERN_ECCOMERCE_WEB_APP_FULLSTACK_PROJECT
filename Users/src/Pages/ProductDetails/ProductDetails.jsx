@@ -1,13 +1,13 @@
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Rating from "@mui/material/Rating";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import ProductZoom from "../../components/ProductZoom/ProductZoom";
 import Button from "@mui/material/Button";
 import { useEffect, useState, useContext } from "react";
 import TextField from "@mui/material/TextField";
 import ProductsSlider from "../../components/ProductsSlider/ProductsSlider";
 import ProductDetailsComponent from "../../components/ProductDetailsComponent/ProductDetailsComponent";
-import { fetchDataFromApi } from "../../utils/api";
+import { editData, fetchDataFromApi, postData } from "../../utils/api";
 import ProductLoading from "../../components/ProductLoading/ProductLoading";
 import { MyContext } from "../../App";
 
@@ -18,12 +18,15 @@ function ProductDetails() {
   const [activeTab, setActiveTab] = useState(0);
   const [productData, setProductData] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
+  const [formFields, setFormFields] = useState({
+    review: "",
+  });
   // ✅ Fetch Product Details
   useEffect(() => {
     const fetchProduct = async () => {
-      setLoading(true);
+      setIsLoading(true);
       try {
         const res = await fetchDataFromApi(`/api/product/${id}`);
         if (res && res.product) {
@@ -38,7 +41,7 @@ function ProductDetails() {
       } catch (err) {
         console.error("Product fetch error:", err);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -58,14 +61,87 @@ function ProductDetails() {
     fetchProduct();
   }, [id]);
 
-  if (loading) return <ProductLoading />;
+  if (isLoading) return <ProductLoading />;
   if (!productData)
     return (
       <div className="container py-10 text-center text-gray-500">
         <h3>Product not found</h3>
       </div>
     );
+  const onChangeInput = (e) => {
+    const { name, value } = e.target;
+    setFormFields(() => {
+      return {
+        ...formFields,
+        [name]: e.target.value,
+      };
+    });
+  };
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   setIsLoading(true);
 
+  //   if (formFields.review.trim() === "") {
+  //     context.openAlertBox("error", "Review is required");
+  //     setIsLoading(false);
+  //     return;
+  //   }
+
+  //   // ✅ Make sure formFields.images is an array of objects [{url, public_id}, ...]
+  //   postData("/api/product/create", {
+  //     review: formFields.review,
+  //   }).then((res) => {
+  //     if (res?.error) {
+  //       context.openAlertBox("error", res?.message || "Failed to add review");
+  //       setIsLoading(false);
+  //     }
+  //     if (res?.error === false) {
+  //       setTimeout(() => {
+  //         setIsLoading(false);
+  //         context.openAlertBox("success", res?.message || "Review added");
+
+  //         context.setIsOpenFullScreenPanel({
+  //           open: false,
+  //         });
+  //         context?.getCat();
+  //         // history("/category/list");
+  //       }, 2500);
+  //     }
+  //   });
+  // };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formFields.review)
+      return context.openAlertBox("error", "Enter product review");
+
+    setIsLoading(true);
+
+    try {
+      const res = await editData(`/api/product/updateProduct/${id}`, {
+        ...formFields,
+        // images: previews,
+      });
+
+      if (res?.error === false) {
+        context.openAlertBox("success", "Review Added Successfully!");
+        // console.log("updated", res);
+        setTimeout(() => {
+          setIsLoading(false);
+          context.setIsOpenFullScreenPanel({ open: false });
+          // Navigate("/products");
+        }, 800);
+      } else {
+        context.openAlertBox("success", res?.message || "Update failed");
+        console.log("failed", res);
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error(err);
+      context.openAlertBox("error", "Network or server error");
+      setIsLoading(false);
+    }
+  };
   return (
     <>
       {/* 🧭 Breadcrumbs */}
@@ -182,22 +258,23 @@ function ProductDetails() {
             <div className="shadow-md w-full py-5 px-8 rounded-md">
               <div className="w-full lg:w-[80%] productReviewsContainer">
                 <h2 className="text-[18px] font-semibold">Customer Reviews</h2>
-                <p className="text-gray-500 mb-4">
-                  (Static sample — integrate dynamic reviews later)
-                </p>
+                <p className="text-gray-500 mb-4">{productData.review}</p>
 
                 <div className="reviewForm bg-[#fafafa] p-4 rounded-md">
                   <h2 className="text-[18px] mb-3">Add a Review</h2>
-                  <form className="w-full">
+                  <form className="w-full" onSubmit={handleSubmit}>
                     <TextField
                       label="Write a review..."
                       multiline
                       rows={4}
                       className="w-full"
+                      name="review"
+                      value={formFields.review}
+                      onChange={onChangeInput}
                     />
                     <div className="flex items-center gap-3 mt-5">
                       <Rating name="size-small" defaultValue={5} />
-                      <Button variant="contained" color="error">
+                      <Button variant="contained" color="error" type="submit">
                         Submit Review
                       </Button>
                     </div>
