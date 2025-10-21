@@ -12,5 +12,5 @@ const cartRoute = Router();
 cartRoute.post("/add", auth, addToCartItemController);
 cartRoute.get("/get", auth, getCartItemController);
 cartRoute.put("/update-qty",auth,updateCartItemQtyController);
-cartRoute.delete("/deleteCartItem",auth,deleteCartItemWtyController)
+cartRoute.delete("/deleteCartItem/:id",auth,deleteCartItemWtyController)
 export default cartRoute;

@@ -133,7 +133,7 @@ export const updateCartItemQtyController = async (request, response) => {
 export const deleteCartItemWtyController = async (req, res) => {
   try {
     const userId = req.userId; // from auth middleware
-    const { productId } = req.body;
+    const { id } = req.params;
 
     if (!userId) {
       return res.status(401).json({
@@ -143,7 +143,7 @@ export const deleteCartItemWtyController = async (req, res) => {
       });
     }
 
-    if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
+    if (!id) {
       return res.status(400).json({
         message: "Provide a valid productId",
         error: true,
@@ -153,13 +153,13 @@ export const deleteCartItemWtyController = async (req, res) => {
 
     // Delete from cartproducts
     const deletedCartItem = await CartProductModel.deleteOne({
-      userId: new mongoose.Types.ObjectId(userId),
-      productId: new mongoose.Types.ObjectId(productId),
+      _id: id,
+      userId: userId,
     });
 
-    console.log("Deleted CartItem result:", deletedCartItem);
+    // console.log("Deleted CartItem result:", deletedCartItem);
 
-    if (!deletedCartItem.deletedCount) {
+    if (!deletedCartItem) {
       return res.status(404).json({
         message: "Item not found in cart",
         error: true,
@@ -168,14 +168,15 @@ export const deleteCartItemWtyController = async (req, res) => {
     }
 
     // Remove from user's shopping_cart array
-    await UserModel.findByIdAndUpdate(userId, {
-      $pull: { shopping_cart: new mongoose.Types.ObjectId(productId) },
-    });
+    // await UserModel.findByIdAndUpdate(userId, {
+    //   $pull: { shopping_cart: new mongoose.Types.ObjectId(_id) },
+    // });
 
     return res.status(200).json({
       message: "Item removed successfully",
       error: false,
       success: true,
+      data: deletedCartItem,
     });
   } catch (error) {
     console.error("Delete cart item error:", error.message);

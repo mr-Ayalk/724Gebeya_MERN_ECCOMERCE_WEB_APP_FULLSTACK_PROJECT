@@ -73,6 +73,7 @@ function App() {
           }
         }
       });
+      getCartItems();
     }
   }, [isLogin]);
   const handleCloseProductDetailsModel = () => {
@@ -113,18 +114,21 @@ function App() {
       productId: product?._id,
       countInStock: product?.countInStock,
       userId: userId,
-      cartData,
     };
     postData("/api/cart/add", data).then((res) => {
       if (res?.error === false) {
         openAlertBox("success", res?.message);
-        fetchDataFromApi(`/api/cart/add`, data).then((res) => {
-          if (res?.error === false) {
-            setCartData(res?.data);
-          }
-        });
+        getCartItems();
       } else {
         openAlertBox("error", res?.message);
+      }
+    });
+  };
+  const getCartItems = () => {
+    fetchDataFromApi(`/api/cart/get`).then((res) => {
+      if (res?.error === false) {
+        setCartData(res?.data);
+       
       }
     });
   };
@@ -143,6 +147,7 @@ function App() {
     catData,
     addToCart,
     setCatData,
+    cartData,
   };
 
   return (

@@ -3,7 +3,7 @@ import "../ProductItem/ProductItem.css";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
 import Button from "@mui/material/Button";
-import { FaRegHeart } from "react-icons/fa";
+import { FaMinus, FaPlus, FaRegHeart } from "react-icons/fa";
 import { IoGitCompareOutline } from "react-icons/io5";
 import {
   MdOutlineShop,
@@ -12,11 +12,28 @@ import {
 } from "react-icons/md";
 import Tooltip from "@mui/material/Tooltip";
 import { MyContext } from "../../App";
+import { useState } from "react";
+import { useEffect } from "react";
+import CartItems from "../../Pages/CartPage/CartItems";
+import { deleteData } from "../../utils/api";
 function ProductItem(props) {
   const context = useContext(MyContext);
+  const [quantity, setQuantity] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
+  const [cartItem, setCartItem] = useState([]);
   const addToCart = (product, userId, quantity) => {
     context.addToCart(product, userId, quantity);
+    setIsAdded(true);
   };
+  useEffect(() => {
+    const item = context?.cartData?.filter((cartItem) =>
+      cartItem.productId.includes(props?.item?._id)
+    );
+    if (item?.length !== 0) {
+      setCartItem(item);
+      setIsAdded(true);
+    }
+  }, []);
   return (
     <div
       className="productItem rounded-md overflow-hidden  border-[rgba(0,0,0,0.2)] shadow-sm "
@@ -100,14 +117,50 @@ function ProductItem(props) {
           </span>
         </div>
         <div className="!absolute bottom-[15px] left-0 pl-3 pr-3 w-full">
-          <Button
-            className="btn-org btn-border flex w-full btn-sm gap-2 "
-            size="small"
-            onClick={() => addToCart(props?.item, context?.userData?._id, 1)}
-          >
-            <MdOutlineShoppingCart className="text-[18px]" />
-            Add to Cart
-          </Button>
+          {isAdded === false ? (
+            <Button
+              className="btn-org btn-border flex w-full btn-sm gap-2 "
+              size="small"
+              onClick={() =>
+                addToCart(props?.item, context?.userData?._id, quantity)
+              }
+            >
+              <MdOutlineShoppingCart className="text-[18px]" />
+              Add to Cart
+            </Button>
+          ) : (
+            <div className="flex items-center justify-between overflow-hidden rounded-full border border-[rgb(0,0,0,0.1)]">
+              <Button
+                className="!min-w-[35px] !w-[35px] !h-[35px] !bg-[f1f1f1] "
+                onClick={() => {
+                  if (quantity !== 0 && quantity > 0) {
+                    setQuantity(quantity - 1);
+                  } else {
+                    setQuantity(0);
+                  }
+
+                  if (quantity === 0) {
+                    deleteData(
+                      `/api/cart/deleteCartItem/${cartItem[0]?._id}`
+                    ).then((res) => {
+                      console.log(res);
+                    });
+                  }
+                }}
+              >
+                <FaMinus className="text-[rgba(0,0,0,0.7)]" />
+              </Button>
+              <span>{quantity}</span>
+              <Button
+                className="!min-w-[35px] !w-[35px] !h-[35px] !bg-primary  !rounded-none"
+                onClick={() => {
+                  setQuantity(quantity + 1);
+                }}
+              >
+                <FaPlus className="!text-white" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
