@@ -15,7 +15,7 @@ import { MyContext } from "../../App";
 import { useState } from "react";
 import { useEffect } from "react";
 import CartItems from "../../Pages/CartPage/CartItems";
-import { deleteData } from "../../utils/api";
+import { deleteData, editData } from "../../utils/api";
 function ProductItem(props) {
   const context = useContext(MyContext);
   const [quantity, setQuantity] = useState(1);
@@ -33,7 +33,7 @@ function ProductItem(props) {
       setCartItem(item);
       setIsAdded(true);
     }
-  }, []);
+  }, [context?.cartData]);
   return (
     <div
       className="productItem rounded-md overflow-hidden  border-[rgba(0,0,0,0.2)] shadow-sm "
@@ -133,16 +133,27 @@ function ProductItem(props) {
               <Button
                 className="!min-w-[35px] !w-[35px] !h-[35px] !bg-[f1f1f1] "
                 onClick={() => {
-                  if (quantity !== 0 && quantity > 0) {
+                  if (quantity !== 1 && quantity > 1) {
                     setQuantity(quantity - 1);
                   } else {
-                    setQuantity(0);
+                    setQuantity(1);
                   }
 
-                  if (quantity === 0) {
+                  if (quantity === 1) {
                     deleteData(
                       `/api/cart/deleteCartItem/${cartItem[0]?._id}`
                     ).then((res) => {
+                      // console.log(res);
+                      setIsAdded(false);
+                      context.openAlertBox("success", res?.message);
+                    });
+                  } else {
+                    const obj = {
+                      _id: cartItem[0]?._id,
+                      qty: quantity,
+                      subTotal: props?.item?.price * quantity,
+                    };
+                    editData(`/api/cart/update-qty`, obj).then((res) => {
                       console.log(res);
                     });
                   }
