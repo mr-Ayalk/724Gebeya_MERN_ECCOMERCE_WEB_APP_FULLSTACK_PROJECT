@@ -22,6 +22,7 @@ function ProductDetails() {
   const [previews, setPreviews] = useState([]);
   const [formFields, setFormFields] = useState({
     review: "",
+    rating: "",
   });
   // ✅ Fetch Product Details
   useEffect(() => {
@@ -85,6 +86,12 @@ function ProductDetails() {
         [name]: e.target.value,
       };
     });
+  };
+  const onChangeRating = (e) => {
+    setFormFields((formFields) => ({
+      ...formFields,
+      rating: e.target.value,
+    }));
   };
   // const handleSubmit = (e) => {
   //   e.preventDefault();
@@ -303,9 +310,10 @@ function ProductDetails() {
                     </div>
                   </div>
                   <Rating
-                    name="size-small"
-                    defaultValue={productData.rating}
-                    readOnly
+                    name="half-rating"
+                    defaultValue={2.5}
+                    precision={0.5}
+                    onChange={onChangeRating}
                   />
                 </div>
 
@@ -322,7 +330,10 @@ function ProductDetails() {
                       onChange={onChangeInput}
                     />
                     <div className="flex items-center gap-3 mt-5">
-                      <Rating name="size-small" defaultValue={5} />
+                      <Rating
+                        name="size-small"
+                        defaultValue={productData.rating}
+                      />
                       <Button variant="contained" color="error" type="submit">
                         Submit Review
                       </Button>
