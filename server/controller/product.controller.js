@@ -381,7 +381,7 @@ export async function getAllProductsBysubCatName(request, response) {
     });
   }
 }
-// dddddddddddddddddddddddddddddddddd
+
 
 //get all products by Third Level Category Id
 
@@ -863,7 +863,7 @@ export async function updatedProduct(request, response) {
   }
 }
 
-/////////////////////////////////////////////////////
+
 ///////////RAMS CONTROLLER////////////////
 //create ram
 
@@ -1034,7 +1034,7 @@ export async function getProductRAMSById(request, response) {
     });
   }
 }
-/////////////////////////////////////////////////////
+
 ///////////Weight CONTROLLER////////////////
 
 //create Weight
@@ -1207,7 +1207,7 @@ export async function getProductWEIGHTById(request, response) {
   }
 }
 
-/////////////////////////////////////////////////////
+
 ///////////SIZE CONTROLLER////////////////
 
 //create SIZE

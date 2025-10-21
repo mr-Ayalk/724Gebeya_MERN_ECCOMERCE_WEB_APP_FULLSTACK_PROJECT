@@ -23,7 +23,7 @@ function ProductItem(props) {
       }}
     >
       <div className="group imgWrapper w-[100%]   rounded-md relative">
-        <Link to={`/product/${props?.item?._id}`}>
+        <Link to={`/ProductDetails/${props?.item?._id}`}>
           <div className="img h-[220px] overflow-hidden">
             <img
               src={props?.item?.images[0]?.url}
