@@ -19,7 +19,7 @@ function ProductDetails() {
   const [productData, setProductData] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [previews, setPreviews] = useState([]);
   const [formFields, setFormFields] = useState({
     review: "",
   });
@@ -60,7 +60,16 @@ function ProductDetails() {
 
     fetchProduct();
   }, [id]);
-
+  useEffect(() => {
+    const userAvatar = [];
+    if (
+      context?.userData?.avatar !== "" &&
+      context?.userData?.avatar !== undefined
+    ) {
+      userAvatar.push(context?.userData?.avatar);
+      setPreviews(userAvatar);
+    }
+  }, [context?.userData]);
   if (isLoading) return <ProductLoading />;
   if (!productData)
     return (
@@ -257,8 +266,48 @@ function ProductDetails() {
           {activeTab === 2 && (
             <div className="shadow-md w-full py-5 px-8 rounded-md">
               <div className="w-full lg:w-[80%] productReviewsContainer">
-                <h2 className="text-[18px] font-semibold">Customer Reviews</h2>
-                <p className="text-gray-500 mb-4">{productData.review}</p>
+                {/* <h2 className="text-[18px] font-semibold">Customer Reviews</h2>
+                <p className="text-gray-500 mb-4">{productData.review}</p> */}
+                <div className="flex justify-between">
+                  {" "}
+                  <div className="info w-[60%] flex items-center gap-3">
+                    <div className="img w-[80px] h-[80px] overflow-hidden rounded-full">
+                      <>
+                        {previews.length > 0 ? (
+                          previews.map((img, index) => (
+                            <img
+                              src={img}
+                              key={index}
+                              alt="avatar"
+                              className="w-full h-full object-cover"
+                            />
+                          ))
+                        ) : (
+                          <img
+                            src="/user.png"
+                            alt="user image avatar place holder"
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </>
+                    </div>
+
+                    <div className="w-[80%] ">
+                      <h4 className="text-[16px] ">
+                        {context?.userData?.name}
+                      </h4>
+                      <h5 className="text-[13px] mb-0">
+                        {productData.createdAt.split("T")[0]}
+                      </h5>
+                      <p className="mt-0 mb-0">{productData.review}</p>
+                    </div>
+                  </div>
+                  <Rating
+                    name="size-small"
+                    defaultValue={productData.rating}
+                    readOnly
+                  />
+                </div>
 
                 <div className="reviewForm bg-[#fafafa] p-4 rounded-md">
                   <h2 className="text-[18px] mb-3">Add a Review</h2>
