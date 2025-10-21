@@ -116,7 +116,7 @@ function App() {
           <Header />
           <Routes>
             <Route path={"/"} element={<Home />} />
-            <Route path={"/ProductListing"} element={<ProductListing />} />
+            <Route path={"/category/:id"} element={<ProductListing />} />
             <Route path={"/ProductDetails/:id"} element={<ProductDetails />} />
             <Route path={"/login"} element={<Login />} />
             <Route path={"/register"} element={<Register />} />

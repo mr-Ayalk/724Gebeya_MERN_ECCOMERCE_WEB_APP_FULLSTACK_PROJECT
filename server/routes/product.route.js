@@ -56,7 +56,6 @@ productRoute.post("/create", auth, createProduct);
 productRoute.get("/getAllProducts", getAllProducts);
 productRoute.get("/getAllProductsByCatId/:id", getAllProductsByCatId);
 productRoute.get("/getAllProductsByCatName", getAllProductsByCatName);
-//
 productRoute.get("/getAllProductsBysubCatId/:id", getAllProductsBysubCatId);
 productRoute.get("/getAllProductsBysubCatName", getAllProductsBysubCatName);
 productRoute.get(

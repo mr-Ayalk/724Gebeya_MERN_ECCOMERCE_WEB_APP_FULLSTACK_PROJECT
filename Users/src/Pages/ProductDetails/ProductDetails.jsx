@@ -3,248 +3,203 @@ import Rating from "@mui/material/Rating";
 import { Link, useParams } from "react-router-dom";
 import ProductZoom from "../../components/ProductZoom/ProductZoom";
 import Button from "@mui/material/Button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import TextField from "@mui/material/TextField";
 import ProductsSlider from "../../components/ProductsSlider/ProductsSlider";
 import ProductDetailsComponent from "../../components/ProductDetailsComponent/ProductDetailsComponent";
 import { fetchDataFromApi } from "../../utils/api";
-// http://localhost:5173/ProductDetails/99
-function ProductDetails() {
-  const [activeTab, setActiveTab] = useState(0);
-  const [productData, setProductData] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+import ProductLoading from "../../components/ProductLoading/ProductLoading";
+import { MyContext } from "../../App";
 
+function ProductDetails() {
   const { id } = useParams();
+  const context = useContext(MyContext);
+
+  const [activeTab, setActiveTab] = useState(0);
+  const [productData, setProductData] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Fetch Product Details
   useEffect(() => {
-    // alert(`Product ID: ${id}`);
-    fetchDataFromApi(`/api/product/${id}`).then((res) => {
-      console.log("Product details:", res);
-      if (res?.error !== false) {
-        setProductData(res?.product);
+    const fetchProduct = async () => {
+      setLoading(true);
+      try {
+        const res = await fetchDataFromApi(`/api/product/${id}`);
+        if (res && res.product) {
+          setProductData(res.product);
+          // Fetch related products by category ID
+          if (res.product.catId) {
+            fetchRelatedProducts(res.product.catId);
+          }
+        } else {
+          console.error("No product found:", res);
+        }
+      } catch (err) {
+        console.error("Product fetch error:", err);
+      } finally {
+        setLoading(false);
       }
-    });
+    };
+
+    const fetchRelatedProducts = async (catId) => {
+      try {
+        const res = await fetchDataFromApi(
+          `/api/product/getAllProductsByCatId/${catId}`
+        );
+        if (Array.isArray(res?.products)) {
+          setRelatedProducts(res.products);
+        }
+      } catch (err) {
+        console.error("Related products fetch error:", err);
+      }
+    };
+
+    fetchProduct();
   }, [id]);
+
+  if (loading) return <ProductLoading />;
+  if (!productData)
+    return (
+      <div className="container py-10 text-center text-gray-500">
+        <h3>Product not found</h3>
+      </div>
+    );
+
   return (
     <>
-      <div className="py-5 ">
+      {/* 🧭 Breadcrumbs */}
+      <div className="py-5">
         <div className="container">
           <Breadcrumbs aria-label="breadcrumb">
             <Link
               underline="hover"
               color="inherit"
               href="/"
-              className="link transition !text-[14px]"
+              className="link !text-[14px]"
             >
               Home
             </Link>
             <Link
               underline="hover"
               color="inherit"
-              href="/"
-              className="link transition !text-[14px]"
+              href="#"
+              className="link !text-[14px]"
             >
-              Fashion
+              {productData.catName || "Category"}
             </Link>
             <Link
               underline="hover"
               color="inherit"
-              href="/"
-              className="link transition !text-[14px]"
+              href="#"
+              className="link !text-[14px]"
             >
-              Cropped Satin Bomber Jacket
+              {productData.name || "Product Details"}
             </Link>
           </Breadcrumbs>
         </div>
       </div>
 
-      <section className="bg-white py-5 ">
-        <div className="container flex gap-8 items-center">
-          <div className="productZoomContainer w-[30%]  ">
-            <ProductZoom images={productData?.images} />
+      {/* 🏷️ Product Section */}
+      <section className="bg-white py-5">
+        <div className="container flex flex-col lg:flex-row gap-8">
+          {/* Product Image Zoom */}
+          <div className="productZoomContainer w-full lg:w-[40%]">
+            <ProductZoom images={productData?.images || []} />
           </div>
 
-          <div className="productContent w-[70%] pr-10 pl-10 ">
+          {/* Product Info */}
+          <div className="productContent w-full lg:w-[60%] px-6">
             <ProductDetailsComponent item={productData} />
           </div>
         </div>
 
+        {/* 🔖 Product Tabs */}
         <div className="container pt-10">
-          <div className="flex items-center gap-8 mb-5">
-            <span
-              className={`link text-[17px] cursor-pointer font-[500] ${
-                activeTab === 0 && "text-primary"
-              }`}
-              onClick={() => setActiveTab(0)}
-            >
-              Description
-            </span>
-            <span
-              className={`link text-[17px] cursor-pointer font-[500] ${
-                activeTab === 1 && "text-primary"
-              }`}
-              onClick={() => setActiveTab(1)}
-            >
-              Products Detail
-            </span>
-            <span
-              className={`link text-[17px] cursor-pointer font-[500] ${
-                activeTab === 2 && "text-primary"
-              }`}
-              onClick={() => setActiveTab(2)}
-            >
-              Review(5)
-            </span>
+          <div className="flex flex-wrap items-center gap-8 mb-5">
+            {["Description", "Product Detail", "Reviews (5)"].map(
+              (tab, index) => (
+                <span
+                  key={index}
+                  className={`link text-[17px] cursor-pointer font-[500] ${
+                    activeTab === index
+                      ? "text-primary border-b-2 border-primary pb-1"
+                      : ""
+                  }`}
+                  onClick={() => setActiveTab(index)}
+                >
+                  {tab}
+                </span>
+              )
+            )}
           </div>
 
+          {/* Description Tab */}
           {activeTab === 0 && (
             <div className="shadow-md w-full py-5 px-8 rounded-md">
-              <p>
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Fuga
-                debitis eligendi corrupti reprehenderit officiis error placeat
-                natus, inventore quaerat! Aut sit a beatae. Vero facere,
-                similique error explicabo debitis laudantium!
-              </p>
-              <h4>Lightweight Design</h4>
-              <p>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eius
-                modi ullam fugit laudantium. Veniam, nostrum, magnam excepturi
-                incidunt, modi recusandae fugit vel dolorem perspiciatis amet
-                officia neque accusamus obcaecati officiis.
-              </p>
-              <h4>Free Shipping & Return</h4>
-              <p>
-                Lorem ipsumaudantium, accusamus inventore? Facere hic expedita
-                recusandae soluta earum.
-              </p>
-              <h4>Money Back Guarantee</h4>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit
-                quae asperiores iste odit aliquam distinctio natus maiores
-                blanditiis dolore!
-              </p>
-              <h4>Online Support</h4>
-              <p>
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                Molestiae illum i!
+              <p className="text-gray-600">
+                {productData.description || "No description available."}
               </p>
             </div>
           )}
+
+          {/* Product Details Tab */}
           {activeTab === 1 && (
             <div className="shadow-md w-full py-5 px-8 rounded-md">
-              <div className="relative overflow-x-auto">
-                <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left text-gray-500 border border-gray-200">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-100">
                     <tr>
-                      <th scope="col" className="px-6 py-3">
-                        Product name
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        Color
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        Category
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        Price
-                      </th>
+                      <th className="px-6 py-3">Brand</th>
+                      <th className="px-6 py-3">Category</th>
+                      <th className="px-6 py-3">Price</th>
+                      <th className="px-6 py-3">Stock</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                      <td className="px-6 py-4 font-[500]">Silver</td>
-                      <td className="px-6 py-4  font-[500]">Silver</td>
-                      <td className="px-6 py-4  font-[500]">Laptop</td>
-                      <td className="px-6 py-4  font-[500]">$2999</td>
-                    </tr>{" "}
-                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                      <td className="px-6 py-4 font-[500]">Silver</td>
-                      <td className="px-6 py-4  font-[500]">Silver</td>
-                      <td className="px-6 py-4  font-[500]">Laptop</td>
-                      <td className="px-6 py-4  font-[500]">$2999</td>
-                    </tr>{" "}
-                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                      <td className="px-6 py-4 font-[500]">Silver</td>
-                      <td className="px-6 py-4  font-[500]">Silver</td>
-                      <td className="px-6 py-4  font-[500]">Laptop</td>
-                      <td className="px-6 py-4  font-[500]">$2999</td>
+                    <tr className="bg-white border-t">
+                      <td className="px-6 py-4">
+                        {productData.brand || "N/A"}
+                      </td>
+                      <td className="px-6 py-4">
+                        {productData.catName || "N/A"}
+                      </td>
+                      <td className="px-6 py-4">
+                        ${productData.price || "0.00"}
+                      </td>
+                      <td className="px-6 py-4">
+                        {productData.countInStock || "N/A"}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             </div>
           )}
+
+          {/* Reviews Tab */}
           {activeTab === 2 && (
-            <div
-              className="shadow-md w-full py-5 px-8 rounded-md
-            "
-            >
-              <div className=" w-[80%] productReviewsContainer">
-                <h2 className="text-[18px]">Customer question & answer</h2>
-                <div className="reviewScroll w-full max-h-[300px] overflow-y-scroll overflow-x-hidden mt-5 pr-5">
-                  <div className="review pb-5 pt-5 border-b border-[rgba(0,0,0,0.1)] w-full flex items-center justify-between">
-                    <div className="info w-[60%] flex items-center gap-3">
-                      <div className="img w-[80px] h-[80px] overflow-hidden rounded-full">
-                        <img
-                          src="https://media.istockphoto.com/id/2164034650/photo/close-up-individual-portrait-of-handsome-serious-guy-looking-at-camera-standing-outdoors.webp?a=1&b=1&s=612x612&w=0&k=20&c=hk9mOu0nE9dGlE2lNqD2p-xMJeVgfm0oBwTJGZn_58E="
-                          alt=""
-                          className="w-full  h-[80px] "
-                        />
-                      </div>
+            <div className="shadow-md w-full py-5 px-8 rounded-md">
+              <div className="w-full lg:w-[80%] productReviewsContainer">
+                <h2 className="text-[18px] font-semibold">Customer Reviews</h2>
+                <p className="text-gray-500 mb-4">
+                  (Static sample — integrate dynamic reviews later)
+                </p>
 
-                      <div className="w-[80%] ">
-                        <h4 className="text-[16px] ">Ayalk Teketel</h4>
-                        <h5 className="text-[13px] mb-0">2025-12-3</h5>
-                        <p className="mt-0 mb-0">
-                          Lorem ipsum dolor sit, amet consectetur adipisicing
-                          fug dolorem quibusdam voluptas praesentium
-                          reprehenderit ducimus tempore pariatur?
-                        </p>
-                      </div>
-                    </div>
-                    <Rating name="size-small" defaultValue={5} readOnly />
-                  </div>{" "}
-                  <div className="review pb-5 pt-5 border-b border-[rgba(0,0,0,0.1)] w-full flex items-center justify-between">
-                    <div className="info w-[60%] flex items-center gap-3">
-                      <div className="img w-[80px] h-[80px] overflow-hidden rounded-full">
-                        <img
-                          src="https://media.istockphoto.com/id/2164034650/photo/close-up-individual-portrait-of-handsome-serious-guy-looking-at-camera-standing-outdoors.webp?a=1&b=1&s=612x612&w=0&k=20&c=hk9mOu0nE9dGlE2lNqD2p-xMJeVgfm0oBwTJGZn_58E="
-                          alt=""
-                          className="w-full  h-[80px] "
-                        />
-                      </div>
-
-                      <div className="w-[80%] ">
-                        <h4 className="text-[16px] ">Ayalk Teketel</h4>
-                        <h5 className="text-[13px] mb-0">2025-12-3</h5>
-                        <p className="mt-0 mb-0">
-                          Lorem ipsum dolor sit, amet consectetur adipisicing
-                          fug dolorem quibusdam voluptas praesentium
-                          reprehenderit ducimus tempore pariatur?
-                        </p>
-                      </div>
-                    </div>
-                    <Rating name="size-small" defaultValue={5} readOnly />
-                  </div>
-                </div>
-
-                <br />
-
-                <div className="reviewForm br-[#fafafa] p-4 rounded-md">
-                  <h2 className="text-[18px]">Add a review</h2>
-                  <form className="w-full mt-5">
+                <div className="reviewForm bg-[#fafafa] p-4 rounded-md">
+                  <h2 className="text-[18px] mb-3">Add a Review</h2>
+                  <form className="w-full">
                     <TextField
-                      id="outlined-multiline-flexible"
                       label="Write a review..."
                       multiline
                       rows={4}
                       className="w-full"
                     />
-                    <br />
-                    <br />
-                    <Rating name="size-small" defaultValue={5} readOnly />
-
-                    <div className="flex items-center mt-5">
-                      <Button className="btn-org"> Submit Review</Button>
+                    <div className="flex items-center gap-3 mt-5">
+                      <Rating name="size-small" defaultValue={5} />
+                      <Button variant="contained" color="error">
+                        Submit Review
+                      </Button>
                     </div>
                   </form>
                 </div>
@@ -253,10 +208,13 @@ function ProductDetails() {
           )}
         </div>
 
-        <div className="container pt-8">
-          <h2 className="text-[20px] font-[600] pb-0">Related Products</h2>
-          <ProductsSlider items={6} />
-        </div>
+        {/* 🛒 Related Products */}
+        {Array.isArray(relatedProducts) && relatedProducts.length > 0 && (
+          <div className="container pt-8">
+            <h2 className="text-[20px] font-[600] pb-2">Related Products</h2>
+            <ProductsSlider items={6} data={relatedProducts} />
+          </div>
+        )}
       </section>
     </>
   );
