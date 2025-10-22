@@ -1,4 +1,4 @@
-import  { useContext } from "react";
+import { useContext } from "react";
 import { LiaShippingFastSolid } from "react-icons/lia";
 import { PiKeyReturnLight } from "react-icons/pi";
 import { BsWallet2 } from "react-icons/bs";
@@ -244,7 +244,7 @@ function Footer() {
         className="w-[500px] cartPanel"
       >
         <div className="flex items-center justify-between py-3 px-4 gap-3 borer-b border-[rgba(0,0,0,0.1)] overflow-hidden">
-          <h4>Shopping Cart (1)</h4>
+          <h4>Shopping Cart ({context?.cartData?.length})</h4>
           <IoCloseSharp
             className="text-[20px] cursor-pointer "
             onClick={context.toggleCartPanel(false)}

@@ -1,0 +1,87 @@
+// import mongoose from "mongoose";
+
+// const orderSchema = new mongoose.Schema(
+//   {
+//     userId: {
+//       type: mongoose.Schema.ObjectId,
+//       ref: "User",
+//     },
+//     orderId: {
+//       type: String,
+//       required: [true, "Provide orderId"],
+//       unique: true,
+//     },
+//     productId: {
+//       type: mongoose.Schema.ObjectId,
+//       ref: "product",
+//     },
+//     product_details: {
+//       name: "String",
+//       image: Array,
+//     },
+//     paymentId: {
+//       type: String,
+//       default: "",
+//     },
+//     payment_status: {
+//       type: String,
+//       default: "",
+//     },
+//     delivery_address: {
+//       type: mongoose.Schema.ObjectId,
+//       ref: "address",
+//     },
+//     subTotalAmt: {
+//       type: Number,
+//       default: 0,
+//     },
+//     totalAmt: {
+//       type: Number,
+//       default: 0,
+//     },
+//     innvoice_receipt: {
+//       type: String,
+//       default: "",
+//     },
+//   },
+//   { timestamps: true }
+// );
+// const OrderModel = mongoose.model("order", orderSchema);
+// export default OrderModel;
+// server/models/order.js
+import mongoose from "mongoose";
+const orderSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "USER" },
+    items: [
+      {
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        productTitle: String,
+        image: String,
+        price: Number,
+        quantity: Number,
+      },
+    ],
+    billingDetails: {
+      fullName: String,
+      email: String,
+      phone: String,
+      address_line1: String,
+      city: String,
+      state: String,
+      pincode: String,
+      country: String,
+    },
+    payment: {
+      method: String, // 'paypal' | 'chapa' | 'cod'
+      id: String,
+      status: String,
+      raw: Object,
+    },
+    totalAmount: Number,
+    status: { type: String, default: "Pending" }, // Pending, Processing, Shipped, Delivered, Cancelled
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("order", orderSchema);
