@@ -14,6 +14,8 @@ import addressRouter from "./routes/address.route.js";
 import homeSliderRouter from "./routes/homeSlides.route.js";
 import bannerV1Router from "./routes/bannerV1.js";
 import blogRouter from "./routes/blog.route.js";
+import orderRouter from "./routes/order.route.js";
+import paymentRouter from "./routes/payment.route.js";
 dotenv.config();
 const PORT = process.env.PORT || 8000; // <-- FIXED
 
@@ -37,7 +39,7 @@ app.get("/", (req, res) => {
 
 app.use(`/api/user`, userRouter);
 app.use(`/api/category`, categoryRouter);
-
+app.use("/api/order", orderRouter);
 app.use("/api/product", productRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/myList", myListRouter);
@@ -45,6 +47,7 @@ app.use("/api/address", addressRouter);
 app.use("/api/bannerV1", bannerV1Router);
 app.use("/api/homeSlider", homeSliderRouter);
 app.use("/api/blog", blogRouter);
+app.use("/api/payment", paymentRouter);
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log("Server is running on port", PORT);
