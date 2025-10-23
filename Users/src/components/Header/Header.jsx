@@ -11,7 +11,7 @@ import { IoBagCheckOutline, IoGitCompareOutline } from "react-icons/io5";
 import { FaRegHeart } from "react-icons/fa6";
 import Tooltip from "@mui/material/Tooltip";
 import Navigation from "./Navigation/Navigation";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { MyContext } from "../../App";
 import { FaRegUser } from "react-icons/fa";
 
@@ -32,6 +32,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 function Header() {
   const context = useContext(MyContext);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [previews, setPreviews] = useState([]);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -66,7 +67,16 @@ function Header() {
       console.log(res);
     });
   };
-
+  useEffect(() => {
+    const userAvatar = [];
+    if (
+      context?.userData?.avatar !== "" &&
+      context?.userData?.avatar !== undefined
+    ) {
+      userAvatar.push(context?.userData?.avatar);
+      setPreviews(userAvatar);
+    }
+  }, [context?.userData]);
   return (
     <header className="bg-white sticky top-0 z-50 shadow-sm">
       <div className="top-strip py-2 boarder-t-[1px] border-gray-250 border-b-[1px] ">
@@ -136,8 +146,26 @@ function Header() {
                     className="!text-[#000] myAccountWrap flex items-center gap-3 cursor-pointer"
                     onClick={handleClick}
                   >
-                    <div className="!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !bg-[#f1f1f1] relative">
-                      <FaRegUser className="text-[16px] text-[rgba(0,0,0,0.7)] !items-center absolute top-[10px] left-[10px]" />
+                    <div className="!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !bg-[#f1f1f1] relative ">
+                      {/* <FaRegUser className="text-[16px] text-[rgba(0,0,0,0.7)] !items-center absolute top-[10px] left-[10px]" /> */}
+                      <>
+                        {previews.length > 0 ? (
+                          previews.map((img, index) => (
+                            <img
+                              src={img}
+                              key={index}
+                              alt="avatar"
+                              className="w-full h-full object-cover rounded-full"
+                            />
+                          ))
+                        ) : (
+                          <img
+                            src="/user.png"
+                            alt="user image avatar place holder"
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </>
                     </div>
                     <div className="info flex flex-col">
                       <h4 className="leading-3 text-[14px] text-[rgba(0,0,0,0.7)]  mb-0 capitalize text-left justify-start font-[500]">

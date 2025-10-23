@@ -153,7 +153,7 @@ function CartPage() {
                   >
                     <img
                       src={it?.image?.[0]?.url}
-                      alt={it.name}
+                      alt={it.rating}
                       className="w-24 h-24 object-cover"
                     />
                     <div className="flex-1">
