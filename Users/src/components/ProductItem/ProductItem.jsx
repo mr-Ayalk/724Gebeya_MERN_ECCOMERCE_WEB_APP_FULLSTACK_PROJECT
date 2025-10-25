@@ -137,7 +137,7 @@ function ProductItem({ item }) {
         </p>
 
         <h3 className="text-sm sm:text-base font-semibold mt-1 text-black leading-tight">
-          {item?.name?.substring(0, 10)}...
+          {item?.name?.substring(0, 13)}...
         </h3>
 
         <Rating name="rating" value={item?.rating || 0} size="small" readOnly />
