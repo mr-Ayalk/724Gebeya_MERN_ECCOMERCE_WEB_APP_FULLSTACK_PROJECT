@@ -83,7 +83,7 @@ function Home() {
 
   return (
     <>
-      {/* 🖼️ Home Slider */}
+      {/* Home Slider */}
       {Array.isArray(homeSlidesData) && homeSlidesData.length > 0 && (
         <HomeSlider data={homeSlidesData} />
       )}
