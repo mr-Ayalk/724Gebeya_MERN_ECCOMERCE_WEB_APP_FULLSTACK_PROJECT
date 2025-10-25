@@ -96,6 +96,18 @@ function Home() {
       {/* 🏠 Banner Section */}
       <section className="py-6">
         <div className="container flex items-center gap-5">
+          <div className="part2 w-[30%] flex flex-col items-center justify-between gap-5">
+            <BannerBoxV2
+              info="right"
+              img="https://www.shutterstock.com/image-photo/children-boots-shoes-little-fashionistas-600nw-1778327840.jpg"
+            />
+
+            <BannerBoxV2
+              info="left"
+              img="https://www.shutterstock.com/image-photo/different-empty-female-male-perfume-260nw-1969304374.jpg"
+              data={productData}
+            />
+          </div>
           <div className="part1 w-[70%]">
             {/* {Array.isArray(featuredProduct) && featuredProduct?.length > 0 && (
               <HomeSliderV2 data={featuredProduct} />
@@ -104,16 +116,6 @@ function Home() {
               <HomeSliderV2 data={productData} />
             )}
             {/* {productData?.length !== 0 && <HomeSliderV2 data={productData} />} */}
-          </div>
-          <div className="part2 w-[30%] flex flex-col items-center justify-between gap-5">
-            <BannerBoxV2
-              info="right"
-              image="https://serviceapi.spicezgold.com/download/1741664665391_1741497254110_New_Project_50.jpg"
-            />
-            <BannerBoxV2
-              info="left"
-              image="https://serviceapi.spicezgold.com/download/1741664496923_1737020250515_New_Project_47.jpg"
-            />
           </div>
         </div>
       </section>
