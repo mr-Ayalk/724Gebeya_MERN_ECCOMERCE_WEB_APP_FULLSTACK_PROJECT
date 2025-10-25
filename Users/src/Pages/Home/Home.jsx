@@ -99,13 +99,14 @@ function Home() {
           <div className="part2 w-[30%] flex flex-col items-center justify-between gap-5">
             <BannerBoxV2
               info="right"
-              img="https://www.shutterstock.com/image-photo/children-boots-shoes-little-fashionistas-600nw-1778327840.jpg"
+           
+              data={bannerData[0]}
             />
 
             <BannerBoxV2
               info="left"
-              img="https://www.shutterstock.com/image-photo/different-empty-female-male-perfume-260nw-1969304374.jpg"
-              data={productData}
+            
+              data={bannerData[1]}
             />
           </div>
           <div className="part1 w-[70%]">
