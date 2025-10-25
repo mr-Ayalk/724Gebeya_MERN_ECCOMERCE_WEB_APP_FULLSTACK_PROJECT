@@ -54,29 +54,63 @@ function App() {
   const toggleCartPanel = (newOpen) => () => {
     setOpenCartPanel(newOpen);
   };
-
   useEffect(() => {
     const token = localStorage.getItem("accesstoken");
-    if (token !== undefined && token !== null && token !== "") {
-      setIsLogin(true);
-      fetchDataFromApi("/api/user/user-details").then((res) => {
-        setUserData(res.data);
 
-        if (res?.response?.data?.error === true) {
-          if (res?.response?.data?.message === "You have not login") {
-            localStorage.removeItem("accesstoken"); // ✅ fixed token key
-            localStorage.removeItem("refreshToken");
-
-            openAlertBox("error", "Your session is closed please login again");
-            setIsLogin(false);
-            window.location.href = "/login";
-          }
-        }
-      });
-      getCartItems();
-      console.log("cart data", cartData);
+    if (!token) {
+      setIsLogin(false);
+      return;
     }
-  }, [isLogin]);
+
+    fetchDataFromApi("/api/user/user-details")
+      .then((res) => {
+        if (res?.error === false) {
+          setIsLogin(true);
+          setUserData(res.data);
+          getCartItems();
+          return;
+        }
+
+        const message = res?.response?.data?.message;
+        if (message === "You have not login" || res?.response?.status === 401) {
+          localStorage.removeItem("accesstoken");
+          localStorage.removeItem("refreshToken");
+          setIsLogin(false);
+          openAlertBox(
+            "error",
+            "Your session has expired. Please login again."
+          );
+          window.location.replace("/login");
+        }
+      })
+      .catch(() => {
+        setIsLogin(false);
+        window.location.replace("/login");
+      });
+  }, []); // ✅ remove isLogin dependency
+
+  // useEffect(() => {
+  //   const token = localStorage.getItem("accesstoken");
+  //   if (token !== undefined && token !== null && token !== "") {
+  //     setIsLogin(true);
+  //     fetchDataFromApi("/api/user/user-details").then((res) => {
+  //       setUserData(res.data);
+
+  //       if (res?.response?.data?.error === true) {
+  //         if (res?.response?.data?.message === "You have not login") {
+  //           localStorage.removeItem("accesstoken"); // ✅ fixed token key
+  //           localStorage.removeItem("refreshToken");
+
+  //           openAlertBox("error", "Your session is closed please login again");
+  //           setIsLogin(false);
+  //           window.location.href = "/login";
+  //         }
+  //       }
+  //     });
+  //     getCartItems();
+  //     console.log("cart data", cartData);
+  //   }
+  // }, [isLogin]);
   const handleCloseProductDetailsModel = () => {
     setOpenProductDetailsModel({
       open: false,
