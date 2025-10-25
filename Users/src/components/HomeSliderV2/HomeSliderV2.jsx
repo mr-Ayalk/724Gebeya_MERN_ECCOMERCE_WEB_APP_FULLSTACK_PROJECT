@@ -45,7 +45,7 @@ function HomeSliderV2(props) {
         if (item?.isDisplayOnHomeBanner === true) {
           return (
             <SwiperSlide key={index}>
-              <div className="item w-full rounded-md overflow-hidden relative h-[500px]">
+              <div className="item w-full rounded-md overflow-hidden relative h-[450px]">
                 <img
                   src={item?.bannerimages?.[0]?.url}
                   alt=""
