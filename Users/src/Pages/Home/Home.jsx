@@ -156,7 +156,7 @@ function Home() {
           {popularProduct.length === 0 && <ProductLoading />}
 
           {Array.isArray(popularProduct) && popularProduct.length > 0 && (
-            <ProductsSlider items={6} data={popularProduct} />
+            <ProductsSlider items={5} data={popularProduct} />
           )}
         </div>
       </section>

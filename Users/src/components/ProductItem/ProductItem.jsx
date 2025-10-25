@@ -29,9 +29,7 @@ function ProductItem({ item }) {
   // ✅ Sync cart data from context
   useEffect(() => {
     if (!context?.cartData || !item?._id) return;
-    const existingItem = context.cartData.find(
-      (c) => c.productId === item._id
-    );
+    const existingItem = context.cartData.find((c) => c.productId === item._id);
     if (existingItem) {
       setCartItem(existingItem);
       setQuantity(existingItem.qty || 1);
@@ -79,23 +77,22 @@ function ProductItem({ item }) {
   };
 
   return (
-    <div
-      className="productItem rounded-md overflow-hidden border-[rgba(0,0,0,0.2)] shadow-sm border"
-    >
+    <div className="productItem rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md bg-white transition-all duration-300 hover:-translate-y-1 ">
       {/* Product Images */}
-      <div className="group imgWrapper w-full rounded-md relative">
+      <div className="group imgWrapper relative rounded-lg overflow-hidden">
         <Link to={`/ProductDetails/${item?._id}`}>
-          <div className="img h-[220px] overflow-hidden">
+          <div className="img h-[210px] sm:h-[240px] overflow-hidden relative">
             <img
               src={item?.images?.[0]?.url}
               alt={item?.name || "Product"}
-              className="w-full"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
+
             {item?.images?.[1]?.url && (
               <img
                 src={item.images[1].url}
                 alt="Product hover"
-                className="w-full h-[85%] absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150"
+                className="w-full h-full object-cover absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-125"
               />
             )}
           </div>
@@ -103,97 +100,85 @@ function ProductItem({ item }) {
 
         {/* Discount Badge */}
         {item?.discount > 0 && (
-          <span className="discount flex items-center absolute top-[18px] left-[10px] z-50 bg-primary text-white rounded-lg p-1 text-[12px] font-[500]">
+          <span className="absolute top-3 left-3 bg-primary text-white text-xs px-2 py-1 rounded-md shadow-md font-semibold">
             {item.discount}% OFF
           </span>
         )}
 
         {/* Action Buttons */}
-        <div className="actions absolute top-[-200px] right-[5px] z-50 flex items-center gap-2 flex-col w-[50px] transition-all duration-800 group-hover:top-[15px]">
-          <Tooltip title="Zoom" placement="left-start">
+        <div className="actions absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <Tooltip title="Quick View" placement="left-start">
             <Button
-              className="!w-[35px] !h-[35px] !rounded-full !bg-white text-black hover:!bg-primary hover:text-white"
-              onClick={() =>
-                context.handleOpenProductDetailsModel(true, item)
-              }
+              onClick={() => context.handleOpenProductDetailsModel(true, item)}
+              className="!w-10 !h-10 bg-white shadow hover:!bg-primary hover:text-white transition-all !rounded-full"
             >
-              <MdZoomOutMap className="text-[18px]" />
+              <MdZoomOutMap size={18} />
             </Button>
           </Tooltip>
 
           <Tooltip title="Compare" placement="left-start">
-            <Button className="!w-[35px] !h-[35px] !rounded-full !bg-white text-black hover:!bg-primary hover:text-white">
-              <IoGitCompareOutline className="text-[18px]" />
+            <Button className="!w-10 !h-10 bg-white shadow hover:!bg-primary hover:text-white transition-all !rounded-full">
+              <IoGitCompareOutline size={18} />
             </Button>
           </Tooltip>
 
-          <Tooltip title="Like" placement="left-start">
-            <Button className="!w-[35px] !h-[35px] !rounded-full !bg-white text-black hover:!bg-primary hover:text-white">
-              <FaRegHeart className="text-[18px]" />
+          <Tooltip title="Wishlist" placement="left-start">
+            <Button className="!w-10 !h-10 bg-white shadow hover:!bg-primary hover:text-white transition-all !rounded-full">
+              <FaRegHeart size={18} />
             </Button>
           </Tooltip>
         </div>
       </div>
 
       {/* Product Info */}
-      <div className="info p-1 py-3 relative pb-[50px] h-[220px]">
-        <h6 className="text-[13px] font-[400]">
-          <Link to={`/product/${item?._id}`} className="link transition-all">
-            {item?.brand}
-          </Link>
-        </h6>
+      <div className="info p-3 sm:p-4 relative pb-[55px]">
+        <p className="text-xs text-gray-500 capitalize tracking-wide">
+          {item?.brand?.substring(0, 10)}...
+        </p>
 
-        <h3 className="text-[13px] title mt-1 font-[600] text-[#000]">
-          <Link to={`/product/${item?._id}`} className="link transition-all">
-            {item?.name?.substring(0, 30)}...
-          </Link>
+        <h3 className="text-sm sm:text-base font-semibold mt-1 text-black leading-tight">
+          {item?.name?.substring(0, 10)}...
         </h3>
 
-        <Rating
-          name="size-small"
-          value={item?.rating || 0}
-          size="small"
-          readOnly
-        />
+        <Rating name="rating" value={item?.rating || 0} size="small" readOnly />
 
-        <div className="flex items-center gap-4">
-          <span className="oldPrice line-through text-gray-500 text-[15px]">
-            ${item?.oldPrice?.toFixed(2)}
-          </span>
-          <span className="price text-primary font-bold">
+        <div className="flex items-center gap-3 mt-1">
+          {item?.oldPrice && (
+            <span className="text-gray-400 line-through text-sm">
+              ${item.oldPrice.toFixed(2)}
+            </span>
+          )}
+          <span className="text-primary font-bold text-base">
             ${item?.price?.toFixed(2)}
           </span>
         </div>
 
-        {/* Add to Cart Section */}
-        <div className="absolute bottom-[15px] left-0 pl-3 pr-3 w-full">
+        {/* Add to Cart */}
+        <div className="absolute left-0 bottom-2 w-full px-3">
           {!isAdded ? (
             <Button
-              className="btn-org btn-border flex w-full btn-sm gap-2"
-              size="small"
-              onClick={() =>
-                addToCart(item, context?.userData?._id, quantity)
-              }
+              onClick={() => addToCart(item, context?.userData?._id, quantity)}
+              className="w-full !bg-primary !text-white !rounded-full !py-2 hover:opacity-90 flex items-center justify-center gap-2 text-sm font-medium"
             >
-              <MdOutlineShoppingCart className="text-[18px]" />
+              <MdOutlineShoppingCart size={18} />
               Add to Cart
             </Button>
           ) : (
-            <div className="flex items-center justify-between overflow-hidden rounded-full border border-[rgb(0,0,0,0.1)]">
+            <div className="flex items-center justify-between px-2 py-1 rounded-full border border-gray-300 bg-gray-50">
               <Button
-                className="!min-w-[35px] !w-[35px] !h-[35px] bg-[#f1f1f1]"
                 onClick={handleDecrease}
+                className="!min-w-8 !w-8 !h-8 !bg-gray-200 !rounded-full flex items-center justify-center hover:bg-gray-300"
               >
-                <FaMinus className="text-[rgba(0,0,0,0.7)]" />
+                <FaMinus size={12} />
               </Button>
 
-              <span>{quantity}</span>
+              <span className="font-medium text-sm">{quantity}</span>
 
               <Button
-                className="!min-w-[35px] !w-[35px] !h-[35px] !bg-primary !rounded-none"
                 onClick={handleIncrease}
+                className="!min-w-8 !w-8 !h-8 !bg-primary !rounded-full flex items-center justify-center hover:bg-primary/90"
               >
-                <FaPlus className="!text-white" />
+                <FaPlus size={12} className="text-white" />
               </Button>
             </div>
           )}
