@@ -50,7 +50,6 @@ export async function uploadImages(request, response) {
   }
 }
 
-
 export async function createCategory(request, response) {
   try {
     let category = new Categorymodel({
@@ -83,7 +82,6 @@ export async function createCategory(request, response) {
     });
   }
 }
-
 
 export async function getCategories(req, res) {
   try {
@@ -175,7 +173,6 @@ export async function getCategory(request, response) {
   }
 }
 
-
 export async function removeImageFromCloudinary(req, res) {
   try {
     const publicId = req.query.public_id;
@@ -203,37 +200,78 @@ export async function removeImageFromCloudinary(req, res) {
     return res.status(500).json({ error: true, message: error.message });
   }
 }
+async function deleteCategoryRecursive(categoryId) {
+  const category = await Categorymodel.findById(categoryId);
+  if (!category) return;
 
+  // Delete images from Cloudinary
+  for (const img of category.images) {
+    if (img.public_id) {
+      await cloudinary.uploader.destroy(img.public_id);
+    }
+  }
+
+  // Delete subcategories first
+  const subCategories = await Categorymodel.find({ parentId: category._id });
+  for (const sub of subCategories) {
+    await deleteCategoryRecursive(sub._id);
+  }
+
+  // Delete category itself
+  await Categorymodel.findByIdAndDelete(category._id);
+}
+
+// export async function deleteCatagory(req, res) {
+//   try {
+//     const category = await Categorymodel.findById(req.params.id);
+//     if (!category)
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Category not found" });
+
+//     // Delete images properly
+//     for (let img of category.images) {
+//       if (img?.public_id) {
+//         await cloudinary.uploader.destroy(img.public_id);
+//       }
+//     }
+
+//     // Delete subcategories recursively
+//     const subCategories = await Categorymodel.find({ parentId: category._id });
+//     for (const sub of subCategories) {
+//       await deleteCatagory({ params: { id: sub._id } }, res); // recursive
+//     }
+
+//     await Categorymodel.findByIdAndDelete(category._id);
+
+//     return res.status(200).json({ success: true, message: "Category Deleted" });
+//   } catch (err) {
+//     return res.status(500).json({ success: false, message: err.message });
+//   }
+// }
 
 export async function deleteCatagory(req, res) {
   try {
-    const category = await Categorymodel.findById(req.params.id);
-    if (!category)
+    const { id } = req.params;
+    const category = await Categorymodel.findById(id);
+
+    if (!category) {
       return res
         .status(404)
         .json({ success: false, message: "Category not found" });
-
-    // Delete images properly
-    for (let img of category.images) {
-      if (img?.public_id) {
-        await cloudinary.uploader.destroy(img.public_id);
-      }
     }
 
-    // Delete subcategories recursively
-    const subCategories = await Categorymodel.find({ parentId: category._id });
-    for (const sub of subCategories) {
-      await deleteCatagory({ params: { id: sub._id } }, res); // recursive
-    }
+    await deleteCategoryRecursive(id);
 
-    await Categorymodel.findByIdAndDelete(category._id);
-
-    return res.status(200).json({ success: true, message: "Category Deleted" });
+    return res.status(200).json({
+      success: true,
+      message: "Category deleted successfully",
+    });
   } catch (err) {
+    console.error("Delete Error:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 }
-
 
 export async function updatedCategory(req, res) {
   try {

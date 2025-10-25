@@ -25,7 +25,7 @@ function CatSlider(props) {
               <SwiperSlide>
                 <Link to="/">
                   <div
-                    className="item py-7 px-3 bg-white rounded-sm  text-center flex items-center justify-center flex-col "
+                    className="item py-7 px-3 bg-white rounded-sm  text-center flex items-center justify-center flex-col  h-[160px] w-[160px] !gap-2 "
                     key={index}
                   >
                     <img
