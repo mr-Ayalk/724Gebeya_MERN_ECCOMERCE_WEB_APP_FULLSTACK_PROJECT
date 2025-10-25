@@ -1,8 +1,9 @@
-import { Button } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import { RiMenu2Fill } from "react-icons/ri";
 import { LiaAngleDownSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
 import { GoRocket } from "react-icons/go";
+import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import CategoryPanel from "./CategoryPanel";
 import { useState, useContext, useEffect } from "react";
 import "../Navigation/Navigation.css";
@@ -12,12 +13,10 @@ import { MyContext } from "../../../App";
 function Navigation() {
   const context = useContext(MyContext);
   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const openCategoryPanel = () => {
-    setIsOpenCatPanel(true);
-  };
+  const openCategoryPanel = () => setIsOpenCatPanel(true);
 
-  // 🔄 Fetch categories (optional if not already fetched globally)
   useEffect(() => {
     if (!context.catData || context.catData.length === 0) {
       fetchDataFromApi("/api/category/getAllCategories").then((res) => {
@@ -30,104 +29,118 @@ function Navigation() {
 
   return (
     <>
-      <nav>
-        <div className="container flex items-center justify-end gap-8">
-          {/* 🛍️ Categories Button */}
-          <div className="col1 w-[20%]">
+      <nav className="w-full bg-white shadow-sm border-b">
+        <div className="container mx-auto px-3 lg:px-6 py-2 flex items-center justify-between gap-3">
+          {/* Mobile Menu Button */}
+          <div className="lg:hidden">
+            <IconButton onClick={() => setMobileNavOpen(!mobileNavOpen)}>
+              <HiOutlineMenuAlt3 className="text-[26px]" />
+            </IconButton>
+          </div>
+
+          {/* Categories Button */}
+          <div className="hidden lg:block lg:w-[22%]">
             <Button
-              className="!text-black gap-2 font-bold w-full"
+              className="!text-black gap-2 font-bold w-full !py-2"
               onClick={openCategoryPanel}
             >
               <RiMenu2Fill className="text-[18px]" />
-              Shop By Categories
+              Shop Categories
               <LiaAngleDownSolid className="text-[13px] ml-auto font-bold cursor-pointer" />
             </Button>
           </div>
 
-          {/* 🧭 Navigation Menu */}
-          <div className="col2 w-[60%] pl-5">
-            <ul className="flex items-center gap-2 nav">
-              <li className="list-none">
-                <Link to="/" className="link transition text-[14px] font-[500]">
-                  <Button className="!font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex lg:w-[58%] justify-center">
+            <ul className="flex items-center gap-1 nav">
+              <li>
+                <Link to="/">
+                  <Button className="!text-gray-800 !py-2 hover:!text-[#ff5252]">
                     Home
                   </Button>
                 </Link>
               </li>
 
-              {/* ✅ Dynamic Categories */}
               {context.catData?.length > 0 &&
                 context.catData.map((cat, index) => (
-                  <li className="list-none relative group" key={index}>
-                    <Link
-                      to={`/category/${cat?._id}`}
-                      className="link transition text-[14px] font-[500]"
-                    >
-                      <Button className="!font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
+                  <li className="relative group px-1" key={index}>
+                    <Link to={`/category/${cat?._id}`}>
+                      <Button className="!text-gray-800 !py-2 hover:!text-[#ff5252] whitespace-nowrap">
                         {cat?.name}
                       </Button>
                     </Link>
 
-                    {/* 🔽 Subcategories */}
-                    {Array.isArray(cat?.children) &&
-                      cat.children.length > 0 && (
-                        <div className="submenu absolute top-[100%] left-0 min-w-[180px] bg-white shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                          <ul>
-                            {cat.children.map((subcat, i2) => (
-                              <li
-                                className="list-none relative group/sub"
-                                key={i2}
-                              >
-                                <Link
-                                  to={`/category/${subcat?._id}`}
-                                  className="w-full"
-                                >
-                                  <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none hover:!bg-gray-100">
-                                    {subcat?.name}
-                                  </Button>
-                                </Link>
+                    {/* Desktop Submenu */}
+                    {cat.children?.length > 0 && (
+                      <div className="absolute top-full left-0 min-w-[180px] bg-white shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                        <ul>
+                          {cat.children.map((sub, i2) => (
+                            <li className="relative group/sub" key={i2}>
+                              <Link to={`/category/${sub?._id}`}>
+                                <Button className="!text-gray-700 w-full !text-left !justify-start !rounded-none hover:!bg-gray-100">
+                                  {sub?.name}
+                                </Button>
+                              </Link>
 
-                                {/* ➡️ Third-level categories */}
-                                {Array.isArray(subcat?.children) &&
-                                  subcat.children.length > 0 && (
-                                    <div className="submenu absolute top-0 left-full min-w-[180px] bg-white shadow-md opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all">
-                                      <ul>
-                                        {subcat.children.map((third, i3) => (
-                                          <li className="list-none" key={i3}>
-                                            <Link
-                                              to={`/category/${third?._id}`}
-                                              className="w-full"
-                                            >
-                                              <Button className="!text-[rgba(0,0,0,0.8)] w-full !text-left !justify-start !rounded-none hover:!bg-gray-100">
-                                                {third?.name}
-                                              </Button>
-                                            </Link>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    </div>
-                                  )}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                              {/* Third level */}
+                              {sub.children?.length > 0 && (
+                                <div className="absolute top-0 left-full min-w-[180px] bg-white shadow-md opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all">
+                                  <ul>
+                                    {sub.children.map((third, i3) => (
+                                      <li key={i3}>
+                                        <Link to={`/category/${third?._id}`}>
+                                          <Button className="!text-gray-600 w-full !text-left !justify-start !rounded-none hover:!bg-gray-100">
+                                            {third?.name}
+                                          </Button>
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </li>
                 ))}
             </ul>
           </div>
 
-          {/* 🚀 Right Section */}
-          <div className="col3 w-[20%]">
-            <p className="text-[14px] font-[500] flex items-center gap-3 mb-0 mt-0">
+          {/* Right Section */}
+          <div className="hidden lg:flex lg:w-[20%] justify-end">
+            <p className="text-[13px] font-[500] flex items-center gap-2 whitespace-nowrap">
               <GoRocket className="text-[18px]" />
-              Free International Delivery
+              Free Delivery
             </p>
           </div>
         </div>
+
+        {/* Mobile Navigation Dropdown */}
+        {mobileNavOpen && (
+          <div className="lg:hidden bg-white shadow-md px-3 pb-4 animate-slideDown">
+            <ul className="space-y-3">
+              <li>
+                <Link to="/" onClick={() => setMobileNavOpen(false)}>
+                  Home
+                </Link>
+              </li>
+              {context.catData?.map((cat) => (
+                <li key={cat._id}>
+                  <Link
+                    to={`/category/${cat._id}`}
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    {cat?.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </nav>
 
-      {/* 🪟 Category Panel (Side Popup) */}
       {context.catData?.length > 0 && (
         <CategoryPanel
           isOpenCatPanel={isOpenCatPanel}
