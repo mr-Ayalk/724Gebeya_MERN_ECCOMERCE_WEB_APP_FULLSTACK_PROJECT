@@ -45,14 +45,18 @@ function HomeSliderV2(props) {
         if (item?.isDisplayOnHomeBanner === true) {
           return (
             <SwiperSlide key={index}>
-              <div className="item w-full rounded-md overflow-hidden relative ">
-                <img src={item?.bannerimages?.[0]?.url} alt="" />
+              <div className="item w-full rounded-md overflow-hidden relative h-[500px]">
+                <img
+                  src={item?.bannerimages?.[0]?.url}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+
                 <div className="info absolute top-0 -right-[100%] opacity-1  w-[50%] h-[100%] z-50 p-8 flex items-center flex-col justify-center transition-all duration-700">
                   <h4 className="text-[18px] font-[500] w-full text-left mb-3 relative -right-[100%] opacity-0 ">
                     {item?.bannerTitleName}
                   </h4>
                   <h2 className="text-[35px] font-[700] w-full relative -right-[100%] opacity-0 ">
-                    
                     {item?.name}
                   </h2>
                   <h3 className="flex items-center gap-3  text-[18px] font-[500] w-full text-left mb-3 mt-3 relative -right-[100%] opacity-0 ">
