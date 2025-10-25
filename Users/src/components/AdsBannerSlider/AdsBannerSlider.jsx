@@ -18,7 +18,12 @@ function AdsBannerSlider(props) {
           props.data.length > 0 &&
           props.data.map((banner, index) => (
             <SwiperSlide key={index}>
-              <BannerBoxV2 img={banner?.images[0]?.url}  item={banner} link={"/"} />
+              <BannerBoxV2
+                img={banner?.images[0]?.url}
+                info="right"
+                data={banner}
+                link={"/"}
+              />
             </SwiperSlide>
           ))}
       </Swiper>
