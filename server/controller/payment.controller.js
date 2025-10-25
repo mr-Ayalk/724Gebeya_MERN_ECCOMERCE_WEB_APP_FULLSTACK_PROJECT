@@ -71,7 +71,7 @@ export const capturePayPalOrder = async (req, res) => {
 export const createChapaPayment = async (req, res) => {
   try {
     const {
-      amount,
+      amount = 100,
       currency = "ETB",
       email,
       firstName,

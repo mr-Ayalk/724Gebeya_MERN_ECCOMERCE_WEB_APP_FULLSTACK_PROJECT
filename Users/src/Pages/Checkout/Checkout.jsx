@@ -180,11 +180,11 @@ function Checkout() {
     if (res?.data) setCartItems(res.data);
   };
 
-  const totalAmount = cartItems.reduce(
-    (s, it) => s + it.quantity * (it.productId?.price || 0),
-    0
-  );
-
+  // const totalAmount = cartItems.reduce(
+  //   (s, it) => s + it.quantity * (it.productId?.price || 0),
+  //   0
+  // );
+  const totalAmount = 100;
   const submitOrder = async () => {
     // For PayPal: create order on server, redirect user to approval or use client SDK.
     if (paymentMethod === "paypal") {
@@ -242,6 +242,9 @@ function Checkout() {
         firstName: billing.fullName,
         lastName: "",
       });
+
+      console.log("Chapa Response: ", chapaResp); // <-- put it here
+
       if (chapaResp?.data?.data?.checkout_url) {
         // redirect to chapa checkout hosted page
         window.location.href = chapaResp.data.data.checkout_url;

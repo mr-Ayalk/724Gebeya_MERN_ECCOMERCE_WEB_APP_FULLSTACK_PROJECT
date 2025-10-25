@@ -398,3 +398,81 @@ button .MuiCircularProgress-root {
   width: 1200px !important;
   max-width: 1200px !important;
 }
+
+.productDetailsModal .MuiDialog-paper {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.productDetailsModalContainer .col1 {
+  width: 45%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.productDetailsModalContainer .col1 img {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  object-fit: contain;
+}
+@media (max-width: 992px) {
+  .productDetailsModalContainer {
+    flex-direction: column;
+  }
+
+  .productDetailsModalContainer .col1,
+  .productDetailsModalContainer .col2 {
+    width: 100%;
+    padding: 1rem !important;
+  }
+}
+/* Handles dialog max height and scroll */
+.productDetailsModal .MuiDialog-paper {
+  width: 900px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto !important;
+  padding: 0 !important;
+}
+
+/* Make the content Flex */
+.productDetailsModalContainer {
+  display: flex;
+  width: 100%;
+}
+
+/* Fix image container */
+.productDetailsModalContainer .col1 {
+  flex: 0 0 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Force ProductZoom images to scale correctly */
+.productDetailsModalContainer .col1 img {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Fix content side */
+.productDetailsModalContainer .col2 {
+  flex: 0 0 60%;
+  overflow-y: auto;
+}
+
+/* RESPONSIVE FIX */
+@media (max-width: 992px) {
+  .productDetailsModalContainer {
+    flex-direction: column;
+  }
+
+  .productDetailsModalContainer .col1,
+  .productDetailsModalContainer .col2 {
+    flex: 0 0 100%;
+    padding: 1rem !important;
+  }
+}

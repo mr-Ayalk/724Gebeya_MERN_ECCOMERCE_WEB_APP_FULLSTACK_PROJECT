@@ -13,7 +13,7 @@ function ProductItemListView(props) {
 
   return (
     <div
-      className="z-[50] productItem rounded-md overflow-hidden  border-[rgba(0,0,0,0.2)] shadow-sm flex items-center "
+      className=" productItem rounded-md overflow-hidden  border-[rgba(0,0,0,0.2)] shadow-sm flex items-center "
       style={{
         borderWidth: 1,
       }}
@@ -33,11 +33,11 @@ function ProductItemListView(props) {
             />
           </div>
         </Link>
-        <span className="discount flex items-center absolute top-[18px] left-[10px] z-50 bg-primary text-white rounded-lg p-1 text-[12px] font-[500]">
+        <span className="discount flex items-center absolute top-[18px] left-[10px]  bg-primary text-white rounded-lg p-1 text-[12px] font-[500]">
           {props?.item?.discount}% OFF
         </span>
 
-        <div className="actions absolute top-[-200px] right-[5px] z-50 flex items-center gap-2 flex-col w-[50px] transition-all duration-800 group-hover:top-[15px]">
+        <div className="actions absolute top-[-200px] right-[5px]  flex items-center gap-2 flex-col w-[50px] transition-all duration-800 group-hover:top-[15px]">
           <Tooltip title="Zoom" placement="left-start">
             <Button
               className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-primary hover:text-white  group"

@@ -15,7 +15,9 @@ function ProductItem({ item }) {
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
   const [cartItem, setCartItem] = useState(null);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // ✅ Add product to cart
   const addToCart = (product, userId, qty) => {
     if (!userId) {

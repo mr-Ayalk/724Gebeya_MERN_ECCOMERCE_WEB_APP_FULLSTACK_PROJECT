@@ -2,3 +2,66 @@
   overflow: inherit !important;
 }
 
+.marquee-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 15s linear infinite;
+}
+
+.marquee-item {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 4rem;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+.productDetailsModalContainer {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+}
+
+.productDetailsModalContainer .col1 {
+  width: 45%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.productDetailsModalContainer .col2 {
+  width: 55%;
+  padding-right: 20px;
+}
+
+.productDetailsModal .MuiDialog-paper {
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 992px) {
+  .productDetailsModalContainer {
+    flex-direction: column;
+  }
+  .productDetailsModalContainer .col1,
+  .productDetailsModalContainer .col2 {
+    width: 100%;
+  }
+}

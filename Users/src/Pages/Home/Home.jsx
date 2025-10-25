@@ -97,17 +97,9 @@ function Home() {
       <section className="py-6">
         <div className="container flex items-center gap-5">
           <div className="part2 w-[30%] flex flex-col items-center justify-between gap-5">
-            <BannerBoxV2
-              info="right"
-           
-              data={bannerData[0]}
-            />
+            <BannerBoxV2 info="right" data={bannerData[0]} />
 
-            <BannerBoxV2
-              info="left"
-            
-              data={bannerData[1]}
-            />
+            <BannerBoxV2 info="left" data={bannerData[1]} />
           </div>
           <div className="part1 w-[70%]">
             {/* {Array.isArray(featuredProduct) && featuredProduct?.length > 0 && (
@@ -162,7 +154,7 @@ function Home() {
       </section>
 
       {/* 🚚 Free Shipping */}
-      <section className="py-4 pt-2 bg-white">
+      {/* <section className="py-4 pt-2 bg-white">
         <div className="container">
           <div className="freeShipping w-[80%] mx-auto py-4 p-4 border-2 border-[#ff5252] flex items-center justify-between rounded-md mb-7">
             <div className="col1 flex items-center gap-4">
@@ -177,6 +169,48 @@ function Home() {
             </div>
             <p className="font-bold text-[25px]">-Only $200*</p>
           </div>
+
+
+          {bannerData?.length > 0 && (
+            <AdsBannerSliderV2 items={4} data={bannerData} />
+          )}
+        </div>
+      </section> */}
+      <section className="py-4 pt-2 bg-white">
+        <div className="container">
+          <div className="marquee-container border-2 border-[#ff5252] rounded-md py-4 mb-7">
+            <div className="marquee-track flex">
+              {/* Original */}
+              <div className="marquee-item flex items-center gap-12">
+                <LiaShippingFastSolid className="text-[50px]" />
+                <span className="text-[20px] font-[600]">FREE SHIPPING</span>
+                <p className="font-[500]">
+                  Free Delivery Now On Your First Order and Over $200
+                </p>
+                <p className="font-bold text-[25px]">-Only $200*</p>
+              </div>
+
+              {/* Duplicate for infinite scroll */}
+              <div className="marquee-item flex items-center gap-12">
+                <LiaShippingFastSolid className="text-[50px]" />
+                <span className="text-[20px] font-[600]">FREE SHIPPING</span>
+                <p className="font-[500]">
+                  Free Delivery Now On Your First Order and Over $200
+                </p>
+                <p className="font-bold text-[25px]">-Only $200*</p>
+              </div>
+              {/* Duplicate for infinite scroll */}
+              <div className="marquee-item flex items-center gap-12">
+                <LiaShippingFastSolid className="text-[50px]" />
+                <span className="text-[20px] font-[600]">FREE SHIPPING</span>
+                <p className="font-[500]">
+                  Free Delivery Now On Your First Order and Over $200
+                </p>
+                <p className="font-bold text-[25px]">-Only $200*</p>
+              </div>
+            </div>
+          </div>
+
           {bannerData?.length > 0 && (
             <AdsBannerSliderV2 items={4} data={bannerData} />
           )}

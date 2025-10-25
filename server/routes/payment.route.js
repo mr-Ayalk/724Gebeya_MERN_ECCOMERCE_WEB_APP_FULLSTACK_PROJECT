@@ -2,9 +2,9 @@
 import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import {
-  createPayPalOrder,
   capturePayPalOrder,
   createChapaPayment,
+  createPayPalOrder,
 } from "../controller/payment.controller.js";
 
 const paymentRouter = Router();
