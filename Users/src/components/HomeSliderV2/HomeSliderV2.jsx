@@ -62,7 +62,7 @@ function HomeSliderV2(props) {
                   <h3 className="flex items-center gap-3  text-[18px] font-[500] w-full text-left mb-3 mt-3 relative -right-[100%] opacity-0 ">
                     Starting At Only{" "}
                     <span className="text-primary text-[40px] font-[700]">
-                      ${props?.item?.price}
+                      ${item?.price}
                     </span>
                   </h3>
                   <div className="w-full relative -right-[100%] opacity-0 btn_ ">
