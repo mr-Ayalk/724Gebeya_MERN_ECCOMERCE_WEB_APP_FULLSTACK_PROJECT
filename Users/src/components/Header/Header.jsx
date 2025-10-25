@@ -20,6 +20,7 @@ import MenuItem from "@mui/material/MenuItem";
 
 import { IoIosLogOut, IoMdHeartEmpty } from "react-icons/io";
 import { fetchDataFromApi } from "../../utils/api";
+import Logo from "../Logo";
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
     right: -3,
@@ -116,7 +117,10 @@ function Header() {
         <div className="container flex items-center justify-between">
           <div className="col1 w-[25%]">
             <Link to={"/"}>
-              <img src={logo} alt="logo" className="h-12" />
+              <Logo
+                className="text-primary"
+                spanDesign="group-hover:text-primary "
+              />
             </Link>
           </div>
           <div className="col2 w-[40%]">
