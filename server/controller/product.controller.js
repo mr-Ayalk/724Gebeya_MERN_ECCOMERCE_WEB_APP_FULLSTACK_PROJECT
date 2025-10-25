@@ -141,44 +141,91 @@ export async function createProduct(request, response) {
 }
 
 //get all products
-export async function getAllProducts(request, response) {
+// export async function getAllProducts(request, response) {
+//   try {
+//     // let { page, limit, search } = request.body;
+//     const page = parseInt(request.query.page) || 1;
+//     const perPage = parseInt(request.query.perPage) || 5;
+//     const totalPosts = await ProductModel.countDocuments();
+//     const totalPages = Math.ceil(totalPosts / perPage);
+
+//     if (page > totalPages) {
+//       return response.status(404).json({
+//         message: "Page not found",
+//         success: false,
+//         error: true,
+//       });
+//     }
+
+//     const products = await ProductModel.find()
+//       // .populate("category")
+//       .skip((page - 1) * perPage)
+//       .limit(perPage)
+//       .exec();
+
+//     if (!products) {
+//       response.status(500).json({
+//         error: true,
+//         success: false,
+//         message: "No Product Available",
+//       });
+//     }
+//     return response.status(200).json({
+//       error: false,
+//       success: true,
+//       products: products,
+//       totalPages: totalPages,
+//       page: page,
+//     });
+//   } catch (error) {
+//     return response.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       success: false,
+//     });
+//   }
+// }
+export async function getAllProducts(req, res) {
   try {
-    // let { page, limit, search } = request.body;
-    const page = parseInt(request.query.page) || 1;
-    const perPage = parseInt(request.query.perPage) || 5;
-    const totalPosts = await ProductModel.countDocuments();
+    const page = parseInt(req.query.page) || 1;
+    const perPage = parseInt(req.query.perPage) || 5;
+    const search = req.query.search || "";
+    const catId = req.query.catId;
+    const sortField = req.query.sortField || "createdAt";
+    const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+
+    const filter = {
+      ...(catId ? { catId } : {}),
+      ...(search ? { name: { $regex: search, $options: "i" } } : {}),
+    };
+
+    const totalPosts = await ProductModel.countDocuments(filter);
     const totalPages = Math.ceil(totalPosts / perPage);
 
-    if (page > totalPages) {
-      return response.status(404).json({
+    if (page > totalPages && totalPages !== 0) {
+      return res.status(404).json({
         message: "Page not found",
         success: false,
         error: true,
       });
     }
 
-    const products = await ProductModel.find()
-      // .populate("category")
+    const products = await ProductModel.find(filter)
+      .sort({ [sortField]: sortOrder })
       .skip((page - 1) * perPage)
       .limit(perPage)
+      .populate("category", "name")
       .exec();
 
-    if (!products) {
-      response.status(500).json({
-        error: true,
-        success: false,
-        message: "No Product Available",
-      });
-    }
-    return response.status(200).json({
+    return res.status(200).json({
       error: false,
       success: true,
-      products: products,
-      totalPages: totalPages,
-      page: page,
+      products,
+      totalPages,
+      page,
     });
   } catch (error) {
-    return response.status(500).json({
+    return res.status(500).json({
       message: error.message || error,
       error: true,
       success: false,
@@ -663,46 +710,97 @@ export async function getAllFeaturedProducts(request, response) {
 
 // delete product
 
+// export async function deleteProduct(request, response) {
+//   const product = await ProductModel.findById(request.params.id).populate(
+//     "category"
+//   );
+//   if (!product) {
+//     return response.status(404).json({
+//       message: "Product Not found",
+//       error: true,
+//       success: false,
+//     });
+//   }
+//   const images = product.images;
+//   for (let img of images) {
+//     const imgUrl = img;
+//     const urlArr = imgUrl.split("/");
+//     const image = urlArr[urlArr.length - 1];
+//     const imageName = image.split(".")[0];
+//     if (imageName) {
+//       cloudinary.uploader.destroy(imageName, (error, result) => {
+//         // cloudinary.uploader.destroy(imageName, (error, result));
+//       });
+//     }
+//     //console.log(imageName)
+//   }
+
+//   const deletedProduct = await ProductModel.findByIdAndDelete(
+//     request.params.id
+//   );
+//   if (!deletedProduct) {
+//     response.status(404).json({
+//       message: "Product not deleted !",
+//       success: false,
+//       error: true,
+//     });
+//   }
+//   return response.status(200).json({
+//     success: true,
+//     error: false,
+//     message: "Product Deleted!",
+//   });
+// }
 export async function deleteProduct(request, response) {
-  const product = await ProductModel.findById(request.params.id).populate(
-    "category"
-  );
-  if (!product) {
-    return response.status(404).json({
-      message: "Product Not found",
-      error: true,
-      success: false,
-    });
-  }
-  const images = product.images;
-  for (let img of images) {
-    const imgUrl = img;
-    const urlArr = imgUrl.split("/");
-    const image = urlArr[urlArr.length - 1];
-    const imageName = image.split(".")[0];
-    if (imageName) {
-      cloudinary.uploader.destroy(imageName, (error, result) => {
-        // cloudinary.uploader.destroy(imageName, (error, result));
+  try {
+    const product = await ProductModel.findById(request.params.id).populate(
+      "category"
+    );
+    if (!product) {
+      return response.status(404).json({
+        message: "Product not found",
+        error: true,
+        success: false,
       });
     }
-    //console.log(imageName)
-  }
 
-  const deletedProduct = await ProductModel.findByIdAndDelete(
-    request.params.id
-  );
-  if (!deletedProduct) {
-    response.status(404).json({
-      message: "Product not deleted !",
-      success: false,
+    // Loop through and delete each image from Cloudinary
+    for (let img of product.images) {
+      const imgUrl = img?.url; // ✅ Access the URL properly
+      if (typeof imgUrl === "string") {
+        const urlArr = imgUrl.split("/");
+        const image = urlArr[urlArr.length - 1];
+        const imageName = image.split(".")[0];
+        if (imageName) {
+          await cloudinary.uploader.destroy(imageName);
+        }
+      }
+    }
+
+    // Delete product from DB
+    const deletedProduct = await ProductModel.findByIdAndDelete(
+      request.params.id
+    );
+    if (!deletedProduct) {
+      return response.status(404).json({
+        message: "Product not deleted!",
+        success: false,
+        error: true,
+      });
+    }
+
+    return response.status(200).json({
+      success: true,
+      error: false,
+      message: "Product Deleted!",
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
       error: true,
+      success: false,
     });
   }
-  return response.status(200).json({
-    success: true,
-    error: false,
-    message: "Product Deleted!",
-  });
 }
 
 //delete all products
@@ -832,7 +930,7 @@ export async function updatedProduct(request, response) {
         countInStock: request.body.countInStock,
         category: request.body.category,
         rating: request.body.rating,
-         review: request.body.review,
+        review: request.body.review,
         isFeatured: request.body.isFeatured,
         discount: request.body.discount,
         productRam: request.body.productRam,

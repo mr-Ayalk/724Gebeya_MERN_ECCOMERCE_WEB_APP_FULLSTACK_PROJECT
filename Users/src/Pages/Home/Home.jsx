@@ -50,7 +50,7 @@ function Home() {
     });
     fetchDataFromApi(`/api/blog`).then((res) => {
       setBlogData(res?.blogs);
-      console.log("blog response",res?.blogs);
+      console.log("blog response", res?.blogs);
     });
   }, []);
 
@@ -97,8 +97,11 @@ function Home() {
       <section className="py-6">
         <div className="container flex items-center gap-5">
           <div className="part1 w-[70%]">
-            {Array.isArray(featuredProduct) && featuredProduct?.length > 0 && (
+            {/* {Array.isArray(featuredProduct) && featuredProduct?.length > 0 && (
               <HomeSliderV2 data={featuredProduct} />
+            )} */}
+            {Array.isArray(productData) && productData?.length > 0 && (
+              <HomeSliderV2 data={productData} />
             )}
             {/* {productData?.length !== 0 && <HomeSliderV2 data={productData} />} */}
           </div>
