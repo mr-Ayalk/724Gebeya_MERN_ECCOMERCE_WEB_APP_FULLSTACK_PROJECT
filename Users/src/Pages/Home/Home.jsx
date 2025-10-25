@@ -189,7 +189,7 @@ function Home() {
           <h2 className="text-[20px] font-[600]">Latest Products</h2>
           {productData.length === 0 && <ProductLoading />}
           {productData.length > 0 && (
-            <ProductsSlider items={6} data={productData} />
+            <ProductsSlider items={5} data={productData} />
           )}
           {bannerData?.length > 0 && (
             <AdsBannerSlider items={3} data={bannerData} />
