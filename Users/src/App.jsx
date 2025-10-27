@@ -236,7 +236,7 @@ function App() {
 
                   <div className="col2  py-8 px-8 pr-16 productContent">
                     <ProductDetailsComponent
-                      data={openProductDetailsModel?.item}
+                      item={openProductDetailsModel?.item}
                     />
                   </div>
                 </>
