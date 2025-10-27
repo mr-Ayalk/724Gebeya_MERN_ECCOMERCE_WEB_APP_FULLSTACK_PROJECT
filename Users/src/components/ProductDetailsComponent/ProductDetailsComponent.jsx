@@ -114,7 +114,7 @@ function ProductDetailsComponent({ item }) {
       {Array.isArray(item?.productRam) && item.productRam.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 mb-3">
           <span className="text-[16px] font-medium">RAM:</span>
-          {item.productRam.map((ram, index) => (
+          {/* {item.productRam.map((ram, index) => (
             <Button
               key={index}
               className={`!text-[14px] ${
@@ -126,6 +126,9 @@ function ProductDetailsComponent({ item }) {
             >
               {ram}
             </Button>
+          ))} */}
+          {item.productRam.map((ram, index) => (
+            <Button key={index}>{ram?.name || ram}</Button>
           ))}
         </div>
       )}
@@ -152,7 +155,7 @@ function ProductDetailsComponent({ item }) {
       {Array.isArray(item?.size) && item.size.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 mb-3">
           <span className="text-[16px] font-medium">Size:</span>
-          {item.size.map((s, index) => (
+          {/* {item.size.map((s, index) => (
             <Button
               key={index}
               className={`!text-[14px] ${
@@ -164,13 +167,17 @@ function ProductDetailsComponent({ item }) {
             >
               {s}
             </Button>
+          ))} */}
+          {item.size.map((s, index) => (
+            <Button key={index}>{s?.label || s?.size || s}</Button>
           ))}
         </div>
       )}
 
       {/* 🚚 Shipping Info */}
       <p className="text-[14px] mt-4 mb-2 text-gray-600">
-        Free Shipping (Estimated Delivery: {item?.createdAt.split("T")[0]} Days )
+        Free Shipping (Estimated Delivery: {item?.createdAt.split("T")[0]} Days
+        )
       </p>
 
       {/* 🛒 Quantity & Add to Cart */}

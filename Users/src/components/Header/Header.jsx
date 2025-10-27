@@ -253,7 +253,7 @@ function Header() {
                 </>
               )}
 
-              <li>
+              {/* <li>
                 <Tooltip title="Compare">
                   <IconButton aria-label="cart">
                     <StyledBadge
@@ -264,7 +264,7 @@ function Header() {
                     </StyledBadge>
                   </IconButton>
                 </Tooltip>
-              </li>
+              </li> */}
               <li>
                 <Tooltip title="Wishlist">
                   <IconButton aria-label="cart">

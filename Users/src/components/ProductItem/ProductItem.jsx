@@ -118,11 +118,11 @@ function ProductItem({ item }) {
             </Button>
           </Tooltip>
 
-          <Tooltip title="Compare" placement="left-start">
+          {/* <Tooltip title="Compare" placement="left-start">
             <Button className="!w-10 !h-10 bg-white shadow hover:!bg-primary hover:text-white transition-all !rounded-full">
               <IoGitCompareOutline size={18} />
             </Button>
-          </Tooltip>
+          </Tooltip> */}
 
           <Tooltip title="Wishlist" placement="left-start">
             <Button className="!w-10 !h-10 bg-white shadow hover:!bg-primary hover:text-white transition-all !rounded-full">
