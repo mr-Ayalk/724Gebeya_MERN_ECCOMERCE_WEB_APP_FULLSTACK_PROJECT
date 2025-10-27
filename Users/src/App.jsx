@@ -47,7 +47,7 @@ function App() {
       if (res?.error === false) {
         setCatData(res?.data);
       }
-      // console.log(res);
+      // console.log("Ashenafi");
     });
   }, []);
   const apiUrl = import.meta.env.VITE_API_URL;
