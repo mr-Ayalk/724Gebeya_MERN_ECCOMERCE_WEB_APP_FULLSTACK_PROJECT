@@ -1562,3 +1562,18 @@ export async function sortBy(request, response) {
     products: sortedItems,
   });
 }
+
+// Search products by name or description (Safe & Error-Resistant)
+export async function searchProducts(req, res) {
+  try {
+    const query = req.query.query || "";
+    const products = await ProductModel.find({
+      name: { $regex: query, $options: "i" },
+    }).populate("category");
+
+    return res.status(200).json({ success: true, products });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: true, message: err.message });
+  }
+}
+

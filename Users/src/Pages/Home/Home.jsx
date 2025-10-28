@@ -177,45 +177,73 @@ function Home() {
           )}
         </div>
       </section> */}
-      <section className="py-4 pt-2 bg-white">
-        <div className="container">
-          <div className="marquee-container border-2 border-[#ff5252] rounded-md py-4 mb-7">
-            <div className="marquee-track flex">
-              {/* Original */}
-              <div className="marquee-item flex items-center gap-12">
-                <LiaShippingFastSolid className="text-[50px]" />
-                <span className="text-[20px] font-[600]">FREE SHIPPING</span>
-                <p className="font-[500]">
-                  Free Delivery Now On Your First Order and Over $200
-                </p>
-                <p className="font-bold text-[25px]">-Only $200*</p>
-              </div>
+      <section className="py-6 bg-gradient-to-r from-red-100 via-red-50 to-white">
+        <div className="container mx-auto">
+          <div className="bg-white shadow-lg rounded-xl border border-red-300 p-6 flex flex-col md:flex-row items-center gap-6 hover:shadow-2xl transition-shadow duration-300">
+            {/* Icon */}
+            <div className="flex-shrink-0 bg-red-500 text-white p-4 rounded-full text-4xl flex items-center justify-center animate-bounce">
+              <LiaShippingFastSolid />
+            </div>
 
-              {/* Duplicate for infinite scroll */}
-              <div className="marquee-item flex items-center gap-12">
-                <LiaShippingFastSolid className="text-[50px]" />
-                <span className="text-[20px] font-[600]">FREE SHIPPING</span>
-                <p className="font-[500]">
-                  Free Delivery Now On Your First Order and Over $200
-                </p>
-                <p className="font-bold text-[25px]">-Only $200*</p>
-              </div>
-              {/* Duplicate for infinite scroll */}
-              <div className="marquee-item flex items-center gap-12">
-                <LiaShippingFastSolid className="text-[50px]" />
-                <span className="text-[20px] font-[600]">FREE SHIPPING</span>
-                <p className="font-[500]">
-                  Free Delivery Now On Your First Order and Over $200
-                </p>
-                <p className="font-bold text-[25px]">-Only $200*</p>
-              </div>
+            {/* Text */}
+            <div className="flex-1 text-center md:text-left">
+              <h3 className="text-2xl font-bold text-red-600 mb-2">
+                FREE SHIPPING
+              </h3>
+              <p className="text-gray-600 text-sm md:text-base">
+                Free delivery on your first order and on orders over $200
+              </p>
+            </div>
+
+            {/* Offer Tag */}
+            <div className="text-center md:text-right">
+              <span className="text-3xl font-extrabold text-red-500">
+                -Only $200*
+              </span>
             </div>
           </div>
 
-          {bannerData?.length > 0 && (
-            <AdsBannerSliderV2 items={4} data={bannerData} />
-          )}
+          {/* Optional: Marquee Effect for infinite scrolling */}
+          <div className="mt-6 overflow-hidden relative">
+            <div className="flex animate-marquee gap-12">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 bg-red-50 p-4 rounded-lg border border-red-200"
+                >
+                  <LiaShippingFastSolid className="text-3xl text-red-500" />
+                  <div>
+                    <h4 className="text-red-600 font-semibold">
+                      FREE SHIPPING
+                    </h4>
+                    <p className="text-gray-500 text-sm">
+                      Free delivery now on your first order & over $200
+                    </p>
+                  </div>
+                  <span className="font-bold text-red-500 text-xl">
+                    -Only $200*
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+
+        <style jsx>{`
+          @keyframes marquee {
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(-33.333%);
+            }
+          }
+          .animate-marquee {
+            display: flex;
+            gap: 2rem;
+            animation: marquee 15s linear infinite;
+          }
+        `}</style>
       </section>
 
       {/* 🆕 Latest Products */}
