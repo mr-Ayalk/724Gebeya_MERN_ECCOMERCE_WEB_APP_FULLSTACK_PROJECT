@@ -129,13 +129,13 @@ function MyAccount() {
           {/* Profile Section */}
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 transition-all duration-300 hover:shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-semibold text-gray-800 border-l-4 border-orange-500 pl-3">
+              <h2 className="text-2xl font-semibold text-gray-800 border-l-4 border-primary pl-3">
                 My Profile
               </h2>
               <Button
                 variant="outlined"
                 size="small"
-                className="!text-orange-600 !border-orange-400 hover:!bg-orange-50"
+                className="!text-primary !border-primary hover:!bg-orange-50"
                 onClick={() =>
                   setIsChangePasswordFormShow(!isChangePasswordFormShow)
                 }
@@ -184,7 +184,7 @@ function MyAccount() {
               <Button
                 type="submit"
                 disabled={!validateValue || isLoading}
-                className="!bg-gradient-to-r !from-orange-500 !to-orange-600 !text-white w-full py-2.5 rounded-md font-medium hover:!opacity-90 transition-all"
+                className="!bg-gradient-to-r !from-primary !to-orange-600 !text-white w-full py-2.5 rounded-md font-medium hover:!opacity-90 transition-all"
               >
                 {isLoading ? (
                   <CircularProgress color="inherit" size={24} />
@@ -198,7 +198,7 @@ function MyAccount() {
           {/* Password Section */}
           <Collapse isOpened={isChangePasswordFormShow}>
             <div className="bg-white rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl">
-              <h2 className="text-2xl font-semibold text-gray-800 border-l-4 border-orange-500 pl-3 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-800 border-l-4 border-primary pl-3 mb-4">
                 Change Password
               </h2>
               <hr className="mb-5" />
@@ -244,7 +244,7 @@ function MyAccount() {
                 <Button
                   type="submit"
                   disabled={!validateValuePassword || isLoadingPassword}
-                  className="!bg-gradient-to-r !from-orange-500 !to-orange-600 !text-white w-full py-2.5 rounded-md font-medium hover:!opacity-90 transition-all"
+                  className="!bg-gradient-to-r !from-primary !to-orange-600 !text-white w-full py-2.5 rounded-md font-medium hover:!opacity-90 transition-all"
                 >
                   {isLoadingPassword ? (
                     <CircularProgress color="inherit" size={24} />

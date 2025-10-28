@@ -127,7 +127,7 @@ const Address = () => {
               </h2>
               <Button
                 variant="contained"
-                className="!bg-gradient-to-r !from-orange-500 !to-orange-600 !text-white !capitalize"
+                className="!bg-gradient-to-r !from-primary !to-orange-600 !text-white !capitalize"
                 onClick={handleClickOpenAddressDialog}
               >
                 + Add Address
@@ -279,7 +279,7 @@ const Address = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="!bg-gradient-to-r !from-orange-500 !to-orange-600 !text-white !capitalize"
+                className="!bg-gradient-to-r !from-primary !to-orange-600 !text-white !capitalize"
               >
                 {isLoading ? (
                   <CircularProgress color="inherit" size={24} />

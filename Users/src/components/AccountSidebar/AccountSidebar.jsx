@@ -1,9 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import { NavLink } from "react-router";
-import { CircularProgress, Button } from "@mui/material";
+import { NavLink, useNavigate } from "react-router-dom"; // ✅ added useNavigate
+import { CircularProgress } from "@mui/material";
 import { MyContext } from "../../App";
-import { uploadImage } from "../../utils/api";
-
+import { uploadImage, fetchDataFromApi } from "../../utils/api"; // ✅ added fetchDataFromApi
 import { FaCloudUploadAlt, FaRegUser } from "react-icons/fa";
 import { IoBagCheckOutline } from "react-icons/io5";
 import { IoIosLogOut, IoMdHeartEmpty } from "react-icons/io";
@@ -13,6 +12,7 @@ function AccountSidebar() {
   const context = useContext(MyContext);
   const [uploading, setUploading] = useState(false);
   const [previews, setPreviews] = useState([]);
+  const navigate = useNavigate(); // ✅ added navigation hook
 
   useEffect(() => {
     if (context?.userData?.avatar) {
@@ -54,6 +54,23 @@ function AccountSidebar() {
       console.log(error);
       setUploading(false);
     }
+  };
+
+  // ✅ Added logout function (same as Header)
+  const logout = () => {
+    fetchDataFromApi(
+      `/api/user/logout?token=${localStorage.getItem("accesstoken")}`,
+      { withCredentials: true }
+    ).then((res) => {
+      if (res?.error === false) {
+        localStorage.removeItem("accesstoken");
+        localStorage.removeItem("refreshToken");
+        context.setIsLogin(false);
+        context.setCatData([]);
+        navigate("/");
+      }
+      console.log(res);
+    });
   };
 
   return (
@@ -111,7 +128,6 @@ function AccountSidebar() {
           },
           { to: "/my-list", icon: <IoMdHeartEmpty />, label: "My Wishlist" },
           { to: "/my-orders", icon: <IoBagCheckOutline />, label: "My Orders" },
-          { to: "/logout", icon: <IoIosLogOut />, label: "Logout" },
         ].map((item, index) => (
           <li key={index}>
             <NavLink
@@ -120,7 +136,7 @@ function AccountSidebar() {
                 `flex items-center gap-3 px-6 py-3 text-gray-700 font-medium transition-all 
                  ${
                    isActive
-                     ? "bg-orange-500 text-white shadow-inner"
+                     ? "bg-primary text-white shadow-inner"
                      : "hover:bg-blue-50"
                  }`
               }
@@ -130,6 +146,19 @@ function AccountSidebar() {
             </NavLink>
           </li>
         ))}
+
+        {/* ✅ Logout item (calls logout function) */}
+        <li>
+          <button
+            onClick={logout}
+            className="flex items-center gap-3 px-6 py-3 w-full text-left text-gray-700 font-medium transition-all hover:bg-red-50 hover:text-red-600"
+          >
+            <span className="text-lg">
+              <IoIosLogOut />
+            </span>
+            Logout
+          </button>
+        </li>
       </ul>
     </div>
   );
