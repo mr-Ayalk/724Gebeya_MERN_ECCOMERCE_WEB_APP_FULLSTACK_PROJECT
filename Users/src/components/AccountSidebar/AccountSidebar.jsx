@@ -120,7 +120,7 @@ function AccountSidebar() {
                 `flex items-center gap-3 px-6 py-3 text-gray-700 font-medium transition-all 
                  ${
                    isActive
-                     ? "bg-primary text-white shadow-inner"
+                     ? "bg-orange-500 text-white shadow-inner"
                      : "hover:bg-blue-50"
                  }`
               }
