@@ -188,12 +188,12 @@ function Home() {
                 FREE SHIPPING
               </h3>
               <p className="text-gray-600 text-sm md:text-base">
-                Free delivery on your first order and on orders over $200
+                Free delivery on your first order and on orders over $100
               </p>
             </div>
             <div className="text-center md:text-right">
               <span className="text-3xl font-extrabold text-red-500">
-                -Only $200*
+                Only $100+
               </span>
             </div>
           </div>
@@ -214,11 +214,11 @@ function Home() {
                           FREE SHIPPING
                         </h4>
                         <p className="text-gray-500 text-sm">
-                          Free delivery now on your first order & over $200
+                          Free delivery now on your first order & over $100
                         </p>
                       </div>
                       <span className="font-bold text-red-500 text-xl">
-                        -Only $200*
+                        Only $100+
                       </span>
                     </div>
                   ))}
