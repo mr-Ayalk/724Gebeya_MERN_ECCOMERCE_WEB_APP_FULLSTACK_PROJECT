@@ -17,6 +17,7 @@ import BannerBoxV2 from "../../components/BannerBoxV2/BannerBoxV2";
 import { fetchDataFromApi } from "../../utils/api";
 import { MyContext } from "../../App";
 import ProductLoading from "../../components/ProductLoading/ProductLoading";
+import ChatbotButton from "../../components/Chatbot/ChatbotButton";
 
 function Home() {
   const context = useContext(MyContext);
@@ -268,6 +269,7 @@ function Home() {
           </div>
         </section>
       )}
+      <ChatbotButton />
     </>
   );
 }
