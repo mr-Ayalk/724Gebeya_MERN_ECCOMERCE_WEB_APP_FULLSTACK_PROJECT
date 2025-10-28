@@ -130,7 +130,7 @@ export default function ChatWindow({ onClose }) {
   return (
     <div className="bg-white w-80 h-96 rounded-2xl shadow-2xl flex flex-col">
       {/* Header */}
-      <div className="bg-indigo-600 text-white p-3 rounded-t-2xl flex justify-between items-center">
+      <div className="bg-primary text-white p-3 rounded-t-2xl flex justify-between items-center">
         <span className="font-medium">Smart Assistant</span>
         <button onClick={onClose} className="hover:text-gray-200">
           <IoMdClose size={20} />
@@ -169,7 +169,7 @@ export default function ChatWindow({ onClose }) {
         />
         <button
           onClick={sendMessage}
-          className="bg-indigo-600 text-white px-3 rounded-lg text-sm hover:bg-indigo-700"
+          className="bg-primary text-white px-3 rounded-lg text-sm hover:bg-primary"
         >
           Send
         </button>
