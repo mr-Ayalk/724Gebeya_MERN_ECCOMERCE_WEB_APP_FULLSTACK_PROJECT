@@ -276,7 +276,7 @@ function Home() {
       {blogData?.length !== 0 && (
         <section className="py-5 pb-8 bg-white pt-0 blogSection">
           <div className="container">
-            <h2 className="text-[20px] mb-4 font-[600]">From Blogs</h2>
+            <h2 className="text-[20px] mb-4 font-[600]">From Business Blogs</h2>
 
             <Swiper
               navigation={true}

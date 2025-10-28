@@ -27,6 +27,7 @@
     "react-international-phone": "^4.6.0",
     "react-range-slider-input": "^3.2.1",
     "react-router-dom": "^7.6.3",
+    "react-type-animation": "^3.2.0",
     "styled-components": "^6.1.19",
     "swiper": "^11.2.10"
   },

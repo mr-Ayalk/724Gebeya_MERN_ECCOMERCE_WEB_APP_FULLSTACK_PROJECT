@@ -17,7 +17,7 @@ import { FaRegUser } from "react-icons/fa";
 
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-
+import { TypeAnimation } from "react-type-animation";
 import { IoIosLogOut, IoMdHeartEmpty } from "react-icons/io";
 import { fetchDataFromApi } from "../../utils/api";
 import Logo from "../Logo";
@@ -79,6 +79,8 @@ function Header() {
       setPreviews(userAvatar);
     }
   }, [context?.userData]);
+  // Typing effect state
+
   return (
     <header className="bg-white sticky top-0 z-50 shadow-sm">
       <div className="top-strip py-2 boarder-t-[1px] border-gray-250 border-b-[1px] ">
@@ -86,25 +88,35 @@ function Header() {
           <div className="flex items-center justify-between">
             <div className="col1 w-[50%]">
               <p className="text-[12px] font-[500]">
-          Enjoy up to 50% off on new season styles — for a limited time only!
+                <TypeAnimation
+                  sequence={[
+                    "Enjoy up to 50% off on new season styles — for a limited time only!", // text to type
+                    1000, // pause 2 seconds
+                    "", // delete text
+                    1000, // pause 1 second before typing again
+                  ]}
+                  wrapper="span"
+                  speed={40} // typing speed
+                  repeat={Infinity} // infinite loop
+                />
               </p>
             </div>
 
             <div className="flex items-center justify-end">
               <ul className="flex items-center gap-3">
-                <li className="list-none">
-                  <p className="text-[13px] font-[500] flex items-center gap-2 whitespace-nowrap">
-                    <GoRocket className="text-[18px]" />
-                    Free International Delivery
-                  </p>
-                </li>
-                <li className="list-none">
+                {/* <li className="list-none">
                   <Link
                     to="/order-tracking"
                     className="text-[13px] link font-[500] transition "
                   >
                     Order Tracking
                   </Link>
+                </li> */}
+                <li className="list-none">
+                  <p className="text-[13px] font-[500] flex items-center gap-2 whitespace-nowrap">
+                    <GoRocket className="text-[18px]" />
+                    Free International Delivery
+                  </p>
                 </li>
               </ul>
             </div>
