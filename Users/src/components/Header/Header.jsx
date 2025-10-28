@@ -21,6 +21,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { IoIosLogOut, IoMdHeartEmpty } from "react-icons/io";
 import { fetchDataFromApi } from "../../utils/api";
 import Logo from "../Logo";
+import { GoRocket } from "react-icons/go";
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
     right: -3,
@@ -92,12 +93,10 @@ function Header() {
             <div className="flex items-center justify-end">
               <ul className="flex items-center gap-3">
                 <li className="list-none">
-                  <Link
-                    to="help-center"
-                    className="text-[13px] link font-[500] transition "
-                  >
-                    Help Center{" "}
-                  </Link>
+                  <p className="text-[13px] font-[500] flex items-center gap-2 whitespace-nowrap">
+                    <GoRocket className="text-[18px]" />
+                    Free International Delivery
+                  </p>
                 </li>
                 <li className="list-none">
                   <Link

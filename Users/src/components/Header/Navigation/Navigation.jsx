@@ -109,11 +109,11 @@ function Navigation() {
           </div>
 
           {/* Right Section */}
-          <div className="hidden lg:flex lg:w-[20%] justify-end">
-            <p className="text-[13px] font-[500] flex items-center gap-2 whitespace-nowrap">
+          <div className="hidden lg:flex lg:w-[5%] justify-end">
+            {/* <p className="text-[13px] font-[500] flex items-center gap-2 whitespace-nowrap">
               <GoRocket className="text-[18px]" />
               Free Delivery
-            </p>
+            </p> */}
           </div>
         </div>
 
