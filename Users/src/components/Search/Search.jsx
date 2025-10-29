@@ -36,7 +36,7 @@ function Search() {
     setSearchQuery(e.target.value);
     const obj = {
       page: 1,
-      limit: 3,
+      limit: 30,
       query: e.target.value,
     };
     if (e.target.value !== "") {

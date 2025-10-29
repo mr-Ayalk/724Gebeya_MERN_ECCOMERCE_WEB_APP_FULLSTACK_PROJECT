@@ -71,7 +71,7 @@ function Sidebar(props) {
       catId: [],
       subCatId: [],
       thirdsubCatId: [],
-      rating: "",
+      rating: [],
       page: 1,
       limit: 25,
       minPrice: filters.minPrice,
@@ -89,39 +89,43 @@ function Sidebar(props) {
     }
 
     setFilters(newFilters);
+    context?.setSearchData([]);
   }, [location]);
 
   // ---------- FETCH FILTERED DATA ----------
-  const filtersData = async () => {
-    props.setIsLoading(true);
-    try {
-      const response = await postData(`/api/product/filter`, {
-        ...filters,
-        page: props.page,
-      });
-      props.setProducts(response);
-      props.setTotalPages(response?.totalPages || 1);
-      window.scrollTo(0, 0);
-    } catch (error) {
-      console.error("Error fetching filtered products:", error);
-    } finally {
-      props.setIsLoading(false);
-    }
-  };
-  // const filtersData = () => {
+  // const filtersData = async () => {
   //   props.setIsLoading(true);
-
-  //   if (context?.searchData?.length > 0) {
-  //     props.setProductsData(context?.searchData);
-  //   } else {
-  //     postData("/api/product/filters", filters).then((res) => {
-  //       props.setProductsData(res);
-  //       props.setIsLoading(false);
-  //       props.setTotalPages(res?.totalPages);
-  //       window.scrollTo(0, 0);
+  //   try {
+  //     const response = await postData(`/api/product/filter`, {
+  //       ...filters,
+  //       page: props.page,
   //     });
+  //     props.setProducts(response);
+  //     props.setTotalPages(response?.totalPages || 1);
+  //     window.scrollTo(0, 0);
+  //   } catch (error) {
+  //     console.error("Error fetching filtered products:", error);
+  //   } finally {
+  //     props.setIsLoading(false);
   //   }
   // };
+  const filtersData = () => {
+    props.setIsLoading(true);
+
+    if (context?.searchData?.products?.length > 0) {
+      props.setProductsData(context?.searchData);
+      props.setIsLoading(false);
+      props.setTotalPages(context?.searchData?.totalPages);
+      window.scrollTo(0, 0);
+    } else {
+      postData("/api/product/filter", filters).then((res) => {
+        props.setProducts(res);
+        props.setIsLoading(false);
+        props.setTotalPages(res?.totalPages || 1);
+        window.scrollTo(0, 0);
+      });
+    }
+  };
 
   // ---------- TRIGGER FILTER FETCH ----------
   useEffect(() => {
