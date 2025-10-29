@@ -113,5 +113,5 @@ productRoute.get(`/productSize/:id`, getProductSIZEById);
 productRoute.post("/filter", filters);
 productRoute.post("/sortBy", sortBy);
 
-productRoute.get("/search", searchProductController);
+productRoute.get("/search/get", searchProductController);
 export default productRoute;

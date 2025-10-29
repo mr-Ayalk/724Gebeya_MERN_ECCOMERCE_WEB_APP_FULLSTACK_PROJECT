@@ -2,40 +2,54 @@ import { FaSearch } from "react-icons/fa";
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { useContext } from "react";
+import { MyContext } from "../../App";
 import { fetchDataFromApi } from "../../utils/api";
 
 function Search() {
-  const [query, setQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState([]);
-  const navigate = useNavigate();
+  const context = useContext(MyContext);
+  // const navigate = useNavigate();
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    const trimmedQuery = query.trim();
-    if (!trimmedQuery) return;
+  // const handleSearch = async (e) => {
+  //   e.preventDefault();
+  //   const trimmedQuery = query.trim();
+  //   if (!trimmedQuery) return;
 
-    try {
-      const res = await fetchDataFromApi(
-        `/api/product/search?query=${trimmedQuery}`
+  //   try {
+  //     const res = await fetchDataFromApi(
+  //       `/api/product/search?query=${trimmedQuery}`
+  //     );
+  //     const products = res?.products || [];
+  //     navigate(`/search?query=${trimmedQuery}`, { state: { products } });
+  //   } catch (err) {
+  //     console.error(err);
+  //     navigate(`/search?query=${trimmedQuery}`, { state: { products: [] } });
+  //   }
+  // };
+
+  const onChangeInput = (e) => {
+    setSearchQuery(e.target.value);
+    if (e.target.value !== "") {
+      fetchDataFromApi(`/api/product/search/get?q=${e.target.value}`).then(
+        (res) => {
+          console.log(res);
+        }
       );
-      const products = res?.products || [];
-      navigate(`/search?query=${trimmedQuery}`, { state: { products } });
-    } catch (err) {
-      console.error(err);
-      navigate(`/search?query=${trimmedQuery}`, { state: { products: [] } });
     }
   };
-
   return (
     <form
-      onSubmit={handleSearch}
+      // onSubmit={handleSearch}
       className="relative flex items-center w-full bg-gray-100 rounded-lg px-3 py-2"
     >
       <input
         type="text"
         placeholder="Search products..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        value={searchQuery}
+        onChange={onChangeInput}
         className="w-full bg-transparent outline-none text-sm"
       />
       <button

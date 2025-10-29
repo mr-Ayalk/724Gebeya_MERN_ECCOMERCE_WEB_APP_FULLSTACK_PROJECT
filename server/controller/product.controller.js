@@ -1568,6 +1568,7 @@ export async function sortBy(request, response) {
 export async function searchProductController(req, res) {
   try {
     const query = req.query.q;
+    const { page, limit } = req.body;
     if (!query) {
       return response.status(400).json({
         error: true,
@@ -1575,7 +1576,7 @@ export async function searchProductController(req, res) {
         message: "Query is required",
       });
     }
-    const items = await ProductModel.find({
+    const products = await ProductModel.find({
       $or: [
         { name: { regex: query, $options: "i" } },
         { brand: { regex: query, $options: "i" } },
@@ -1583,12 +1584,19 @@ export async function searchProductController(req, res) {
         { subCat: { regex: query, $options: "i" } },
         { thirdsubCat: { regex: query, $options: "i" } },
       ],
-    }).populate("category");
+    })
+      .populate("category")
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+    const total = await ProductModel.countDocuments(products);
 
     return res.status(200).json({
       success: true,
       error: false,
-      product:items,
+      product: products,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / limit),
     });
   } catch (err) {
     return res.status(500).json({

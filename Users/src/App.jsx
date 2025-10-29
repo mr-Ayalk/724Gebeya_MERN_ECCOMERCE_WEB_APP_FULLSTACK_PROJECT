@@ -42,6 +42,7 @@ function App() {
   const [userData, setUserData] = useState(null);
   const [catData, setCatData] = useState([]);
   const [cartData, setCartData] = useState([]);
+  const [searchData, setSearchData] = useState([]);
   useEffect(() => {
     fetchDataFromApi("/api/category").then((res) => {
       if (res?.error === false) {
@@ -182,6 +183,8 @@ function App() {
     addToCart,
     setCatData,
     cartData,
+    searchData,
+    setSearchData,
   };
 
   return (
