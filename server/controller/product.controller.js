@@ -1567,8 +1567,8 @@ export async function sortBy(request, response) {
 // Search products by name or description (Safe & Error-Resistant)
 export async function searchProductController(req, res) {
   try {
-    const query = req.query.q;
-    const { page, limit } = req.body;
+    // const query = req.query.q;
+    const { query, page, limit } = req.body;
     if (!query) {
       return response.status(400).json({
         error: true,
@@ -1588,7 +1588,7 @@ export async function searchProductController(req, res) {
       .populate("category")
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
-    const total = await ProductModel.countDocuments(products);
+    const total = await products.length;
 
     return res.status(200).json({
       success: true,

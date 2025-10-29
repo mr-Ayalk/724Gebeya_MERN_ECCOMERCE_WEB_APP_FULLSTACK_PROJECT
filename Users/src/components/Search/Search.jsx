@@ -5,13 +5,15 @@ import { useNavigate } from "react-router-dom";
 
 import { useContext } from "react";
 import { MyContext } from "../../App";
-import { fetchDataFromApi } from "../../utils/api";
+import { fetchDataFromApi, postData } from "../../utils/api";
+import { Button } from "@mui/material";
+import { IoSearch } from "react-icons/io5";
 
 function Search() {
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState([]);
   const context = useContext(MyContext);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   // const handleSearch = async (e) => {
   //   e.preventDefault();
@@ -32,13 +34,20 @@ function Search() {
 
   const onChangeInput = (e) => {
     setSearchQuery(e.target.value);
+    const obj = {
+      page: 1,
+      limit: 3,
+      query: e.target.value,
+    };
     if (e.target.value !== "") {
-      fetchDataFromApi(`/api/product/search/get?q=${e.target.value}`).then(
-        (res) => {
-          console.log(res);
-        }
-      );
+      postData(`/api/product/search/get`, obj).then((res) => {
+        // console.log(res);
+        context.setSearchData(res);
+      });
     }
+  };
+  const search = () => {
+    navigate("/search");
   };
   return (
     <form
@@ -52,12 +61,13 @@ function Search() {
         onChange={onChangeInput}
         className="w-full bg-transparent outline-none text-sm"
       />
-      <button
+      <Button
         type="submit"
         className="absolute right-2 text-gray-500 hover:text-black"
+        onClick={search}
       >
-        <FaSearch className="text-[#2a2a2ad2] text-[22px] font-thin" />
-      </button>
+        <IoSearch className="text-[#2a2a2ad2] text-[22px] font-thin" />
+      </Button>
     </form>
   );
 }

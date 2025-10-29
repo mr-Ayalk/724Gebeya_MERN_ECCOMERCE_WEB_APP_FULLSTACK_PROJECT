@@ -28,6 +28,7 @@ import MyList from "./Pages/MyList/MyList";
 import Orders from "./Pages/Orders/Orders";
 import { fetchDataFromApi, postData } from "./utils/api";
 import Address from "./Pages/MyAccount/address";
+import SearchPage from "./Pages/Search";
 
 const MyContext = createContext();
 function App() {
@@ -206,7 +207,9 @@ function App() {
             <Route path={"/my-list"} element={<MyList />} />
             <Route path={"/my-orders"} element={<Orders />} />
             <Route path={"/my-address"} element={<Address />} />
+            <Route path={"/search"} element={<SearchPage />} />
           </Routes>
+
           <Footer />
         </MyContext.Provider>
       </BrowserRouter>
