@@ -274,9 +274,11 @@ function Home() {
 
       {/* 📰 Blog Section */}
       {blogData?.length !== 0 && (
-        <section className="py-5 pb-8 bg-white pt-0 blogSection">
+        <section className="py-10 bg-white">
           <div className="container">
-            <h2 className="text-[20px] mb-4 font-[600]">From Business Blogs</h2>
+            <h2 className="text-[22px] font-[700] mb-6 text-gray-900">
+              📰 Latest From Our Blogs
+            </h2>
 
             <Swiper
               navigation={true}
