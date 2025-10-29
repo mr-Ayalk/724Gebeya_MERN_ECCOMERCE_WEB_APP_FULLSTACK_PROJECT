@@ -4,6 +4,7 @@ import fs from "fs";
 import ProductRAMSModel from "../models/productRAMS.js";
 import ProductWEIGHTModel from "../models/productWEIGHT.js";
 import ProductSIZEModel from "../models/productSIZE.js";
+import { error } from "console";
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_Config_Cloud_Name,
@@ -1564,16 +1565,36 @@ export async function sortBy(request, response) {
 }
 
 // Search products by name or description (Safe & Error-Resistant)
-export async function searchProducts(req, res) {
+export async function searchProductController(req, res) {
   try {
-    const query = req.query.query || "";
-    const products = await ProductModel.find({
-      name: { $regex: query, $options: "i" },
+    const query = req.query.q;
+    if (!query) {
+      return response.status(400).json({
+        error: true,
+        success: false,
+        message: "Query is required",
+      });
+    }
+    const items = await ProductModel.find({
+      $or: [
+        { name: { regex: query, $options: "i" } },
+        { brand: { regex: query, $options: "i" } },
+        { catName: { regex: query, $options: "i" } },
+        { subCat: { regex: query, $options: "i" } },
+        { thirdsubCat: { regex: query, $options: "i" } },
+      ],
     }).populate("category");
 
-    return res.status(200).json({ success: true, products });
+    return res.status(200).json({
+      success: true,
+      error: false,
+      product:items,
+    });
   } catch (err) {
-    return res.status(500).json({ success: false, error: true, message: err.message });
+    return res.status(500).json({
+      success: false,
+      error: true,
+      message: err.message || error,
+    });
   }
 }
-
