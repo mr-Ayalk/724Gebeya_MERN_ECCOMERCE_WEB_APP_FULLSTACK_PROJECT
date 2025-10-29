@@ -149,7 +149,7 @@ function Home() {
           {popularProduct.length === 0 && <ProductLoading />}
 
           {Array.isArray(popularProduct) && popularProduct.length > 0 && (
-            <ProductsSlider items={5} data={popularProduct} />
+            <ProductsSlider items={6} data={popularProduct} />
           )}
         </div>
       </section>
@@ -251,7 +251,7 @@ function Home() {
           <h2 className="text-[20px] font-[600]">Latest Products</h2>
           {productData.length === 0 && <ProductLoading />}
           {productData.length > 0 && (
-            <ProductsSlider items={5} data={productData} />
+            <ProductsSlider items={6} data={productData} />
           )}
           {bannerData?.length > 0 && (
             <AdsBannerSlider items={3} data={bannerData} />
